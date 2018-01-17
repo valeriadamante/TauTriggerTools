@@ -2,13 +2,15 @@ from ROOT import *
 import numpy as n
 
 # the hadd of all the output ntuples
-fname = "/data_CMS/cms/strebler/TauHLT/TagAndProbeTrees/TagAndProbe_VBF/NTuple_MC_VBF_BadPixGT_TandP.root"
+path = "/afs/cern.ch/user/h/hsert/TriggerStudies/ForkedRepo/Samples/2018_01_14/"
+fname =  path +"NTuple_Data2017F_17Nov2017-v1_14_01_2018.root"
+
 #pt = [20, 26, 30, 34]
 pt = [20, 26, 30, 32, 34]
-numberOfHLTTriggers = 19
+numberOfHLTTriggers = 23
 
-saveOnlyOS = True # False; save only OS, True: save both and store weight for bkg sub
-
+saveOnlyOS = False # True; save only OS, False; save both and store weight for bkg sub
+disabledPScolumns = False  # True; to remove the disabled columns, False; to consider all columns
 #######################################################
 fIn = TFile.Open(fname)
 tIn = fIn.Get('Ntuplizer/TagAndProbe')
@@ -21,6 +23,7 @@ tOutNames = tTriggerNames.CloneTree(-1) # copy all
 briso   = [n.zeros(1, dtype=int) for x in range (0, len(pt))]
 brnoiso = [n.zeros(1, dtype=int) for x in range (0, len(pt))]
 bkgSubW = n.zeros(1, dtype=float)
+bkgSubANDpuW = n.zeros(1, dtype=float)
 
 hltPathTriggered_OS   = [n.zeros(1, dtype=int) for x in range (0, numberOfHLTTriggers+1)]
 
@@ -38,6 +41,7 @@ for i in range (0, numberOfHLTTriggers):
 #tOut.Branch("isoHLT", hltPathTriggered_OS[6], name+"/I")
 
 tOut.Branch("bkgSubW", bkgSubW, "bkgSubW/D")
+tOut.Branch("bkgSubANDpuW", bkgSubANDpuW, "bkgSubANDpuW/D")
 
 nentries = tIn.GetEntries()
 for ev in range (0, nentries):
@@ -72,20 +76,31 @@ for ev in range (0, nentries):
     HLTpt = tIn.hltPt
     for bitIndex in range(0, numberOfHLTTriggers):
         if bitIndex in range(6, 12):            
-            if ((triggerBits >> bitIndex) & 1) == 1 and (L1pt>=32) and (L1iso):
+            if ((triggerBits >> bitIndex) & 1) == 1: #and (L1pt>=32) and (L1iso):
                 hltPathTriggered_OS[bitIndex][0] = 1
         else:
             if ((triggerBits >> bitIndex) & 1) == 1:
                 hltPathTriggered_OS[bitIndex][0] = 1
 
     bkgSubW[0] = 1. if tIn.isOS else -1.
-
     #if (L1pt > 26) and (L1iso) and (HLTpt > 32) and (((triggerBits >> 2) & 1) == 1):
     #    hltPathTriggered_OS[6][0] = 1
     #else:
     #    hltPathTriggered_OS[6][0] = 0
 
-    tOut.Fill()
+    if not "Data" in fname:
+        puweight = tIn.puweight
+    else:
+        puweight = 1
+
+    bkgSubANDpuW[0] = bkgSubW[0]*puweight
+
+    # for removing the disabled PS columns:
+    if(disabledPScolumns):
+	if((RunNumber<305177 and PS_column>=2) or (RunNumber>=305178 and RunNumber<=305387 and PS_column>=2 and PS_column!=10) or (RunNumber>=305388 and PS_column>=3 and PS_column!=11 and PS_column!=12)):
+            tOut.Fill()
+    else:
+	tOut.Fill()
 
 tOutNames.Write()
 tOut.Write()
