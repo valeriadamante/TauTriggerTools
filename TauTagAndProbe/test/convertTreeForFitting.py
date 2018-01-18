@@ -95,12 +95,14 @@ for ev in range (0, nentries):
 
     bkgSubANDpuW[0] = bkgSubW[0]*puweight
 
-    # for removing the disabled PS columns:
-    if(disabledPScolumns):
-	if((RunNumber<305177 and PS_column>=2) or (RunNumber>=305178 and RunNumber<=305387 and PS_column>=2 and PS_column!=10) or (RunNumber>=305388 and PS_column>=3 and PS_column!=11 and PS_column!=12)):
+    #Mass cuts, mt and mvis
+    if(tIn.mT < 30 and tIn.mVis >40 and tIn.mVis < 80):
+        # for removing the disabled PS columns:
+        if(disabledPScolumns):
+            if((RunNumber<305177 and PS_column>=2) or (RunNumber>=305178 and RunNumber<=305387 and PS_column>=2 and PS_column!=10) or (RunNumber>=305388 and PS_column>=3 and PS_column!=11 and PS_column!=12)):
+                tOut.Fill()
+        else:
             tOut.Fill()
-    else:
-	tOut.Fill()
 
 tOutNames.Write()
 tOut.Write()

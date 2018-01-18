@@ -80,7 +80,7 @@ class TurnOnPlot:
         # lumi_num = float(cfg.readOption ("general::lumi"))
         # lumi_num = lumi_num/1000. # from pb-1 to fb-1
         # lumi = "%.1f fb^{-1} (13 TeV)" % lumi_num
-        lumi = "5.8 fb^{-1} (13 TeV, 2017)"
+        lumi = "42.0 fb^{-1} (13 TeV, 2017)" # RunB - RunF
         lumibox = ROOT.TLatex  (0.953, 0.95, lumi)
         lumibox.SetNDC()
         lumibox.SetTextAlign(31)
@@ -91,7 +91,10 @@ class TurnOnPlot:
         legend = ROOT.TLegend(self.legendPosition[0],self.legendPosition[1],self.legendPosition[2],self.legendPosition[3])
         legend.SetTextFont(42)
         legend.SetFillColor(0)
-	legend.SetTextSize(0.75*extraTextSize)
+        legend.SetTextSize(0.75*extraTextSize)
+        legend.SetBorderSize(0)
+        legend.SetFillColor(0)
+        legend.SetFillStyle(0)
         '''legend1 = ROOT.TLegend(0.14, 0.80, 0.80, 1.02)
         legend1.SetBorderSize(0)
         legend1.SetTextFont(62)
@@ -116,7 +119,7 @@ class TurnOnPlot:
             histo.Draw("p same")
             fit.Draw("l same")
             # legends
-            legend.AddEntry(histo, turnon.legend, "pe")
+            legend.AddEntry(histo, turnon.legend, "pel")
             legend.Draw()
             #if self.name=="turnon_Stage1_Stage2_EB":
         #triggerNameBox.Draw()
