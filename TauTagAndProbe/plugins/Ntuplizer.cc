@@ -169,7 +169,7 @@ class Ntuplizer : public edm::EDAnalyzer {
         float _muonPhi;
         float _MET;
         int _Nvtx;
-		int _nTruePU;
+        float _nTruePU;
 		
         edm::EDGetTokenT<GenEventInfoProduct> _genTag;
         edm::EDGetTokenT<edm::View<pat::GenericParticle> > _genPartTag;
@@ -522,7 +522,7 @@ void Ntuplizer::beginJob()
     _tree -> Branch("isOS", &_isOS, "isOS/O");
     _tree -> Branch("foundJet", &_foundJet, "foundJet/I");
     _tree -> Branch("Nvtx", &_Nvtx, "Nvtx/I");
-    _tree -> Branch("nTruePU", &_nTruePU, "nTruePU/I");
+    _tree -> Branch("nTruePU", &_nTruePU, "nTruePU/F");
 
     return;
 }
@@ -605,7 +605,6 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
       obj.unpackPathNames(names);
       const edm::TriggerNames::Strings& triggerNames = names.triggerNames();
 
-      const std::vector<std::string>& eventLabels = obj.filterLabels();
       if(obj.hasTriggerObjectType(trigger::TriggerMuon)){
 
         const float dR = deltaR (*muon, obj);
@@ -810,14 +809,22 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
 
     _Nvtx = vertexes->size();
     
-    if(vertexes->size()>0){
-    	_nTruePU = -99;
-    	if (puInfo.isValid()) {
-      		if (puInfo->size() > 0) {
-				_nTruePU = puInfo->at(1).getTrueNumInteractions();
-    		}
-   		}
-  	}
+    _nTruePU = -99;
+    	
+    if (_isMC) {
+
+      std::vector<PileupSummaryInfo>::const_iterator PVI;
+      for(PVI = puInfo->begin(); PVI != puInfo->end(); ++PVI) {
+	if(PVI->getBunchCrossing() == 0) { 
+	  float nTrueInt = PVI->getTrueNumInteractions();
+	  cout<<"nTrueInt="<<PVI->getTrueNumInteractions()<<endl;
+	  _nTruePU = nTrueInt;  
+	  //break;
+	}
+      }
+
+    }
+
   	
     _tauTriggerBits = _tauTriggerBitSet.to_ulong();
 
