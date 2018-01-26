@@ -115,7 +115,7 @@ for ev in range (0, nentries):
             else:
                 hltPathTriggered_OS[numberOfHLTTriggers+1][0] = 0       		
 
-    if ((((triggerBits >> 11) & 1) == 1) or (((triggerBits >> 20) & 1) == 1) or (((triggerBits >> 21) & 1) == 1)  and L1pt>=32):
+    if (((((triggerBits >> 11) & 1) == 1) or (((triggerBits >> 20) & 1) == 1) or (((triggerBits >> 21) & 1) == 1))  and L1pt>=32):
         hltPathTriggered_OS[numberOfHLTTriggers+2][0] = 1
     else:
         hltPathTriggered_OS[numberOfHLTTriggers+2][0] = 0
