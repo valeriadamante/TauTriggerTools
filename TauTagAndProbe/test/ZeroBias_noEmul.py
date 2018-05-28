@@ -89,8 +89,8 @@ process.ZeroBias.L1Tau = cms.InputTag("hltGtStage2Digis", "Tau", "MYHLT")
 process.ZeroBias.l1tJetCollection = cms.InputTag("hltGtStage2Digis", "Jet", "MYHLT")
 process.ZeroBias.triggerSet = cms.InputTag("selectedPatTriggerCustom","","MYHLT")
 process.ZeroBias.triggerResultsLabel = cms.InputTag("TriggerResults", "", "MYHLT")
-process.ZeroBias.L2CaloJet_ForIsoPix_Collection = cms.InputTag("hltL2TausForPixelIsolation", "", "MYHLT")
-process.ZeroBias.L2CaloJet_ForIsoPix_IsoCollection = cms.InputTag("hltL2TauPixelIsoTagProducer", "", "MYHLT")
+process.ZeroBias.L2CaloJet_ForIsoPix_Collection = cms.InputTag("hltL2TausForPixelIsolationL1TauSeeded", "", "MYHLT")
+process.ZeroBias.L2CaloJet_ForIsoPix_IsoCollection = cms.InputTag("hltL2TauPixelIsoTagProducerL1TauSeeded", "", "MYHLT")
 #process.ZeroBias.triggerSet = cms.InputTag("patTriggerUnpacker")
 
 process.p = cms.Path ( 

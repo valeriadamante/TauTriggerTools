@@ -40,6 +40,7 @@ class TauTagAndProbeFilter : public edm::EDFilter {
         bool _useMassCuts;
         EDGetTokenT<edm::View<reco::GsfElectron> >  _electronsTag;
         edm::EDGetTokenT<edm::ValueMap<bool> > _eleLooseIdMapTag;
+        bool _electronVeto;
         EDGetTokenT<pat::JetRefVector>  _bjetsTag;
 };
 
@@ -54,6 +55,7 @@ _bjetsTag  (consumes<pat::JetRefVector>  (iConfig.getParameter<InputTag>("bjets"
     produces <pat::TauRefVector>  (); // probe
     produces <pat::MuonRefVector> (); // tag
     _useMassCuts = iConfig.getParameter<bool>("useMassCuts");
+    _electronVeto = iConfig.getParameter<bool>("eleVeto");   
 }
 
 TauTagAndProbeFilter::~TauTagAndProbeFilter()
@@ -66,18 +68,21 @@ bool TauTagAndProbeFilter::filter(edm::Event & iEvent, edm::EventSetup const& iS
     std::unique_ptr<pat::TauRefVector>  resultTau  ( new pat::TauRefVector  );  
 
     // Veto events with loose electrons
-    Handle<edm::View<reco::GsfElectron> > electrons;
-    iEvent.getByToken(_electronsTag, electrons);
-    Handle<edm::ValueMap<bool> > loose_id_decisions;
-    iEvent.getByToken(_eleLooseIdMapTag, loose_id_decisions);
-
-    for(unsigned int i = 0; i< electrons->size(); ++i){
-     
-      const auto ele = electrons->ptrAt(i);
-      int isLooseID = (*loose_id_decisions)[ele];
-      if(isLooseID && ele->p4().Pt()>10 && fabs(ele->p4().Eta())<2.5)
-	return false;
-
+    if(_electronVeto){
+      Handle<edm::View<reco::GsfElectron> > electrons;
+      iEvent.getByToken(_electronsTag, electrons);
+      Handle<edm::ValueMap<bool> > loose_id_decisions;
+      iEvent.getByToken(_eleLooseIdMapTag, loose_id_decisions);
+      
+      for(unsigned int i = 0; i< electrons->size(); ++i){
+	
+	const auto ele = electrons->ptrAt(i);
+	int isLooseID = (*loose_id_decisions)[ele];
+	if(isLooseID && ele->p4().Pt()>10 && fabs(ele->p4().Eta())<2.5)
+	  return false;
+	
+      }
+      
     }
 
     // ---------------------   search for the tag in the event --------------------

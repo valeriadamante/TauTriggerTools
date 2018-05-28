@@ -3,43 +3,30 @@ Set of tools to evaluate tau trigger performance on T&amp;P
 
 ### Install instructions
 ```
-cmsrel CMSSW_9_2_5_patch2
-cd CMSSW_9_2_5_patch2/src
+cmsrel CMSSW_10_1_2_patch2
+cd CMSSW_10_1_2_patch2/src
 cmsenv
-git clone https://github.com/davignon/TauTagAndProbe
+git clone https://github.com/tstreble/TauTagAndProbe
+cd TauTagAndProbe
+git checkout master_HLT
+cd -
 scram b -j4
 ```
 
-Run test.py to produce ntuples including offline taus + various online quantities
 
-### Running on Monte Carlo for HLT
-Simply switch the flag isMC accordingly in test.py
-It is important to use T&P mu-tau selections as the efficiency is computed using the tau leg of the mu+tau paths.
+### Producing TagAndProbe ntuples
 
-### Running on Monte Carlo for L1
-For Monte Carlo (MC), we implemented a truth matching rather than a Tag & Probe technique which would dramatically and artificially decrease the available statistics.
-The MC-specific producers are in two parts:
+Set flag isMC and isMINIAOD according to sample in test/test.py
 
-1. To get the unpacked L1 quantities and the reco information, use:
-```
-cmsRun test_noTagAndProbe_multipleTaus.py
-```
-This runs on MiniAOD and will write ntuples that are referred as "offline".
-A wrapper for this is: ```submitOnTier3_multipleTaus.py```, where you can specify the name of the dataset to run on, the global tag, etc.
+HLT path used specified in python/MCAnalysis_cff.py (MC) or python/tagAndProbe_cff.py (data)
 
-2. To re-emulate the L1 objects with a specific config, you have to run on RAW, and use:
-```
-cmsRun reEmulL1_MC_L1Only.py
-```
-The correspond wrapper is: ```submitOnTier3_reEmulL1_MC.py```, where you can specify the name of the dataset to run on, the global tag, etc. Also be mindful that you can specify the emulator version to be run in reEmulL1_MC_L1Only.py by specifying the correct:
-```
-process.load("L1Trigger.L1TCalorimeter.caloStage2Params_2017_vX_X_XXX_cfi")
-```
+Launch test_2018.py
+
+To apply standard Z->mu+tauh TagAndProbe selections, mass cuts can be applied at production level by setting useMassCuts = cms.bool(True) in the TauTagAndProbeFilter module or reproducing those selections in the ntuple with mT<30 && 40<mVis && mVis<80 && isOS (the latter is recommended).
+
 
 ### Ntuples content
 The Ntuple produced that way contain basic tau offline quantities (kinematics, DM, various discriminators) + bits corresponding to various HLT triggers (tauTriggerBits variable) + L1-HLT specific variables (for expert user).
-
-The events stored pass basic mu+tauh T&P selections (OS requirement not applied for filter! isOS variable stored in Ntuple).
 
 The tree triggerNames has the name of all the HLT paths included in the tauTriggerBits variable.
 
@@ -79,7 +66,5 @@ To be launched with
 ```
 The "Michelangelo" turn-on plot can then be produced adapting the script test/fitter/results/plot_turnOn_Data_vs_MC.py
 
-### Resolutions:
-UNDER DEVELOPMENT
 
 

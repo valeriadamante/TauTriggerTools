@@ -962,7 +962,7 @@ void ZeroBias::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
 	    x++;
 	  }
 	
-	const std::vector<std::string>& L2CaloJetIsoPix_filters = {"hltL2TauIsoFilter"};
+	const std::vector<std::string>& L2CaloJetIsoPix_filters = {"hltL2TauIsoFilterL1TauSeeded"};
 	if (this -> hasFilters(obj, L2CaloJetIsoPix_filters)){
 	  this -> _hltL2CaloJetIsoPix_N++;	  
 	  this -> _hltL2CaloJetIsoPix_Pt.push_back(obj.pt());
@@ -1190,8 +1190,6 @@ Long64_t ZeroBias::FindTriggerBit(const vector<string> foundPaths, const vector<
       
       string toCheckTrigger  = _triggerlist.at(it) ;
       string elemAllTriggers = foundPaths.at(j) ;
-      //if(triggerResults->accept(indexOfPaths[j]))
-      //cout<<"Path "<<elemAllTriggers<<endl;
 
       if (elemAllTriggers.find(toCheckTrigger) != std::string::npos) // equivalent to wildcard at the end or beginning of triggername 
       {
