@@ -45,6 +45,7 @@ class TurnOnPlot:
         hDummy = ROOT.TH1F("hDummy_"+self.name, self.name, 1, self.xRange[0], self.xRange[1])
         hDummy.SetAxisRange(0, 1.05, "Y")
         hDummy.SetXTitle(self.xTitle)
+        hDummy.GetXaxis().SetMoreLogLabels()
         #hDummy.SetYTitle("Test")
         hDummy.SetYTitle("Efficiency")
         hDummy.Draw()
@@ -80,7 +81,7 @@ class TurnOnPlot:
         # lumi_num = float(cfg.readOption ("general::lumi"))
         # lumi_num = lumi_num/1000. # from pb-1 to fb-1
         # lumi = "%.1f fb^{-1} (13 TeV)" % lumi_num
-        lumi = "42.0 fb^{-1} (13 TeV, 2017)" # RunB - RunF
+        lumi = "41.5 fb^{-1} (13 TeV, 2017)" # RunB - RunF
         lumibox = ROOT.TLatex  (0.953, 0.95, lumi)
         lumibox.SetNDC()
         lumibox.SetTextAlign(31)
@@ -91,7 +92,7 @@ class TurnOnPlot:
         legend = ROOT.TLegend(self.legendPosition[0],self.legendPosition[1],self.legendPosition[2],self.legendPosition[3])
         legend.SetTextFont(42)
         legend.SetFillColor(0)
-        legend.SetTextSize(0.75*extraTextSize)
+        legend.SetTextSize(1*extraTextSize)
         legend.SetBorderSize(0)
         legend.SetFillColor(0)
         legend.SetFillStyle(0)
@@ -112,6 +113,8 @@ class TurnOnPlot:
             histo.SetMarkerStyle(turnon.markerStyle)
             histo.SetMarkerColor(turnon.markerColor)
             histo.SetLineColor(turnon.markerColor)
+            histo.SetMarkerSize(1)
+            histo.SetLineWidth(2)
             fit = turnon.fit
             fit.SetLineStyle(turnon.lineStyle)
             fit.SetLineColor(turnon.lineColor)

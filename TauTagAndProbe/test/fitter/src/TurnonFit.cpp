@@ -241,6 +241,7 @@ void TurnonFit::save(TFile* outputFile)
     dummy->GetXaxis()->SetTitleOffset(1.3);
     dummy->GetYaxis()->SetTitle("L1 Efficiency");
     dummy->GetYaxis()->SetTitleOffset(1.3);
+    dummy->GetXaxis()->SetMoreLogLabels();
     dummy->SetTitle("");
     dummy->SetStats(0);
     dummy->Draw();
