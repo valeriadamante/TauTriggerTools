@@ -4,7 +4,7 @@ import numpy as n
 # the hadd of all the output ntuples
 path = "/afs/cern.ch/user/h/hsert/TriggerStudies/ForkedRepo/Samples/2018_01_14/"
 fname =  path + "NTuple_Data2017BCDEF_17Nov2017-v1_14_01_2018.root"
-#fname =  path +"NTuple_DYJets_RunIIFall17MiniAOD-RECOSIMstep_94X_mc2017_realistic_v10-v1_14_01_2018_PU.root"
+#fname =  path +"NTuple_DYJets_RunIIFall17MiniAOD-RECOSIMstep_94X_mc2017_realistic_nomPlusExt_14_01_2018_PU.root"
 
 #pt = [20, 26, 30, 34]
 pt = [20, 26, 30, 32, 34]
@@ -105,7 +105,7 @@ for ev in range (0, nentries):
                 hltPathTriggered_OS[bitIndex][0] = 0
                         
         if(bitIndex==13):	
-            if (((triggerBits >> bitIndex) & 1) == 1 and L1pt>=26 and HLTpt>30):
+            if (((triggerBits >> bitIndex) & 1) == 1 and L1pt>=26 and L1iso>0 and HLTpt>30):
                 hltPathTriggered_OS[numberOfHLTTriggers][0] = 1	
             else:
                 hltPathTriggered_OS[numberOfHLTTriggers][0] = 0
@@ -138,14 +138,15 @@ for ev in range (0, nentries):
 
     bkgSubANDpuW[0] = bkgSubW[0]*puweight
 
-    #Mass cuts, mt and mvis
-    if(tIn.mT < 30 and tIn.mVis >40 and tIn.mVis < 80): # and tau_genindex == 5): for tau gen matching
-        # for removing the disabled PS columns:
-        if(disabledPScolumns):
-            if((RunNumber<305177 and PS_column>=2) or (RunNumber>=305178 and RunNumber<=305387 and PS_column>=2 and PS_column!=10) or (RunNumber>=305388 and PS_column>=3 and PS_column!=11 and PS_column!=12)):
+    if(tIn.byMediumIsolationMVArun2v1DBoldDMwLT> 0.5):
+        #Mass cuts, mt and mvis
+	if(tIn.mT < 30 and tIn.mVis >40 and tIn.mVis < 80):# and tIn.tau_genindex > 0): #for tau gen matching
+       # for removing the disabled PS columns:
+	    if(disabledPScolumns):
+                if((RunNumber<305177 and PS_column>=2) or (RunNumber>=305178 and RunNumber<=305387 and PS_column>=2 and PS_column!=10) or (RunNumber>=305388 and PS_column>=3 and PS_column!=11 and PS_column!=12)):
+                    tOut.Fill()
+	    else:
                 tOut.Fill()
-        else:
-            tOut.Fill()
 
 tOutNames.Write()
 tOut.Write()
