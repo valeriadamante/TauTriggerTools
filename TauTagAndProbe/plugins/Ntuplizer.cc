@@ -113,17 +113,7 @@ class Ntuplizer : public edm::EDAnalyzer {
         bool _byMediumIsolationMVArun2v1DBdR03oldDMwLT;
         bool _byTightIsolationMVArun2v1DBdR03oldDMwLT;
         bool _byVTightIsolationMVArun2v1DBdR03oldDMwLT;
-          /*
-        // 2017v1 training for Fall 17
-        bool _byIsolationMVArun2017v1DBoldDMwLTraw2017;
-		bool _byVVLooseIsolationMVArun2017v1DBoldDMwLT2017;
-		bool _byVLooseIsolationMVArun2017v1DBoldDMwLT2017;
-		bool _byLooseIsolationMVArun2017v1DBoldDMwLT2017;
-		bool _byMediumIsolationMVArun2017v1DBoldDMwLT2017;
-		bool _byTightIsolationMVArun2017v1DBoldDMwLT2017;
-		bool _byVTightIsolationMVArun2017v1DBoldDMwLT2017;
-		bool _byVVTightIsolationMVArun2017v1DBoldDMwLT2017;
-		*/
+          
         bool _againstMuonLoose3;
         bool _againstMuonTight3;
         bool _againstElectronVLooseMVA6;
@@ -379,17 +369,7 @@ void Ntuplizer::Initialize() {
     _byMediumIsolationMVArun2v1DBdR03oldDMwLT = 0;
     _byTightIsolationMVArun2v1DBdR03oldDMwLT = 0;
     _byVTightIsolationMVArun2v1DBdR03oldDMwLT = 0;
-    /*
-     // 2017v1 training for Fall 17
-    _byIsolationMVArun2017v1DBoldDMwLTraw2017 = 0;
-	_byVVLooseIsolationMVArun2017v1DBoldDMwLT2017 = 0;
-	_byVLooseIsolationMVArun2017v1DBoldDMwLT2017 = 0;
-	_byLooseIsolationMVArun2017v1DBoldDMwLT2017 = 0;
-	_byMediumIsolationMVArun2017v1DBoldDMwLT2017 = 0;
-	_byTightIsolationMVArun2017v1DBoldDMwLT2017 = 0;
-	_byVTightIsolationMVArun2017v1DBoldDMwLT2017 = 0;
-	_byVVTightIsolationMVArun2017v1DBoldDMwLT2017 = 0;
-	*/
+    
     _againstMuonLoose3 = 0;
     _againstMuonTight3 = 0;
     _againstElectronVLooseMVA6 = 0;
@@ -491,17 +471,8 @@ void Ntuplizer::beginJob()
     _tree -> Branch("byMediumIsolationMVArun2v1DBdR03oldDMwLT", &_byMediumIsolationMVArun2v1DBdR03oldDMwLT, "byMediumIsolationMVArun2v1DBdR03oldDMwLT/O");
     _tree -> Branch("byTightIsolationMVArun2v1DBdR03oldDMwLT", &_byTightIsolationMVArun2v1DBdR03oldDMwLT, "byTightIsolationMVArun2v1DBdR03oldDMwLT/O");
     _tree -> Branch("byVTightIsolationMVArun2v1DBdR03oldDMwLT", &_byVTightIsolationMVArun2v1DBdR03oldDMwLT, "byVTightIsolationMVArun2v1DBdR03oldDMwLT/O");
-    /*
-      // 2017v1 training for Fall 17
-    _tree -> Branch("byIsolationMVArun2017v1DBoldDMwLTraw2017", &_byIsolationMVArun2017v1DBoldDMwLTraw2017, "byIsolationMVArun2017v1DBoldDMwLTraw2017/O");
-    _tree -> Branch("byVVLooseIsolationMVArun2017v1DBoldDMwLT2017", &_byVVLooseIsolationMVArun2017v1DBoldDMwLT2017, "byVVLooseIsolationMVArun2017v1DBoldDMwLT2017/O");
-    _tree -> Branch("byVLooseIsolationMVArun2017v1DBoldDMwLT2017", &_byVLooseIsolationMVArun2017v1DBoldDMwLT2017, "byVLooseIsolationMVArun2017v1DBoldDMwLT2017/O");
-    _tree -> Branch("byLooseIsolationMVArun2017v1DBoldDMwLT2017", &_byLooseIsolationMVArun2017v1DBoldDMwLT2017, "byLooseIsolationMVArun2017v1DBoldDMwLT2017/O");
-    _tree -> Branch("byMediumIsolationMVArun2017v1DBoldDMwLT2017", &_byMediumIsolationMVArun2017v1DBoldDMwLT2017, "byMediumIsolationMVArun2017v1DBoldDMwLT2017/O");
-    _tree -> Branch("byTightIsolationMVArun2017v1DBoldDMwLT2017", &_byTightIsolationMVArun2017v1DBoldDMwLT2017, "byTightIsolationMVArun2017v1DBoldDMwLT2017/O");
-    _tree -> Branch("byVTightIsolationMVArun2017v1DBoldDMwLT2017", &_byVTightIsolationMVArun2017v1DBoldDMwLT2017, "byVTightIsolationMVArun2017v1DBoldDMwLT2017/O");
-    _tree -> Branch("byVVTightIsolationMVArun2017v1DBoldDMwLT2017", &_byVVTightIsolationMVArun2017v1DBoldDMwLT2017, "byVVTightIsolationMVArun2017v1DBoldDMwLT2017/O");
-      */
+    
+    
     _tree -> Branch("againstMuonLoose3", &_againstMuonLoose3, "againstMuonLoose3/O");;
     _tree -> Branch("againstMuonTight3", &_againstMuonTight3, "againstMuonTight3/O");
     _tree -> Branch("againstElectronVLooseMVA6", &_againstElectronVLooseMVA6, "againstElectronVLooseMVA6/O");
@@ -852,17 +823,7 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
     _byMediumIsolationMVArun2v1DBdR03oldDMwLT = tau->tauID("byMediumIsolationMVArun2v1DBdR03oldDMwLT");
     _byTightIsolationMVArun2v1DBdR03oldDMwLT = tau->tauID("byTightIsolationMVArun2v1DBdR03oldDMwLT");
     _byVTightIsolationMVArun2v1DBdR03oldDMwLT = tau->tauID("byVTightIsolationMVArun2v1DBdR03oldDMwLT");
-    /*
-     // 2017v1 training for Fall 17
-    _byIsolationMVArun2017v1DBoldDMwLTraw2017  = tau->tauID("byIsolationMVArun2017v1DBoldDMwLTraw2017");
-	_byVVLooseIsolationMVArun2017v1DBoldDMwLT2017 = tau->tauID("byVVLooseIsolationMVArun2017v1DBoldDMwLT2017");
-	_byVLooseIsolationMVArun2017v1DBoldDMwLT2017 = tau->tauID("byVLooseIsolationMVArun2017v1DBoldDMwLT2017");
-	_byLooseIsolationMVArun2017v1DBoldDMwLT2017 = tau->tauID("byLooseIsolationMVArun2017v1DBoldDMwLT2017");
-	_byMediumIsolationMVArun2017v1DBoldDMwLT2017 = tau->tauID("byMediumIsolationMVArun2017v1DBoldDMwLT2017");
-	_byTightIsolationMVArun2017v1DBoldDMwLT2017 = tau->tauID("byTightIsolationMVArun2017v1DBoldDMwLT2017");
-	_byVTightIsolationMVArun2017v1DBoldDMwLT2017 = tau->tauID("byVTightIsolationMVArun2017v1DBoldDMwLT2017");
-	_byVVTightIsolationMVArun2017v1DBoldDMwLT2017 = tau->tauID("byVVTightIsolationMVArun2017v1DBoldDMwLT2017");
-  */
+    
     _againstMuonLoose3 = tau->tauID("againstMuonLoose3");
     _againstMuonTight3 = tau->tauID("againstMuonTight3");
     _againstElectronVLooseMVA6 = tau->tauID("againstElectronVLooseMVA6");
