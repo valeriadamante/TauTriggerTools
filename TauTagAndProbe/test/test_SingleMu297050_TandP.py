@@ -234,7 +234,7 @@ na.runTauID()
 if not isMC:
     from Configuration.AlCa.autoCond import autoCond
     process.GlobalTag.globaltag = '94X_dataRun2_ReReco_EOY17_v2' # 92X_dataRun2_HLT_v7'
-    process.load('TauTagAndProbe.TauTagAndProbe.tagAndProbe_cff')
+    process.load('TauTagAndProbe.TauTagAndProbe.tagAndProbe_2017_cff')
     process.source = cms.Source("PoolSource",
         fileNames = cms.untracked.vstring(
           #  '/store/data/Run2017E/SingleMuon/MINIAOD/17Nov2017-v1/50000/000DCB8B-2ADD-E711-9100-008CFAF35AC0.root'
@@ -246,7 +246,7 @@ if not isMC:
 
 else:
     process.GlobalTag.globaltag = '94X_mc2017_realistic_v14'
-    process.load('TauTagAndProbe.TauTagAndProbe.MCanalysis_cff')
+    process.load('TauTagAndProbe.TauTagAndProbe.MCanalysis_2017_cff')
     process.source = cms.Source("PoolSource",
         fileNames = cms.untracked.vstring(            
         #   '/store/mc/RunIIFall17MiniAOD/DY1JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/94X_mc2017_realistic_v10-v1/20000/12DB4A06-65D7-E711-8DA4-0CC47A78A456.root'
