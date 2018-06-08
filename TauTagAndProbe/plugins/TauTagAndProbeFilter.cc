@@ -106,8 +106,7 @@ bool TauTagAndProbeFilter::filter(edm::Event & iEvent, edm::EventSetup const& iS
     iEvent.getByToken (_tausTag, tauHandle);
     if (tauHandle->size() < 1) return false;
 
-    vector<pair<float, int>> tausIdxPtVecv1;
-    vector<pair<float, int>> tausIdxPtVecv2;
+    vector<pair<float, int>> tausIdxPtVec;
     for (uint itau = 0; itau < tauHandle->size(); ++itau)
     {
         const pat::TauRef tau = (*tauHandle)[itau] ;
@@ -117,24 +116,18 @@ bool TauTagAndProbeFilter::filter(edm::Event & iEvent, edm::EventSetup const& iS
 
         // min iso
        // float isoMVA = tau->tauID("byIsolationMVArun2v1DBoldDMwLTraw");
-        float isoMVAv1 = tau->tauID("byIsolationMVArun2017v1DBoldDMwLTraw2017");
-        float isoMVAv2 = tau->tauID("byIsolationMVArun2017v2DBoldDMwLTraw2017");
-        tausIdxPtVecv1.push_back(make_pair(isoMVAv1, itau));
-        tausIdxPtVecv2.push_back(make_pair(isoMVAv2, itau));
+        float isoMVA = tau->tauID("byIsolationMVArun2017v1DBoldDMwLTraw2017");
+        tausIdxPtVec.push_back(make_pair(isoMVA, itau));
     }
 
 
     pat::TauRef tau;
 
-    if (tausIdxPtVecv1.size() == 0) return false; //No tau found
-    if (tausIdxPtVecv1.size() > 1) sort (tausIdxPtVecv1.begin(), tausIdxPtVecv1.end()); //Sort if multiple taus
-    int tauIdxv1 = tausIdxPtVecv1.back().second; // min iso --> max MVA score
-    tau = (*tauHandle)[tauIdxv1];
+    if (tausIdxPtVec.size() == 0) return false; //No tau found
+    if (tausIdxPtVec.size() > 1) sort (tausIdxPtVec.begin(), tausIdxPtVec.end()); //Sort if multiple taus
+    int tauIdx = tausIdxPtVec.back().second; // min iso --> max MVA score
+    tau = (*tauHandle)[tauIdx];
 
-	if (tausIdxPtVecv2.size() == 0) return false; //No tau found
-    if (tausIdxPtVecv2.size() > 1) sort (tausIdxPtVecv2.begin(), tausIdxPtVecv2.end()); //Sort if multiple taus
-    int tauIdxv2 = tausIdxPtVecv2.back().second; // min iso --> max MVA score
-    tau = (*tauHandle)[tauIdxv2];
 
     // ----------------- b-jets veto ---------------------
     Handle<pat::JetRefVector> bjetHandle;
