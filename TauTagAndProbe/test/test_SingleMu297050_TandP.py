@@ -30,7 +30,7 @@ else:
  	options.outputFile = 'NTuple_SingleMu_DYMC_2017.root'
 
 options.inputFiles = []
-options.maxEvents  =2000
+options.maxEvents  = -999
 options.parseArguments()
 
 
@@ -61,14 +61,6 @@ process.egmGsfElectronIDSequence = cms.Sequence(process.egmGsfElectronIDs)
 # Define which IDs we want to produce
 # Each of these two example IDs contains all four standard 
 my_id_modules =[
-'RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_Spring15_25ns_V1_cff',    # both 25 and 50 ns cutbased ids produced
-'RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_Spring15_50ns_V1_cff',
-'RecoEgamma.ElectronIdentification.Identification.heepElectronID_HEEPV60_cff',                 # recommended for both 50 and 25 ns
-'RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Spring15_25ns_nonTrig_V1_cff', # will not be produced for 50 ns, triggering still to come
-'RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Spring15_25ns_Trig_V1_cff',    # 25 ns trig
-'RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Spring15_50ns_Trig_V1_cff',    # 50 ns trig
-'RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Spring16_GeneralPurpose_V1_cff',   #Spring16
-'RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Spring16_HZZ_V1_cff',   #Spring16 HZZ
 'RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Fall17_iso_V1_cff',  #Fall17 iso
 ] 
 
@@ -92,7 +84,7 @@ process.electrons = cms.Sequence(getattr(process,mvaMod)*getattr(process,egmMod)
 from TauTagAndProbe.TauTagAndProbe.runTauIdMVA import TauIDEmbedder
 
 toKeep = []
-toKeep.extend(("2017v1","2017v2"))
+toKeep.extend(("2017v1","2017v2","newDM2017v2", "dR0p32017v2"))
 
 na = TauIDEmbedder(process, cms,
     debug=True,
@@ -103,7 +95,7 @@ na.runTauID()
 
 if not isMC:
     from Configuration.AlCa.autoCond import autoCond
-    process.GlobalTag.globaltag = '94X_dataRun2_ReReco_EOY17_v2' # 92X_dataRun2_HLT_v7'
+    process.GlobalTag.globaltag = '94X_dataRun2_v6'
     process.load('TauTagAndProbe.TauTagAndProbe.tagAndProbe_2017_cff')
     process.source = cms.Source("PoolSource",
         fileNames = cms.untracked.vstring(
