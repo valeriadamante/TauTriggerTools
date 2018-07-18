@@ -32,7 +32,7 @@
 #include "RooFitResult.h"
 #include "RooRealVar.h"
 #include "FuncCB.h"
-
+#include "FuncCB_cdf.h"
 
 class TurnonFit
 {
@@ -64,6 +64,15 @@ class TurnonFit
 			    double mturn, double mturn0,double mturn1,
 			    double p, double p0, double p1,
 			    double width, double width0, double width1);
+
+		void setCrystalBall(double max, double max0, double max1,
+			    double alpha, double alpha0, double alpha1,
+			    double n, double n0, double n1,
+			    double mean, double mean0, double mean1,
+			    double sigma, double sigma0, double sigma1,
+			    double yrise, double yrise0, double yrise1
+			   );
+
         void setNCPU(int nCPU) {m_nCPU = nCPU;}
         void setNoFit(bool noFit) {m_noFit = noFit;}
 
@@ -90,13 +99,17 @@ class TurnonFit
         RooRealVar m_mean;
         RooRealVar m_sigma;
         RooRealVar m_mturn;
-	RooRealVar m_p;
-	RooRealVar m_width;
+		RooRealVar m_p;
+		RooRealVar m_width;
+	    RooRealVar m_yrise;
         
-        FuncCB* m_function;
+        //FuncCB* m_function;
+        FuncCB_cdf* m_function;
         RooPlot* m_plot;
         RooHist* m_histo;
         RooCurve* m_fit;
+        RooCurve* m_fitError1Sigma;
+        RooCurve* m_fitError2Sigma;
         RooFitResult* m_fitResult;
 };
 
