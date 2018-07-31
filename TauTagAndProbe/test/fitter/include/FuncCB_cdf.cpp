@@ -64,8 +64,8 @@ Double_t FuncCB_cdf::evaluate() const
        double D = std::sqrt(M_PI/2.)*(1.+ RooMath::erf(abs_alpha/std::sqrt(2.)));
        double totIntegral = sigma*(C+D);
  
-       double integral = crystalball_integral(-m,alpha,n,sigma,m0); 
-       return (alpha > 0) ? yrise -(1. - integral/totIntegral)*norm : yrise - (integral/totIntegral)*norm; 
+       double integral = crystalball_integral(m, alpha, n, sigma, m0);
+       return (alpha > 0) ? yrise -(1. - integral/totIntegral)*(-norm) : yrise - (integral/totIntegral)*(-norm);
   }
 
 
