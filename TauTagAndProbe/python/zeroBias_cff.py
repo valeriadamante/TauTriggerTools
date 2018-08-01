@@ -1,4 +1,4 @@
-import FWCore.ParameterSet.Config as cms
+&import FWCore.ParameterSet.Config as cms
 
 
 #print "Running on data or mc"
@@ -109,21 +109,6 @@ HLTLIST = cms.VPSet(
         leg2 = cms.int32(15)
     ),
 
-    #Mu+Tau HPS
-    cms.PSet (
-        HLT = cms.string("HLT_IsoMu20_eta2p1_LooseChargedIsoPFTauHPS27_eta2p1_CrossL1_v"),
-        path1 = cms.vstring ("hltL3crIsoL1sMu18erTau24erIorMu20erTau24erL1f0L2f10QL3f20QL3trkIsoFiltered0p07", "hltHpsOverlapFilterIsoMu20LooseChargedIsoPFTau27L1Seeded"),
-        path2 = cms.vstring ("hltHpsSelectedPFTau27LooseChargedIsolationAgainstMuonL1HLTMatched", "hltHpsOverlapFilterIsoMu20LooseChargedIsoPFTau27L1Seeded"),
-        leg1 = cms.int32(13),
-        leg2 = cms.int32(15)
-    ),    
-    cms.PSet (
-        HLT = cms.string("HLT_IsoMu24_eta2p1_MediumChargedIsoPFTauHPS35_Trk1_eta2p1_Reg_CrossL1_v"),
-        path1 = cms.vstring ("hltL3crIsoL1sBigOrMuXXerIsoTauYYerL1f0L2f10QL3f20QL3trkIsoFiltered0p07", "hltHpsOverlapFilterIsoMu24MediumChargedIsoPFTau35MonitoringReg"),
-        path2 = cms.vstring ("hltHpsSelectedPFTau35TrackPt1MediumChargedIsolationL1HLTMatchedReg", "hltHpsOverlapFilterIsoMu24MediumChargedIsoPFTau35MonitoringReg"),
-        leg1 = cms.int32(13),
-        leg2 = cms.int32(15)
-    ),
 
     #ETau CrossL1
     cms.PSet (
@@ -169,14 +154,11 @@ HLTLIST = cms.VPSet(
         leg2 = cms.int32(15)
     ),
 
-        #Di-tau
-   cms.PSet (
-        HLT = cms.string("HLT_DoubleMediumChargedIsoPFTauHPS35_Trk1_eta2p1_Reg_v"),
-        path1 = cms.vstring ("hltHpsDoublePFTau35TrackPt1MediumChargedIsolationDz02Reg"),
-        path2 = cms.vstring ("hltHpsDoublePFTau35TrackPt1MediumChargedIsolationDz02Reg"),
-        leg1 = cms.int32(15),
-        leg2 = cms.int32(15)
-    ),
+
+
+
+
+    #Di-tau
     cms.PSet (
         HLT = cms.string("HLT_DoubleMediumChargedIsoPFTau35_Trk1_eta2p1_Reg_v"),
         path1 = cms.vstring ("hltDoublePFTau35TrackPt1MediumChargedIsolationDz02Reg"),
@@ -339,6 +321,204 @@ HLTLIST = cms.VPSet(
         leg1 = cms.int32(-1),
         leg2 = cms.int32(-1)
     )
+
+
+
+    #Mu+Tau HPS
+    cms.PSet (
+        HLT = cms.string("HLT_IsoMu20_eta2p1_LooseChargedIsoPFTauHPS27_eta2p1_CrossL1_v"),
+        path1 = cms.vstring ("hltL3crIsoL1sMu18erTau24erIorMu20erTau24erL1f0L2f10QL3f20QL3trkIsoFiltered0p07", "hltHpsOverlapFilterIsoMu20LooseChargedIsoPFTau27L1Seeded"),
+        path2 = cms.vstring ("hltHpsSelectedPFTau27LooseChargedIsolationAgainstMuonL1HLTMatched", "hltHpsOverlapFilterIsoMu20LooseChargedIsoPFTau27L1Seeded"),
+        leg1 = cms.int32(13),
+        leg2 = cms.int32(15)
+    ),    
+
+        cms.PSet (
+        HLT = cms.string("HLT_IsoMu20_eta2p1_MediumChargedIsoPFTauHPS27_eta2p1_CrossL1_v"),
+        path1 = cms.vstring ("hltL3crIsoL1sMu18erTau24erIorMu20erTau24erL1f0L2f10QL3f20QL3trkIsoFiltered0p07", "hltHpsOverlapFilterIsoMu20MediumChargedIsoPFTau27L1Seeded"),
+        path2 = cms.vstring ("hltHpsSelectedPFTau27MediumChargedIsolationAgainstMuonL1HLTMatched", "hltHpsOverlapFilterIsoMu20MediumChargedIsoPFTau27L1Seeded"),
+        leg1 = cms.int32(13),
+        leg2 = cms.int32(15)
+    ),    
+    cms.PSet (
+        HLT = cms.string("HLT_IsoMu20_eta2p1_TightChargedIsoPFTauHPS27_eta2p1_CrossL1_v"),
+        path1 = cms.vstring ("hltL3crIsoL1sMu18erTau24erIorMu20erTau24erL1f0L2f10QL3f20QL3trkIsoFiltered0p07", "hltHpsOverlapFilterIsoMu20TightChargedIsoPFTau27L1Seeded"),
+        path2 = cms.vstring ("hltHpsSelectedPFTau27TightChargedIsolationAgainstMuonL1HLTMatched", "hltHpsOverlapFilterIsoMu20TightChargedIsoPFTau27L1Seeded"),
+        leg1 = cms.int32(13),
+        leg2 = cms.int32(15)
+    ),    
+    cms.PSet (
+        HLT = cms.string("HLT_IsoMu20_eta2p1_LooseChargedIsoPFTauHPS27_eta2p1_TightID_CrossL1_v"),
+        path1 = cms.vstring ("hltL3crIsoL1sMu18erTau24erIorMu20erTau24erL1f0L2f10QL3f20QL3trkIsoFiltered0p07", "hltHpsOverlapFilterIsoMu20LooseChargedIsoTightOOSCPhotonsPFTau27L1Seeded"),
+        path2 = cms.vstring ("hltHpsSelectedPFTau27LooseChargedIsolationTightOOSCPhotonsAgainstMuonL1HLTMatched", "hltHpsOverlapFilterIsoMu20LooseChargedIsoTightOOSCPhotonsPFTau27L1Seeded"),
+        leg1 = cms.int32(13),
+        leg2 = cms.int32(15)
+    ),    
+    cms.PSet (
+        HLT = cms.string("HLT_IsoMu20_eta2p1_MediumChargedIsoPFTauHPS27_eta2p1_TightID_CrossL1_v"),
+        path1 = cms.vstring ("hltL3crIsoL1sMu18erTau24erIorMu20erTau24erL1f0L2f10QL3f20QL3trkIsoFiltered0p07", "hltHpsOverlapFilterIsoMu20MediumChargedIsoTightOOSCPhotonsPFTau27L1Seeded"),
+        path2 = cms.vstring ("hltHpsSelectedPFTau27MediumChargedIsolationTightOOSCPhotonsAgainstMuonL1HLTMatched", "hltHpsOverlapFilterIsoMu20MediumChargedIsoTightOOSCPhotonsPFTau27L1Seeded"),
+        leg1 = cms.int32(13),
+        leg2 = cms.int32(15)
+    ),    
+    cms.PSet (
+        HLT = cms.string("HLT_IsoMu20_eta2p1_TightChargedIsoPFTauHPS27_eta2p1_TightID_CrossL1_v"),
+        path1 = cms.vstring ("hltL3crIsoL1sMu18erTau24erIorMu20erTau24erL1f0L2f10QL3f20QL3trkIsoFiltered0p07", "hltHpsOverlapFilterIsoMu20TightChargedIsoTightOOSCPhotonsPFTau27L1Seeded"),
+        path2 = cms.vstring ("hltHpsSelectedPFTau27TightChargedIsolationTightOOSCPhotonsAgainstMuonL1HLTMatched", "hltHpsOverlapFilterIsoMu20TightChargedIsoTightOOSCPhotonsPFTau27L1Seeded"),
+        leg1 = cms.int32(13),
+        leg2 = cms.int32(15)
+    ),    
+
+    cms.PSet (
+        HLT = cms.string("HLT_IsoMu27_LooseChargedIsoPFTauHPS20_Trk1_eta2p1_SingleL1_v"),
+        path1 = cms.vstring ("hltL3crIsoL1sMu22Or25L1f0L2f10QL3f27QL3trkIsoFiltered0p07", "hltHpsOverlapFilterIsoMu27LooseChargedIsoPFTau20"),
+        path2 = cms.vstring ("hltHpsPFTau20TrackLooseChargedIsoAgainstMuon", "hltHpsOverlapFilterIsoMu27LooseChargedIsoPFTau20"),
+        leg1 = cms.int32(13),
+        leg2 = cms.int32(15)
+    ),
+
+    cms.PSet (
+        HLT = cms.string("HLT_IsoMu24_eta2p1_MediumChargedIsoPFTauHPS35_Trk1_eta2p1_Reg_CrossL1_v"),
+        path1 = cms.vstring ("hltL3crIsoL1sBigOrMuXXerIsoTauYYerL1f0L2f10QL3f20QL3trkIsoFiltered0p07", "hltHpsOverlapFilterIsoMu24MediumChargedIsoPFTau35MonitoringReg"),
+        path2 = cms.vstring ("hltHpsSelectedPFTau35TrackPt1MediumChargedIsolationL1HLTMatchedReg", "hltHpsOverlapFilterIsoMu24MediumChargedIsoPFTau35MonitoringReg"),
+        leg1 = cms.int32(13),
+        leg2 = cms.int32(15)
+    ),
+
+
+    #E+Tau HPS
+
+    cms.PSet (
+        HLT = cms.string("HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTauHPS30_eta2p1_CrossL1_v"),
+        path1 = cms.vstring ("hltEle24erWPTightGsfTrackIsoFilterForTau", "hltHpsOverlapFilterIsoEle24WPTightGsfLooseIsoPFTau30"),
+        path2 = cms.vstring ("hltHpsSelectedPFTau30LooseChargedIsolationL1HLTMatched", "hltHpsOverlapFilterIsoEle24WPTightGsfLooseIsoPFTau30"),
+        leg1 = cms.int32(11),
+        leg2 = cms.int32(15)
+    ),
+    cms.PSet (
+        HLT = cms.string("HLT_Ele24_eta2p1_WPTight_Gsf_MediumChargedIsoPFTauHPS30_eta2p1_CrossL1_v"),
+        path1 = cms.vstring ("hltEle24erWPTightGsfTrackIsoFilterForTau", "hltHpsOverlapFilterIsoEle24WPTightGsfMediumIsoPFTau30"),
+        path2 = cms.vstring ("hltHpsSelectedPFTau30MediumChargedIsolationL1HLTMatched", "hltHpsOverlapFilterIsoEle24WPTightGsfMediumIsoPFTau30"),
+        leg1 = cms.int32(11),
+        leg2 = cms.int32(15)
+    ),
+    cms.PSet (
+        HLT = cms.string("HLT_Ele24_eta2p1_WPTight_Gsf_TightChargedIsoPFTauHPS30_eta2p1_CrossL1_v"),
+        path1 = cms.vstring ("hltEle24erWPTightGsfTrackIsoFilterForTau", "hltHpsOverlapFilterIsoEle24WPTightGsfTightIsoPFTau30"),
+        path2 = cms.vstring ("hltHpsSelectedPFTau30TightChargedIsolationL1HLTMatched", "hltHpsOverlapFilterIsoEle24WPTightGsfTightIsoPFTau30"),
+        leg1 = cms.int32(11),
+        leg2 = cms.int32(15)
+    ),
+    cms.PSet (
+        HLT = cms.string("HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTauHPS30_eta2p1_TightID_CrossL1_v"),
+        path1 = cms.vstring ("hltEle24erWPTightGsfTrackIsoFilterForTau", "hltHpsOverlapFilterIsoEle24WPTightGsfLooseIsoTightOOSCPhotonsPFTau30"),
+        path2 = cms.vstring ("hltHpsSelectedPFTau30LooseChargedIsolationTightOOSCPhotonsL1HLTMatched", "hltHpsOverlapFilterIsoEle24WPTightGsfLooseIsoTightOOSCPhotonsPFTau30"),
+        leg1 = cms.int32(11),
+        leg2 = cms.int32(15)
+    ),
+    cms.PSet (
+        HLT = cms.string("HLT_Ele24_eta2p1_WPTight_Gsf_MediumChargedIsoPFTauHPS30_eta2p1_TightID_CrossL1_v"),
+        path1 = cms.vstring ("hltEle24erWPTightGsfTrackIsoFilterForTau", "hltHpsOverlapFilterIsoEle24WPTightGsfMediumIsoTightOOSCPhotonsPFTau30"),
+        path2 = cms.vstring ("hltHpsSelectedPFTau30MediumChargedIsolationTightOOSCPhotonsL1HLTMatched", "hltHpsOverlapFilterIsoEle24WPTightGsfMediumIsoTightOOSCPhotonsPFTau30"),
+        leg1 = cms.int32(11),
+        leg2 = cms.int32(15)
+    ),
+    cms.PSet (
+        HLT = cms.string("HLT_Ele24_eta2p1_WPTight_Gsf_TightChargedIsoPFTauHPS30_eta2p1_TightID_CrossL1_v"),
+        path1 = cms.vstring ("hltEle24erWPTightGsfTrackIsoFilterForTau", "hltHpsOverlapFilterIsoEle24WPTightGsfTightIsoTightOOSCPhotonsPFTau30"),
+        path2 = cms.vstring ("hltHpsSelectedPFTau30TightChargedIsolationTightOOSCPhotonsL1HLTMatched", "hltHpsOverlapFilterIsoEle24WPTightGsfTightIsoTightOOSCPhotonsPFTau30"),
+        leg1 = cms.int32(11),
+        leg2 = cms.int32(15)
+    ),
+
+    #Di-tau HPS
+
+    cms.PSet (
+        HLT = cms.string("HLT_DoubleMediumChargedIsoPFTauHPS35_Trk1_eta2p1_Reg_v"),
+        path1 = cms.vstring ("hltHpsDoublePFTau35TrackPt1MediumChargedIsolationDz02Reg"),
+        path2 = cms.vstring ("hltHpsDoublePFTau35TrackPt1MediumChargedIsolationDz02Reg"),
+        leg1 = cms.int32(15),
+        leg2 = cms.int32(15)
+    ),
+
+    cms.PSet (
+        HLT = cms.string("HLT_DoubleMediumChargedIsoPFTauHPS40_Trk1_eta2p1_Reg_v"),
+        path1 = cms.vstring ("hltHpsDoublePFTau40TrackPt1MediumChargedIsolationDz02Reg"),
+        path2 = cms.vstring ("hltHpsDoublePFTau40TrackPt1MediumChargedIsolationDz02Reg"),
+        leg1 = cms.int32(15),
+        leg2 = cms.int32(15)
+    ),
+    cms.PSet (
+        HLT = cms.string("HLT_DoubleTightChargedIsoPFTauHPS35_Trk1_eta2p1_Reg_v"),
+        path1 = cms.vstring ("hltHpsDoublePFTau35TrackPt1TightChargedIsolationDz02Reg"),
+        path2 = cms.vstring ("hltHpsDoublePFTau35TrackPt1TightChargedIsolationDz02Reg"),
+        leg1 = cms.int32(15),
+        leg2 = cms.int32(15)
+    ),
+    cms.PSet (
+        HLT = cms.string("HLT_DoubleTightChargedIsoPFTauHPS40_Trk1_eta2p1_Reg_v"),
+        path1 = cms.vstring ("hltHpsDoublePFTau40TrackPt1TightChargedIsolationDz02Reg"),
+        path2 = cms.vstring ("hltHpsDoublePFTau40TrackPt1TightChargedIsolationDz02Reg"),
+        leg1 = cms.int32(15),
+        leg2 = cms.int32(15)
+    ),
+    cms.PSet (
+        HLT = cms.string("HLT_DoubleMediumChargedIsoPFTauHPS35_Trk1_TightID_eta2p1_Reg_v"),
+        path1 = cms.vstring ("hltHpsDoublePFTau35TrackPt1MediumChargedIsolationAndTightOOSCPhotonsDz02Reg"),
+        path2 = cms.vstring ("hltHpsDoublePFTau35TrackPt1MediumChargedIsolationAndTightOOSCPhotonsDz02Reg"),
+        leg1 = cms.int32(15),
+        leg2 = cms.int32(15)
+    ),
+    cms.PSet (
+        HLT = cms.string("HLT_DoubleMediumChargedIsoPFTauHPS40_Trk1_TightID_eta2p1_Reg_v"),
+        path1 = cms.vstring ("hltHpsDoublePFTau40TrackPt1MediumChargedIsolationAndTightOOSCPhotonsDz02Reg"),
+        path2 = cms.vstring ("hltHpsDoublePFTau40TrackPt1MediumChargedIsolationAndTightOOSCPhotonsDz02Reg"),
+        leg1 = cms.int32(15),
+        leg2 = cms.int32(15)
+    ),
+    cms.PSet (
+        HLT = cms.string("HLT_DoubleTightChargedIsoPFTauHPS35_Trk1_TightID_eta2p1_Reg_v"),
+        path1 = cms.vstring ("hltHpsDoublePFTau35TrackPt1TightChargedIsolationAndTightOOSCPhotonsDz02Reg"),
+        path2 = cms.vstring ("hltHpsDoublePFTau35TrackPt1TIghtChargedIsolationAndTightOOSCPhotonsDz02Reg"),
+        leg1 = cms.int32(15),
+        leg2 = cms.int32(15)
+    ),
+    cms.PSet (
+        HLT = cms.string("HLT_DoubleTightChargedIsoPFTauHPS40_Trk1_TightID_eta2p1_Reg_v"),
+        path1 = cms.vstring ("hltHpsDoublePFTau40TrackPt1TightChargedIsolationAndTightOOSCPhotonsDz02Reg"),
+        path2 = cms.vstring ("hltHpsDoublePFTau40TrackPt1TIghtChargedIsolationAndTightOOSCPhotonsDz02Reg"),
+        leg1 = cms.int32(15),
+        leg2 = cms.int32(15)
+    ),
+
+
+    #VBF HPS
+
+    cms.PSet (
+        HLT = cms.string("HLT_VBF_DoubleLooseChargedIsoPFTauHPS20_Trk1_eta2p1_v"),
+        path1 = cms.vstring (""),
+        path2 = cms.vstring (""),
+        leg1 = cms.int32(-1),
+        leg2 = cms.int32(-1)
+    ),
+
+    cms.PSet (
+        HLT = cms.string("HLT_VBF_DoubleMediumChargedIsoPFTauHPS20_Trk1_eta2p1_v"),
+        path1 = cms.vstring (""),
+        path2 = cms.vstring (""),
+        leg1 = cms.int32(-1),
+        leg2 = cms.int32(-1)
+    ),
+
+    cms.PSet (
+        HLT = cms.string("HLT_VBF_DoubleTightChargedIsoPFTauHPS20_Trk1_eta2p1_v"),
+        path1 = cms.vstring (""),
+        path2 = cms.vstring (""),
+        leg1 = cms.int32(-1),
+        leg2 = cms.int32(-1)
+    )
+
+
 
 )
 
