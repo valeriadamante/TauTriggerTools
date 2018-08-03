@@ -6,7 +6,8 @@ DYJets = True   # False means WJet enriched cuts will be used, True means cuts f
 
 if MC:
 	saveOnlyOS = True # True; save only OS, False; save both and store weight for bkg sub
-	tauGenMatching = True
+	if DYJets: tauGenMatching = True
+	if not DYJets: tauGenMatching = False
 	excludeLumiSections = False
 	print "==> OS events are stored and tau gen matching is applied for MC samples! <=="
 else:
@@ -49,7 +50,7 @@ if MC:
 else:
 	suppressionType = "SSsubtraction"
 if DYJets:
-	outname = fname.replace ('.root', '_' + suppressionType + '_MediumWP2017v2_forFit.root')
+	outname = fname.replace ('.root', '_' + suppressionType + 'TightWPold2017v1_forFit.root')
 else:
 	outname = fname.replace ('.root', '_' + suppressionType + '_WjetEnriched_MediumWP2017v2_forFit.root')
 fOut = TFile (outname, 'recreate')
@@ -124,34 +125,34 @@ for ev in range (0, nentries):
 	import itertools as it
     	if bitIndex in it.chain(range(6, 13), range(19, 23)):   # apply this L1 cut only for di-tau triggers
             if (bitIndex==9 or bitIndex==10):
-                if ((triggerBits >> bitIndex) & 1) == 1 and (L1pt>=32) and HLTpt>40: #and (L1iso):
+                if ((triggerBits >> bitIndex) & 1) == 1 and (L1pt>=32) and HLTpt>40:
                     hltPathTriggered_OS[bitIndex][0] = 1
                 else:
                     hltPathTriggered_OS[bitIndex][0] = 0
             else:
-                if ((triggerBits >> bitIndex) & 1) == 1 and (L1pt>=32): #and (L1iso):
+                if ((triggerBits >> bitIndex) & 1) == 1 and (L1pt>=32):
                     hltPathTriggered_OS[bitIndex][0] = 1
                 else:
-                    hltPathTriggered_OS[bitIndex][0] = 0           
+                    hltPathTriggered_OS[bitIndex][0] = 0
         else:
-            if ((triggerBits >> bitIndex) & 1) == 1: #and (L1pt>=32): #and (L1iso):
+            if ((triggerBits >> bitIndex) & 1) == 1:
             	hltPathTriggered_OS[bitIndex][0] = 1
             else:
                 hltPathTriggered_OS[bitIndex][0] = 0
                         
         if(bitIndex==13):	
             if (((triggerBits >> bitIndex) & 1) == 1 and L1pt>=26 and L1iso>0 and HLTpt>30):
-                hltPathTriggered_OS[numberOfHLTTriggers][0] = 1	
+                hltPathTriggered_OS[numberOfHLTTriggers][0] = 1	  # this is the path for etau trigger. So (L1iso) should be applied here!
             else:
                 hltPathTriggered_OS[numberOfHLTTriggers][0] = 0
 
             if ((triggerBits >> bitIndex) & 1) == 1:
-                hltPathTriggered_OS[numberOfHLTTriggers+1][0] = 1
+                hltPathTriggered_OS[numberOfHLTTriggers+1][0] = 1 # this is the path for mutau trigger. So no extra requirement is needed like: L1pt and L1iso and HLTpt
             else:
                 hltPathTriggered_OS[numberOfHLTTriggers+1][0] = 0       		
         
     if (((((triggerBits >> 9) & 1) == 1 and HLTpt>40) or (((triggerBits >> 10) & 1) == 1 and HLTpt>40) or (((triggerBits >> 11) & 1) == 1))  and L1pt>=32):
-        hltPathTriggered_OS[numberOfHLTTriggers+2][0] = 1
+        hltPathTriggered_OS[numberOfHLTTriggers+2][0] = 1  # this is the path for di-tau trigger. HLTpt cut is required to have the same threshold on tau + L1Pt is needed due to L1 matching differences between MC and Data
     else:
         hltPathTriggered_OS[numberOfHLTTriggers+2][0] = 0
 		
@@ -168,7 +169,7 @@ for ev in range (0, nentries):
 
     bkgSubANDpuW[0] = bkgSubW[0]*puweight
 
-    if(tIn.byMediumIsolationMVArun2017v2DBoldDMwLT2017 > 0.5):
+    if(tIn.byTightIsolationMVArun2017v1DBoldDMwLT2017 > 0.5):
         #Mass cuts, mt and mvis for DY Jets
 	    if DYJets:
 		    if(tIn.mT < 30 and tIn.mVis >40 and tIn.mVis < 80):
@@ -186,7 +187,7 @@ for ev in range (0, nentries):
 			    if(tauGenMatching):    #for tau gen matching
 				    if(tIn.tau_genindex > 0):
 					    tOut.Fill()
-				elif(excludeLumiSections):    # for removing the extra lumi sections in Final golden JSON file compared to Rereco ones
+			    elif(excludeLumiSections):    # for removing the extra lumi sections in Final golden JSON file compared to Rereco ones
 				    if not ((RunNumber==299480 and lumi==7) or (RunNumber==301397 and lumi==518)):
 					    tOut.Fill()
 			    else:
