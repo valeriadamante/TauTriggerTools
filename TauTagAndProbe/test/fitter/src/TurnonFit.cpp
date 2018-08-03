@@ -45,16 +45,18 @@ TurnonFit::TurnonFit(const std::string& name):m_name(name),
     m_sigma   ("sigma",    "#sigma",   2.,     0.01,   10.),
     m_mturn   ("mturn",    "mturn",    20.,    10.,    50.),
     m_p       ("p",        "p",        0.8,    0.4,    1.),
-    m_width   ("width",    "width",    10.,    1.,     50.)
+    m_width   ("width",    "width",    10.,    1.,     50.),
+    m_yrise   ("yrise",    "yrise",    0.9,    0.1,    1.0)
 /*****************************************************************/
 {
-  stringstream sxvar, smax, salpha, sn, smean, ssigma, smturn, sp, swidth;
+  stringstream sxvar, smax, salpha, sn, smean, ssigma, smturn, sp, swidth, syrise;
     sxvar  << "xVar_"  << m_name;
     smax   << "max_"   << m_name;
     salpha << "alpha_" << m_name;
     sn     << "n_"     << m_name;
     smean  << "mean_"  << m_name;
     ssigma << "sigma_" << m_name;
+    syrise << "yrise_" << m_name;
     m_xVar .SetName(sxvar.str().c_str());
     m_max  .SetName(smax.str().c_str());
     m_alpha.SetName(salpha.str().c_str());
@@ -64,6 +66,7 @@ TurnonFit::TurnonFit(const std::string& name):m_name(name),
     m_mturn.SetName(smturn.str().c_str());
     m_p    .SetName(sp.str().c_str());
     m_width.SetName(swidth.str().c_str());
+    m_yrise.SetName(syrise.str().c_str());
 }
 
 
@@ -79,7 +82,7 @@ TurnonFit::~TurnonFit()
 
 
 /*****************************************************************/
-void TurnonFit::setCrystalBall(double max, double max0, double max1,
+/*void TurnonFit::setCrystalBall(double max, double max0, double max1,
         double alpha, double alpha0, double alpha1,
         double n, double n0, double n1,
         double mean, double mean0, double mean1, 
@@ -87,8 +90,9 @@ void TurnonFit::setCrystalBall(double max, double max0, double max1,
 	double mturn, double mturn0, double mturn1,
 	double p, double p0, double p1,
 	double width, double width0, double width1)
+*/
 /*****************************************************************/
-{
+/*{
     m_max.setVal(max);
     m_max.setRange(max0, max1);
     m_alpha.setVal(alpha);
@@ -108,9 +112,41 @@ void TurnonFit::setCrystalBall(double max, double max0, double max1,
 
     stringstream cbName;
     cbName << "cb_" << m_name;
+    // This uses function defined in FuncCB class. To make it run, arrange the makefile and compile it!
     m_function = new FuncCB(cbName.str().c_str(), cbName.str().c_str(), m_xVar, m_mean, m_sigma, m_alpha, m_n, m_max,m_mturn,m_p,m_width) ;
-}
 
+}
+*/
+
+/*****************************************************************/
+void TurnonFit::setCrystalBall(double max, double max0, double max1,
+        double alpha, double alpha0, double alpha1,
+        double n, double n0, double n1,
+        double mean, double mean0, double mean1,
+        double sigma, double sigma0, double sigma1,
+        double yrise, double yrise0, double yrise1
+	)
+/*****************************************************************/
+{
+    m_max.setVal(max);
+    m_max.setRange(max0, max1);
+    m_alpha.setVal(alpha);
+    m_alpha.setRange(alpha0, alpha1);
+    m_n.setVal(n);
+    m_n.setRange(n0, n1);
+    m_mean.setVal(mean);
+    m_mean.setRange(mean0, mean1);
+    m_sigma.setVal(sigma);
+    m_sigma.setRange(sigma0, sigma1);
+    m_yrise.setVal(yrise);
+    m_yrise.setRange(yrise0,yrise1);
+
+    stringstream cbName;
+    cbName << "cb_" << m_name;
+
+    m_function = new FuncCB_cdf(cbName.str().c_str(), cbName.str().c_str(), m_xVar, m_mean, m_sigma, m_alpha, m_n, m_max, m_yrise) ;
+
+}
 
 
 /*****************************************************************/
@@ -180,16 +216,20 @@ void TurnonFit::fit()
     //if(!m_noFit) m_fitResult = eff.fitTo(*dataSet,ConditionalObservables(m_xVar),Minos(kTRUE),Warnings(kFALSE),NumCPU(m_nCPU),Save(kTRUE),Verbose(kFALSE));
     if(!m_noFit)
     {
-        if (m_weightVar=="") m_fitResult = eff.fitTo(*dataSet,ConditionalObservables(m_xVar),Minos(kFALSE),Warnings(kFALSE),NumCPU(m_nCPU),Save(kTRUE),Verbose(kFALSE),SumW2Error(kTRUE));
+        if (m_weightVar==""){ m_fitResult = eff.fitTo(*dataSet,ConditionalObservables(m_xVar),Minos(kFALSE),Warnings(kFALSE),NumCPU(m_nCPU),Save(kTRUE),Verbose(kFALSE),SumW2Error(kTRUE));
         // if (m_weightVar=="") m_fitResult = eff.fitTo(*dataSet,ConditionalObservables(m_xVar),Minos(kFALSE),Warnings(kFALSE),NumCPU(m_nCPU),Save(kTRUE),Verbose(kFALSE));
-        else                 m_fitResult = eff.fitTo(*dataSet,ConditionalObservables(m_xVar),Minos(kFALSE),Warnings(kFALSE),NumCPU(m_nCPU),Save(kTRUE),Verbose(kFALSE),SumW2Error(kTRUE));
+       } else    {             m_fitResult = eff.fitTo(*dataSet,ConditionalObservables(m_xVar),Minos(kFALSE),Warnings(kFALSE),NumCPU(m_nCPU),Save(kTRUE),Verbose(kFALSE),SumW2Error(kTRUE));
+       }
         stringstream resultName;
         resultName << "fitResult_" << m_name;
         m_fitResult->SetName(resultName.str().c_str());
-    }
-
+	}
     // m_function->plotOn(m_plot,VisualizeError(*m_fitResult,1),FillColor(kOrange),LineColor(kRed),LineWidth(2));
-    m_function->plotOn(m_plot,LineColor(kRed),LineWidth(2));
+    //m_function->plotOn(m_plot,LineColor(kRed),LineWidth(2));
+	m_function->plotOn(m_plot,VisualizeError(*m_fitResult,2),FillColor(kBlue),LineColor(kRed),LineWidth(2));
+	m_function->plotOn(m_plot,VisualizeError(*m_fitResult,1),FillColor(kOrange),LineColor(kRed),LineWidth(2));
+	m_function->plotOn(m_plot,LineColor(kRed),LineWidth(2));
+    dataSet->plotOn(m_plot, DataError(RooAbsData::Poisson), Binning(binning), Efficiency(cut), MarkerColor(kBlack), LineColor(kBlack), MarkerStyle(20));
 
     m_plot->GetYaxis()->SetRangeUser(0,1.05);
     m_plot->GetXaxis()->SetRangeUser(m_xVar.getMin(),m_xVar.getMax());
@@ -210,12 +250,18 @@ void TurnonFit::fit()
         }   
     }
 
-    m_fit  = (RooCurve*)m_plot->getObject(1);
-    stringstream histoName, fitName;
+    m_fit  = (RooCurve*)m_plot->getObject(3);
+    m_fitError1Sigma  = (RooCurve*)m_plot->getObject(1);
+    m_fitError2Sigma  = (RooCurve*)m_plot->getObject(2);
+    stringstream histoName, fitName, fit1sigErrBandName,fit2sigErrBandName;
     histoName << "histo_" << m_name;
     fitName << "fit_" << m_name;
+    fit1sigErrBandName << "fit1sigErrBand_" << m_name;
+    fit2sigErrBandName << "fit2sigErrBand_" << m_name;
     m_histo->SetName(histoName.str().c_str());
     m_fit->SetName(fitName.str().c_str());
+	m_fitError1Sigma->SetName(fit1sigErrBandName.str().c_str());
+	m_fitError2Sigma->SetName(fit2sigErrBandName.str().c_str());
 
     file->Close();
     dataSet->Delete();
@@ -250,6 +296,8 @@ void TurnonFit::save(TFile* outputFile)
     canvas->Write();
     m_histo->Write();
     m_fit->Write();
+    m_fitError1Sigma->Write();
+	m_fitError2Sigma->Write();
     m_function->Write();
     if(!m_noFit) m_fitResult->Write();
 }
