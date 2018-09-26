@@ -1,4 +1,4 @@
-&import FWCore.ParameterSet.Config as cms
+import FWCore.ParameterSet.Config as cms
 
 
 #print "Running on data or mc"
@@ -320,7 +320,7 @@ HLTLIST = cms.VPSet(
         path2 = cms.vstring (""),
         leg1 = cms.int32(-1),
         leg2 = cms.int32(-1)
-    )
+    ),
 
 
 
