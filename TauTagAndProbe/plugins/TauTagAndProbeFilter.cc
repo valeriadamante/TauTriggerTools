@@ -116,7 +116,7 @@ bool TauTagAndProbeFilter::filter(edm::Event & iEvent, edm::EventSetup const& iS
 
         // min iso
        // float isoMVA = tau->tauID("byIsolationMVArun2v1DBoldDMwLTraw");
-        float isoMVA = tau->tauID("byIsolationMVArun2017v1DBoldDMwLTraw2017");
+        float isoMVA = tau->tauID("byIsolationMVArun2017v2DBoldDMwLTraw2017");
         tausIdxPtVec.push_back(make_pair(isoMVA, itau));
     }
 

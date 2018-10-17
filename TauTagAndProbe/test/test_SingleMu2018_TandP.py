@@ -2,8 +2,9 @@ import FWCore.ParameterSet.VarParsing as VarParsing
 import FWCore.PythonUtilities.LumiList as LumiList
 import FWCore.ParameterSet.Config as cms
 process = cms.Process("TagAndProbe")
+import os
 
-isMC = True
+isMC = False
 useGenMatch = False
 useCustomHLT = False
 
@@ -33,6 +34,24 @@ options.inputFiles = []
 options.maxEvents  = -999
 options.parseArguments()
 
+
+def get_cmssw_version():
+	"""returns 'CMSSW_X_Y_Z'"""
+	return os.environ["CMSSW_RELEASE_BASE"].split('/')[-1]
+
+def get_cmssw_version_number():
+	"""returns 'X_Y_Z' (without 'CMSSW_')"""
+	return map(int, get_cmssw_version().split("CMSSW_")[1].split("_")[0:3])
+
+def versionToInt(release=9, subversion=4, patch=0):
+	return release * 10000 + subversion * 100 + patch
+
+def is_above_cmssw_version( release=10, subversion=2, patch=0):
+	split_cmssw_version = get_cmssw_version_number()
+	if versionToInt(release, subversion, patch) > versionToInt(split_cmssw_version[0], split_cmssw_version[1], split_cmssw_version[2]):
+		return False
+	else:
+		return True
 
 # START ELECTRON CUT BASED ID SECTION
 #
@@ -75,6 +94,15 @@ mvaMod = 'electronMVAValueMapProducer'
 setattr(process,egmMod,process.egmGsfElectronIDs.clone())
 setattr(process,mvaMod,process.electronMVAValueMapProducer.clone())
 process.electrons = cms.Sequence(getattr(process,mvaMod)*getattr(process,egmMod))
+
+
+print "The current CMSSW version is", get_cmssw_version()
+
+if is_above_cmssw_version(10, 1, 9):
+	print "=== An electron MVA variable helper is added to the sequence for the electron ID ==="
+	helpMod = 'electronMVAVariableHelper'
+	setattr(process,helpMod,process.electronMVAVariableHelper.clone())
+	process.electrons = cms.Sequence(getattr(process,helpMod)*getattr(process,mvaMod)*getattr(process,egmMod))
 
 
 # =================================
