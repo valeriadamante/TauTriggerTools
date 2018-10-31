@@ -80,7 +80,7 @@ process.egmGsfElectronIDSequence = cms.Sequence(process.egmGsfElectronIDs)
 # Define which IDs we want to produce
 # Each of these two example IDs contains all four standard 
 my_id_modules =[
-'RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Fall17_iso_V1_cff',  #Fall17 iso
+'RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Fall17_iso_V2_cff',  #Fall17 iso
 ] 
 
 
