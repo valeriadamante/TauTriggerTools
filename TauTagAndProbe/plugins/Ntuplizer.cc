@@ -94,7 +94,9 @@ class Ntuplizer : public edm::EDAnalyzer {
         int _tauDM;
         float _mT;
         float _mVis;
-        int _tau_genindex;        
+        int _tau_genindex;
+        bool _decayModeFinding;
+        bool _decayModeFindingNewDMs;
   
         bool _byLooseCombinedIsolationDeltaBetaCorr3Hits;
         bool _byMediumCombinedIsolationDeltaBetaCorr3Hits;
@@ -393,6 +395,9 @@ void Ntuplizer::Initialize() {
     _mVis = -1.;
     _tau_genindex = -1;
     
+     _decayModeFinding = 0;
+     _decayModeFindingNewDMs = 0;
+
     _byLooseCombinedIsolationDeltaBetaCorr3Hits = 0;
     _byMediumCombinedIsolationDeltaBetaCorr3Hits = 0;
     _byTightCombinedIsolationDeltaBetaCorr3Hits = 0;
@@ -534,6 +539,8 @@ void Ntuplizer::beginJob()
     _tree -> Branch("mT", &_mT, "mT/F");
     _tree -> Branch("mVis", &_mVis, "mVis/F");
     _tree -> Branch("tau_genindex", &_tau_genindex, "tau_genindex/I");
+    _tree -> Branch("decayModeFinding", &_decayModeFinding, "decayModeFinding/O");
+    _tree -> Branch("decayModeFindingNewDMs", &_decayModeFindingNewDMs, "decayModeFindingNewDMs/O");
     
     _tree -> Branch("byLooseCombinedIsolationDeltaBetaCorr3Hits", &_byLooseCombinedIsolationDeltaBetaCorr3Hits, "byLooseCombinedIsolationDeltaBetaCorr3Hits/O");
     _tree -> Branch("byMediumCombinedIsolationDeltaBetaCorr3Hits", &_byMediumCombinedIsolationDeltaBetaCorr3Hits, "byMediumCombinedIsolationDeltaBetaCorr3Hits/O");
@@ -925,6 +932,8 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
     _tauEta = tau -> eta();
     _tauPhi = tau -> phi();
     _tauDM = tau -> decayMode();
+    _decayModeFinding = tau->tauID("decayModeFinding");
+    _decayModeFindingNewDMs = tau->tauID("decayModeFindingNewDMs");
     
     _byLooseCombinedIsolationDeltaBetaCorr3Hits = tau->tauID("byLooseCombinedIsolationDeltaBetaCorr3Hits");
     _byMediumCombinedIsolationDeltaBetaCorr3Hits = tau->tauID("byMediumCombinedIsolationDeltaBetaCorr3Hits");

@@ -122,7 +122,7 @@ class TauIDEmbedder(object):
 				}
 			}
 			# update the list of available in DB samples
-			if not self.is_above_cmssw_version(10, 0, 0, self.debug):
+			if not self.is_above_cmssw_version(11, 0, 0, self.debug):
 				if self.debug: print "runTauID: not is_above_cmssw_version(10, 0, 0). Will update the list of available in DB samples to access 2017v1"
 				self.loadMVA_WPs_run2_2017()
 
