@@ -185,7 +185,7 @@ goodMuons = cms.EDFilter("PATMuonRefSelector",
 
 ## good taus - apply analysis selection
 goodTaus = cms.EDFilter("PATTauRefSelector",
-        src = cms.InputTag("slimmedTaus"),
+        src = cms.InputTag("NewTauIDsEmbedded"),
         cut = cms.string(
                 'pt > 20 && abs(eta) < 2.1 ' #kinematics
                 '&& abs(charge) > 0 && abs(charge) < 2 ' #sometimes 2 prongs have charge != 1
@@ -220,7 +220,7 @@ TagAndProbe = cms.EDFilter("TauTagAndProbeFilter",
                            met   = cms.InputTag("slimmedMETs"),
                            useMassCuts = cms.bool(False),
                            electrons = cms.InputTag("slimmedElectrons"),
-                           eleLooseIdMap = cms.InputTag("egmGsfElectronIDs:mvaEleID-Fall17-iso-V1-wpLoose"),
+                           eleLooseIdMap = cms.InputTag("egmGsfElectronIDs:mvaEleID-Fall17-iso-V2-wpLoose"),
                            eleVeto = cms.bool(True),
                            bjets = cms.InputTag("bjets")
 )
