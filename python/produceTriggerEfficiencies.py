@@ -4,8 +4,7 @@ gROOT.SetBatch(True)
 from math import sqrt
 from functions import * 
 from binning2017 import *
-from binning2018v0 import *
-from setFitParam import *
+from binning2018 import *
 
 #choose which year do you want to run it:
 Samples2017 = False
