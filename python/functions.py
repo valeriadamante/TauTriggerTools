@@ -56,7 +56,7 @@ class functions:
                 return outH
     	
     	
-        def getScaleFactor(self):
+        def getScaleFactorFromFunction(self):
 
                 SF = TGraphAsymmErrors()
                 for i in range(20, 450):
@@ -70,6 +70,26 @@ class functions:
                 SF.GetXaxis().SetTitle("Offline p_{T}^{#tau} [GeV]")
                 SF.GetYaxis().SetTitle("SF: Data/MC")
                 return SF
+
+        def getScaleFactor(self):
+
+                hEffi1 = TH1F("", "", 480, 20, 500 )
+                hEffi2 = TH1F("", "", 480, 20, 500 )
+
+                for i in range(0, self.histo[0].GetNbinsX()):
+                        hEffi1.SetBinContent(i, self.histo[0].GetBinContent(i))
+                        hEffi2.SetBinContent(i, self.histo[1].GetBinContent(i))
+
+                hEffi1.Divide(hEffi2)
+                hEffi1.GetXaxis().SetTitle("Offline p_{T}^{#tau} [GeV]")
+                hEffi1.GetYaxis().SetTitle("SF: Data/MC")
+                hEffi1.GetXaxis().SetRangeUser(18,600)
+                hEffi1.GetXaxis().SetMoreLogLabels()
+                hEffi1.GetYaxis().SetRangeUser(0,1.5)
+                hEffi1.SetMarkerStyle(20)
+                hEffi1.SetLineWidth(6)
+
+                return  hEffi1
                 
         def getScaleFactorError(self):
 

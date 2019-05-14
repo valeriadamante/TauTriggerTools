@@ -1,5 +1,5 @@
 
-class setFitParam2017:
+class setFitParam2018:
 
 	def __init__(self, f1, f2, index, idm):
 		self.index = index
@@ -23,14 +23,61 @@ class setFitParam2017:
 		self.f2[self.idm][self.index].SetParameter( 4, 1.0 )
 		self.f2[self.idm][self.index].SetParameter( 5, 1.0)
 		
-	def setDiTauFitParametersDM0DM1(self):
-		self.f2[self.idm][self.index].SetParameter( 0, 4.0)
-		self.f2[self.idm][self.index].SetParameter( 1, 5.0 )
-		self.f2[self.idm][self.index].SetParameter( 2, 7.0 )
-		self.f2[self.idm][self.index].SetParameter( 3, -30.)
-		self.f2[self.idm][self.index].SetParameter( 4, 1.0 )
-		self.f2[self.idm][self.index].SetParameter( 5, 1.0)
+	def setDiTauFitParametersDM0_looser(self):
+		self.f2[self.idm][0].SetParameter( 0, 4.0) 
+		self.f2[self.idm][0].SetParameter( 1, 10.0)
+		self.f2[self.idm][0].SetParameter( 2, 5.0)
+		self.f2[self.idm][0].SetParameter( 3, -30.) 
+		self.f2[self.idm][0].SetParameter( 4, 1.0 )
+		self.f2[self.idm][0].SetParameter( 5, 1.0)
+		
+		self.f2[self.idm][1].SetParameter( 0, 1.5) 
+		self.f2[self.idm][1].SetParameter( 1, 10.0)
+		self.f2[self.idm][1].SetParameter( 2, 7.0 ) 
+		self.f2[self.idm][1].SetParameter( 3, -35.) 
+		self.f2[self.idm][1].SetParameter( 4, 1.0 )
+		self.f2[self.idm][1].SetParameter( 5, 1.0)
 	
+	
+	def setDiTauFitParametersDM0_tighter(self):
+		self.f2[self.idm][0].SetParameter( 0, 4.0)
+		self.f2[self.idm][0].SetParameter( 1, 10.0 )
+		self.f2[self.idm][0].SetParameter( 2, 5.0 )
+		self.f2[self.idm][0].SetParameter( 3, -30.)
+		self.f2[self.idm][0].SetParameter( 4, 1.0 )
+		self.f2[self.idm][0].SetParameter( 5, 1.0)
+		
+		self.f2[self.idm][1].SetParameter( 0, 2.0)
+		self.f2[self.idm][1].SetParameter( 1, 10.0 )
+		self.f2[self.idm][1].SetParameter( 2, 5.0 )
+		self.f2[self.idm][1].SetParameter( 3, -29.)
+		self.f2[self.idm][1].SetParameter( 4, 1.0 )
+		self.f2[self.idm][1].SetParameter( 5, 1.0)
+	
+	def setDiTauFitParametersDM1_looser(self):
+		self.f2[self.idm][0].SetParameter( 0, 4.0)
+		self.f2[self.idm][0].SetParameter( 1, 5.0 )
+		self.f2[self.idm][0].SetParameter( 2, 7.0 )
+		self.f2[self.idm][0].SetParameter( 3, -35.)
+		self.f2[self.idm][0].SetParameter( 4, 1.0)
+		self.f2[self.idm][0].SetParameter( 5, 1.0)
+		
+                self.f2[self.idm][1].SetParameter( 0, 5.0) 
+                self.f2[self.idm][1].SetParameter( 1, 10.0)
+                self.f2[self.idm][1].SetParameter( 2, 7.0 )
+                self.f2[self.idm][1].SetParameter( 3, -34.)
+                self.f2[self.idm][1].SetParameter( 4, 1.0)
+                self.f2[self.idm][1].SetParameter( 5, 1.0)
+
+        def setDiTauFitParametersDM1_tighter(self):
+                self.f2[self.idm][self.index].SetParameter( 0, 4.0)
+                self.f2[self.idm][self.index].SetParameter( 1, 5.0 )
+                self.f2[self.idm][self.index].SetParameter( 2, 7.0 )
+                self.f2[self.idm][self.index].SetParameter( 3, -35.)
+                self.f2[self.idm][self.index].SetParameter( 4, 1.0)
+                self.f2[self.idm][self.index].SetParameter( 5, 1.0)
+
+
 	def setDiTauFitParametersDM10_tightWP(self):
 		self.f2[self.idm][0].SetParameter( 0, 2.0)
 		self.f2[self.idm][0].SetParameter( 1, 10.0 )
@@ -39,10 +86,10 @@ class setFitParam2017:
 		self.f2[self.idm][0].SetParameter( 4, 1.0 )
 		self.f2[self.idm][0].SetParameter( 5, 1.0)		
 
-		self.f2[self.idm][1].SetParameter( 0, 2.0)
-		self.f2[self.idm][1].SetParameter( 1, 10.0 )
-		self.f2[self.idm][1].SetParameter( 2, 0.5 )
-		self.f2[self.idm][1].SetParameter( 3, -30.)
+		self.f2[self.idm][1].SetParameter( 0, 0.5) 
+		self.f2[self.idm][1].SetParameter( 1, 10.0) 
+		self.f2[self.idm][1].SetParameter( 2, 0.5 ) 
+		self.f2[self.idm][1].SetParameter( 3, -34.) 
 		self.f2[self.idm][1].SetParameter( 4, 1.0 )
 		self.f2[self.idm][1].SetParameter( 5, 1.0)
 		
@@ -54,28 +101,28 @@ class setFitParam2017:
 		self.f2[self.idm][0].SetParameter( 4, 1.0 )
 		self.f2[self.idm][0].SetParameter( 5, 1.0)
 
-		self.f2[self.idm][1].SetParameter( 0, 2.0)
-		self.f2[self.idm][1].SetParameter( 1, 10.0 )
-		self.f2[self.idm][1].SetParameter( 2, 0.4 )
-		self.f2[self.idm][1].SetParameter( 3, -30.)
+		self.f2[self.idm][1].SetParameter( 0, 1.2) 
+		self.f2[self.idm][1].SetParameter( 1, 10.0) 
+		self.f2[self.idm][1].SetParameter( 2, 2.6 ) 
+		self.f2[self.idm][1].SetParameter( 3, -27.) 
 		self.f2[self.idm][1].SetParameter( 4, 1.0 )
 		self.f2[self.idm][1].SetParameter( 5, 1.0)
 	
 	def setDiTauFitParametersDM10_vvtightWP(self):
 		self.f2[self.idm][0].SetParameter( 0, 2.0)
 		self.f2[self.idm][0].SetParameter( 1, 10.0 )
-		self.f2[self.idm][0].SetParameter( 2, 0.4 )
+		self.f2[self.idm][0].SetParameter( 2, 0.5 )
 		self.f2[self.idm][0].SetParameter( 3, -30.)
 		self.f2[self.idm][0].SetParameter( 4, 1.0 )
 		self.f2[self.idm][0].SetParameter( 5, 1.0)
 
-		self.f2[self.idm][1].SetParameter( 0, 2.0)
-		self.f2[self.idm][1].SetParameter( 1, 10.0 )
-		self.f2[self.idm][1].SetParameter( 2, 0.5 )
-		self.f2[self.idm][1].SetParameter( 3, -30.)
+		self.f2[self.idm][1].SetParameter( 0, 1.2) 
+		self.f2[self.idm][1].SetParameter( 1, 10.0)
+ 		self.f2[self.idm][1].SetParameter( 2, 2.6 )
+		self.f2[self.idm][1].SetParameter( 3, -27.)
 		self.f2[self.idm][1].SetParameter( 4, 1.0 )
 		self.f2[self.idm][1].SetParameter( 5, 1.0)
-		
+	
 	def setDiTauFitParametersDM10_vlooseWP(self):
 		self.f2[self.idm][0].SetParameter( 0, 0.8)
 		self.f2[self.idm][0].SetParameter( 1, 10.0 )
@@ -84,10 +131,10 @@ class setFitParam2017:
 		self.f2[self.idm][0].SetParameter( 4, 1.0 )
 		self.f2[self.idm][0].SetParameter( 5, 1.0)
 
-		self.f2[self.idm][1].SetParameter( 0, 2.0)
-		self.f2[self.idm][1].SetParameter( 1, 10.0 )
-		self.f2[self.idm][1].SetParameter( 2, 0.3 )
-		self.f2[self.idm][1].SetParameter( 3, -30.)
+		self.f2[self.idm][1].SetParameter( 0, 0.7) 
+		self.f2[self.idm][1].SetParameter( 1, 10.0)
+		self.f2[self.idm][1].SetParameter( 2, 0.5 ) 
+		self.f2[self.idm][1].SetParameter( 3, -34.) 
 		self.f2[self.idm][1].SetParameter( 4, 1.0 )
 		self.f2[self.idm][1].SetParameter( 5, 1.0)
 	
@@ -99,10 +146,10 @@ class setFitParam2017:
 		self.f2[self.idm][0].SetParameter( 4, 1.0 )
 		self.f2[self.idm][0].SetParameter( 5, 1.0)
 
-		self.f2[self.idm][1].SetParameter( 0, 2.0)
-		self.f2[self.idm][1].SetParameter( 1, 10.0 )
-		self.f2[self.idm][1].SetParameter( 2, 2.0 )
-		self.f2[self.idm][1].SetParameter( 3, -25.)
+		self.f2[self.idm][1].SetParameter( 0, 0.7) 
+		self.f2[self.idm][1].SetParameter( 1, 10.0)
+		self.f2[self.idm][1].SetParameter( 2, 0.5)
+		self.f2[self.idm][1].SetParameter( 3, -31.)
 		self.f2[self.idm][1].SetParameter( 4, 1.0 )
 		self.f2[self.idm][1].SetParameter( 5, 1.0)
 	
@@ -115,10 +162,10 @@ class setFitParam2017:
 		self.f2[self.idm][0].SetParameter( 4, 1.0 )
 		self.f2[self.idm][0].SetParameter( 5, 1.0)
 
-		self.f2[self.idm][1].SetParameter( 0, 0.8)
-		self.f2[self.idm][1].SetParameter( 1, 10.0 )
-		self.f2[self.idm][1].SetParameter( 2, 0.3 )
-		self.f2[self.idm][1].SetParameter( 3, -30.)
+		self.f2[self.idm][1].SetParameter( 0, 0.5) 
+		self.f2[self.idm][1].SetParameter( 1, 10.0)
+		self.f2[self.idm][1].SetParameter( 2, 0.5 )
+		self.f2[self.idm][1].SetParameter( 3, -31.)
 		self.f2[self.idm][1].SetParameter( 4, 1.0 )
 		self.f2[self.idm][1].SetParameter( 5, 1.0)
 	
@@ -131,59 +178,89 @@ class setFitParam2017:
 		self.f1[self.index].SetParameter( 4, 1.0 )
 		self.f1[self.index].SetParameter( 5, 1.0)
 		
-	def setMuTauFitParametersDM0DM1(self):
-		self.f2[self.idm][self.index].SetParameter( 0, 0.5)
-		self.f2[self.idm][self.index].SetParameter( 1, 5.0 )
-		self.f2[self.idm][self.index].SetParameter( 2, 7.0 )
-		self.f2[self.idm][self.index].SetParameter( 3, -20.)
-		self.f2[self.idm][self.index].SetParameter( 4, 1.0 )
-		self.f2[self.idm][self.index].SetParameter( 5, 1.0)
-		
-	def setMuTauFitParametersDM10_vvtightWP(self):
-		self.f2[self.idm][0].SetParameter( 0, 0.8)
+	def setMuTauFitParametersDM0_loose(self):
+		self.f2[self.idm][0].SetParameter( 0, 1.2)
 		self.f2[self.idm][0].SetParameter( 1, 10.0 )
-		self.f2[self.idm][0].SetParameter( 2, 0.2 )
+		self.f2[self.idm][0].SetParameter( 2, 4.1 )
+		self.f2[self.idm][0].SetParameter( 3, -18.)
+		self.f2[self.idm][0].SetParameter( 4, 1.0 )
+		self.f2[self.idm][0].SetParameter( 5, 1.0)
+		
+		self.f2[self.idm][1].SetParameter( 0, 1.5)  
+		self.f2[self.idm][1].SetParameter( 1, 10.0 )
+		self.f2[self.idm][1].SetParameter( 2, 1.5 ) 
+		self.f2[self.idm][1].SetParameter( 3, -21.) 
+		self.f2[self.idm][1].SetParameter( 4, 1.0 )
+		self.f2[self.idm][1].SetParameter( 5, 1.0)
+	
+	def setMuTauFitParametersDM0_vloose(self):
+		self.f2[self.idm][0].SetParameter( 0, 1.2)
+		self.f2[self.idm][0].SetParameter( 1, 10.0 )
+		self.f2[self.idm][0].SetParameter( 2, 4.1 )
+		self.f2[self.idm][0].SetParameter( 3, -18.)
+		self.f2[self.idm][0].SetParameter( 4, 1.0 )
+		self.f2[self.idm][0].SetParameter( 5, 1.0)
+		
+		self.f2[self.idm][1].SetParameter( 0, 1.4)  
+		self.f2[self.idm][1].SetParameter( 1, 10.0)
+		self.f2[self.idm][1].SetParameter( 2, 1.2 ) 
+		self.f2[self.idm][1].SetParameter( 3, -21.) 
+		self.f2[self.idm][1].SetParameter( 4, 1.0 )
+		self.f2[self.idm][1].SetParameter( 5, 1.0)
+		
+	def setMuTauFitParametersDM0_tighter(self):
+		self.f2[self.idm][0].SetParameter( 0, 1.2)
+		self.f2[self.idm][0].SetParameter( 1, 10.0)
+		self.f2[self.idm][0].SetParameter( 2, 4.1 )
+		self.f2[self.idm][0].SetParameter( 3, -18.)
+		self.f2[self.idm][0].SetParameter( 4, 1.0 )
+		self.f2[self.idm][0].SetParameter( 5, 1.0)
+		
+		self.f2[self.idm][1].SetParameter( 0, 1.2)
+		self.f2[self.idm][1].SetParameter( 1, 10.0)
+		self.f2[self.idm][1].SetParameter( 2, 7.5 )
+		self.f2[self.idm][1].SetParameter( 3, -30.)
+		self.f2[self.idm][1].SetParameter( 4, 1.0 )
+		self.f2[self.idm][1].SetParameter( 5, 1.0)
+			
+	def setMuTauFitParametersDM1_looser(self):
+		self.f2[self.idm][0].SetParameter( 0, 1.2) 
+		self.f2[self.idm][0].SetParameter( 1, 10.0) 
+		self.f2[self.idm][0].SetParameter( 2, 1.0 ) 
+		self.f2[self.idm][0].SetParameter( 3, -33.)
+		self.f2[self.idm][0].SetParameter( 4, 1.0 )
+		self.f2[self.idm][0].SetParameter( 5, 1.0)
+		
+		self.f2[self.idm][1].SetParameter( 0, 1.2)
+		self.f2[self.idm][1].SetParameter( 1, 10.0)
+		self.f2[self.idm][1].SetParameter( 2, 4.1 )
+		self.f2[self.idm][1].SetParameter( 3, -18.)
+		self.f2[self.idm][1].SetParameter( 4, 1.0 )
+		self.f2[self.idm][1].SetParameter( 5, 1.0)
+		
+	def setMuTauFitParametersDM1_tighter(self):
+		self.f2[self.idm][0].SetParameter( 0, 2.5) 
+		self.f2[self.idm][0].SetParameter( 1, 10.0 ) 
+		self.f2[self.idm][0].SetParameter( 2, 0.6 )
 		self.f2[self.idm][0].SetParameter( 3, -30.)
 		self.f2[self.idm][0].SetParameter( 4, 1.0 )
 		self.f2[self.idm][0].SetParameter( 5, 1.0)
-
-		self.f2[self.idm][1].SetParameter( 0, 0.8)
-		self.f2[self.idm][1].SetParameter( 1, 10.0 )
-		self.f2[self.idm][1].SetParameter( 2, 0.4 )
-		self.f2[self.idm][1].SetParameter( 3, -30.)
-		self.f2[self.idm][1].SetParameter( 4, 1.0 )
-		self.f2[self.idm][1].SetParameter( 5, 1.0)
-	
-	def setMuTauFitParametersDM10_vtightWP(self):
-		self.f2[self.idm][0].SetParameter( 0, 0.8)
-		self.f2[self.idm][0].SetParameter( 1, 10.0 )
-		self.f2[self.idm][0].SetParameter( 2, 0.2 )
-		self.f2[self.idm][0].SetParameter( 3, -25.)
-		self.f2[self.idm][0].SetParameter( 4, 1.0 )
-		self.f2[self.idm][0].SetParameter( 5, 1.0)
-
-		self.f2[self.idm][1].SetParameter( 0, 0.8)
-		self.f2[self.idm][1].SetParameter( 1, 10.0 )
-		self.f2[self.idm][1].SetParameter( 2, 0.4 )
-		self.f2[self.idm][1].SetParameter( 3, -30.)
-		self.f2[self.idm][1].SetParameter( 4, 1.0 )
-		self.f2[self.idm][1].SetParameter( 5, 1.0)
 		
-	def setMuTauFitParametersDM10_tightWP(self):
-		self.f2[self.idm][0].SetParameter( 0, 0.8)
-		self.f2[self.idm][0].SetParameter( 1, 10.0 )
-		self.f2[self.idm][0].SetParameter( 2, 0.2 )
-		self.f2[self.idm][0].SetParameter( 3, -25.)
-		self.f2[self.idm][0].SetParameter( 4, 1.0 )
-		self.f2[self.idm][0].SetParameter( 5, 1.0)
-
-		self.f2[self.idm][1].SetParameter( 0, 0.8)
+		self.f2[self.idm][1].SetParameter( 0, 1.2)
 		self.f2[self.idm][1].SetParameter( 1, 10.0 )
-		self.f2[self.idm][1].SetParameter( 2, 0.5 )
-		self.f2[self.idm][1].SetParameter( 3, -30.)
+		self.f2[self.idm][1].SetParameter( 2, 4.1 )
+		self.f2[self.idm][1].SetParameter( 3, -18.)
 		self.f2[self.idm][1].SetParameter( 4, 1.0 )
 		self.f2[self.idm][1].SetParameter( 5, 1.0)
-	
+
+	def setMuTauFitParametersDM10_tighter(self):
+		self.f2[self.idm][self.index].SetParameter( 0, 5.2)
+		self.f2[self.idm][self.index].SetParameter( 1, 10.0 )
+		self.f2[self.idm][self.index].SetParameter( 2, 7.5 )
+		self.f2[self.idm][self.index].SetParameter( 3, -35.)
+		self.f2[self.idm][self.index].SetParameter( 4, 1.0 )
+		self.f2[self.idm][self.index].SetParameter( 5, 1.0)
+
 	def setMuTauFitParametersDM10_mediumWP(self):
 		self.f2[self.idm][0].SetParameter( 0, 0.8)
 		self.f2[self.idm][0].SetParameter( 1, 5.0 )
@@ -254,21 +331,36 @@ class setFitParam2017:
 		self.f1[self.index].SetParameter( 4, 1.0 )
 		self.f1[self.index].SetParameter( 5, 1.0)
 		
-	def setETauFitParametersDM0(self):
-		self.f2[self.idm][0].SetParameter( 0, 1.5)
+	def setETauFitParametersDM0_looser(self):
+		self.f2[self.idm][0].SetParameter( 0, 0.5)
 		self.f2[self.idm][0].SetParameter( 1, 10.0 )
-		self.f2[self.idm][0].SetParameter( 2, 2.0 )
-		self.f2[self.idm][0].SetParameter( 3, -30.)
+		self.f2[self.idm][0].SetParameter( 2, 7.0 )
+		self.f2[self.idm][0].SetParameter( 3, -35.)
 		self.f2[self.idm][0].SetParameter( 4, 1.0 )
 		self.f2[self.idm][0].SetParameter( 5, 1.0)
 		
-		self.f2[self.idm][1].SetParameter( 0, 2.0)
+		self.f2[self.idm][1].SetParameter( 0, 1.2)
 		self.f2[self.idm][1].SetParameter( 1, 10.0 )
-		self.f2[self.idm][1].SetParameter( 2, 0.8 )
-		self.f2[self.idm][1].SetParameter( 3, -30.)
+		self.f2[self.idm][1].SetParameter( 2, 4.0 )
+		self.f2[self.idm][1].SetParameter( 3, -25.)
 		self.f2[self.idm][1].SetParameter( 4, 1.0 )
 		self.f2[self.idm][1].SetParameter( 5, 1.0)
 		
+	def setETauFitParametersDM0_tighter(self):
+		self.f2[self.idm][0].SetParameter( 0, 0.5)
+		self.f2[self.idm][0].SetParameter( 1, 10.0 )
+		self.f2[self.idm][0].SetParameter( 2, 5.3 )
+		self.f2[self.idm][0].SetParameter( 3, -33.)
+		self.f2[self.idm][0].SetParameter( 4, 1.0 )
+		self.f2[self.idm][0].SetParameter( 5, 1.0)
+		
+		self.f2[self.idm][1].SetParameter( 0, 1.2)
+		self.f2[self.idm][1].SetParameter( 1, 10.0 )
+		self.f2[self.idm][1].SetParameter( 2, 4.0 )
+		self.f2[self.idm][1].SetParameter( 3, -25.)
+		self.f2[self.idm][1].SetParameter( 4, 1.0 )
+		self.f2[self.idm][1].SetParameter( 5, 1.0)
+			
 	def setETauFitParametersDM1(self):
 		self.f2[self.idm][0].SetParameter( 0, 0.8)
 		self.f2[self.idm][0].SetParameter( 1, 10.0 )
@@ -277,13 +369,13 @@ class setFitParam2017:
 		self.f2[self.idm][0].SetParameter( 4, 1.0 )
 		self.f2[self.idm][0].SetParameter( 5, 1.0)
 
-		self.f2[self.idm][1].SetParameter( 0, 0.8)
+		self.f2[self.idm][1].SetParameter( 0, 1.0)
 		self.f2[self.idm][1].SetParameter( 1, 10.0 )
-		self.f2[self.idm][1].SetParameter( 2, 5.0 )
-		self.f2[self.idm][1].SetParameter( 3, -20.)
+		self.f2[self.idm][1].SetParameter( 2, 2.0 )
+		self.f2[self.idm][1].SetParameter( 3, -34.)
 		self.f2[self.idm][1].SetParameter( 4, 1.0 )
 		self.f2[self.idm][1].SetParameter( 5, 1.0)
-		
+
 	def setETauFitParametersDM10_vlooseWP(self):
 		self.f2[self.idm][0].SetParameter( 0, 1.5)
 		self.f2[self.idm][0].SetParameter( 1, 10.0 )
@@ -337,10 +429,10 @@ class setFitParam2017:
 		self.f2[self.idm][0].SetParameter( 4, 1.0 )
 		self.f2[self.idm][0].SetParameter( 5, 1.0)
 
-		self.f2[self.idm][1].SetParameter( 0, 1.5)
+		self.f2[self.idm][1].SetParameter( 0, 0.3)
 		self.f2[self.idm][1].SetParameter( 1, 10.0 )
-		self.f2[self.idm][1].SetParameter( 2, 0.4 )
-		self.f2[self.idm][1].SetParameter( 3, -30.)
+		self.f2[self.idm][1].SetParameter( 2, 0.5 )
+		self.f2[self.idm][1].SetParameter( 3, -35.)
 		self.f2[self.idm][1].SetParameter( 4, 1.0 )
 		self.f2[self.idm][1].SetParameter( 5, 1.0)
 		
@@ -352,41 +444,25 @@ class setFitParam2017:
 		self.f2[self.idm][0].SetParameter( 4, 1.0 )
 		self.f2[self.idm][0].SetParameter( 5, 1.0)
 
-		self.f2[self.idm][1].SetParameter( 0, 0.3)
+		self.f2[self.idm][1].SetParameter( 0, 3.0)
 		self.f2[self.idm][1].SetParameter( 1, 10.0 )
-		self.f2[self.idm][1].SetParameter( 2, 0.3 )
-		self.f2[self.idm][1].SetParameter( 3, -30.)
+		self.f2[self.idm][1].SetParameter( 2, 2.0 )
+		self.f2[self.idm][1].SetParameter( 3, -34.)
 		self.f2[self.idm][1].SetParameter( 4, 1.0 )
 		self.f2[self.idm][1].SetParameter( 5, 1.0)	
 
 	def setETauFitParametersDM10_vvtightWP(self):
-		self.f2[self.idm][0].SetParameter( 0, 2.0)
+		self.f2[self.idm][0].SetParameter( 0, 1.0)
 		self.f2[self.idm][0].SetParameter( 1, 10.0 )
-		self.f2[self.idm][0].SetParameter( 2, 0.7 )
-		self.f2[self.idm][0].SetParameter( 3, -30.)
+		self.f2[self.idm][0].SetParameter( 2, 1.0 )
+		self.f2[self.idm][0].SetParameter( 3, -34.)
 		self.f2[self.idm][0].SetParameter( 4, 1.0 )
 		self.f2[self.idm][0].SetParameter( 5, 1.0)
 
-		self.f2[self.idm][1].SetParameter( 0, 2.0)
+		self.f2[self.idm][1].SetParameter( 0, 1.0)
 		self.f2[self.idm][1].SetParameter( 1, 10.0 )
-		self.f2[self.idm][1].SetParameter( 2, 0.6 )
-		self.f2[self.idm][1].SetParameter( 3, -25.)
+		self.f2[self.idm][1].SetParameter( 2, 1.0)
+		self.f2[self.idm][1].SetParameter( 3, -34.)
 		self.f2[self.idm][1].SetParameter( 4, 1.0 )
 		self.f2[self.idm][1].SetParameter( 5, 1.0)
-		
-	
-	def setDiTauFitParametersDM10(self):
-		setDiTauFitParametersDM10 = {"vvtightTauMVA": self.setDiTauFitParametersDM10_vvtightWP(),  "vtightTauMVA": self.setDiTauFitParametersDM10_vtightWP(), "tightTauMVA": self.setDiTauFitParametersDM10_tightWP(), "mediumTauMVA": self.setDiTauFitParametersDM10_mediumWP(), "looseTauMVA": self.setDiTauFitParametersDM10_looseWP(), "vlooseTauMVA": self.setDiTauFitParametersDM10_vlooseWP()} #, "vvlooseTauMVA": eTauFitParamsDM10_vvlooseWP,}
-		return setDiTauFitParametersDM10
-	
-	def setMuTauFitParametersDM10(self):
-		setMuTauFitParametersDM10 = {"vvtightTauMVA": self.setMuTauFitParametersDM10_vvtightWP(),  "vtightTauMVA": self.setMuTauFitParametersDM10_vtightWP(), "tightTauMVA": self.setMuTauFitParametersDM10_tightWP(), "mediumTauMVA": self.setMuTauFitParametersDM10_mediumWP(), "looseTauMVA": self.setMuTauFitParametersDM10_looseWP(), "vlooseTauMVA": self.setMuTauFitParametersDM10_vlooseWP()} #, "vvlooseTauMVA": eTauFitParamsDM10_vvlooseWP,}
-		return setMuTauFitParametersDM10
-	
-	def setETauFitParametersDM10(self):
-		setETauFitParametersDM10 = {"vvtightTauMVA": self.setETauFitParametersDM10_vvtightWP(),  "vtightTauMVA": self.setETauFitParametersDM10_vtightWP(), "tightTauMVA": self.setETauFitParametersDM10_tightWP(), "mediumTauMVA": self.setETauFitParametersDM10_mediumWP(), "looseTauMVA": self.setETauFitParametersDM10_looseWP(), "vlooseTauMVA": self.setETauFitParametersDM10_vlooseWP()} #, "vvlooseTauMVA": eTauFitParamsDM10_vvlooseWP,}
-		return setETauFitParametersDM10
-	
-	
-	
 		

@@ -4,7 +4,7 @@ gROOT.SetBatch(True)
 from math import sqrt
 from functions import * 
 from binning2017 import *
-from binning2018 import *
+from binning2018v0 import *
 from setFitParam import *
 
 #choose which year do you want to run it:
@@ -51,6 +51,7 @@ elif(Samples2018):
 	
 bin = bins.getBinning()
 binDM = bins.getBinningDM()
+#binDM = bins.getBinningPerDM()
 
 hPtDen = [[],[],[]]
 hPtNum = [[],[],[]]
@@ -88,8 +89,10 @@ for ipath, trigger in enumerate(triggers):
  					hPtDenDM[ipath][index][ind].append(TH1F (histoname + "_Den_" + DM, "", len(binDM[trigger][DM][typ])-1, array('f',binDM[trigger][DM][typ])))
 					hPtNumDM[ipath][index][ind].append(TH1F (histoname + "_Num_" + DM, "", len(binDM[trigger][DM][typ])-1, array('f',binDM[trigger][DM][typ])))
 				elif(Samples2018):
-					hPtDenDM[ipath][index][ind].append(TH1F (histoname + "_Den_" + DM, "", len(binDM[trigger][DM])-1, array('f',binDM[trigger][DM])))
-					hPtNumDM[ipath][index][ind].append(TH1F (histoname + "_Num_" + DM, "", len(binDM[trigger][DM])-1, array('f',binDM[trigger][DM])))
+					hPtDenDM[ipath][index][ind].append(TH1F (histoname + "_Den_" + DM, "", len(binDM[trigger][DM][typ])-1, array('f',binDM[trigger][DM][typ])))
+					hPtNumDM[ipath][index][ind].append(TH1F (histoname + "_Num_" + DM, "", len(binDM[trigger][DM][typ])-1, array('f',binDM[trigger][DM][typ])))
+					#hPtDenDM[ipath][index][ind].append(TH1F (histoname + "_Den_" + DM, "", len(binDM[trigger])-1, array('f',binDM[trigger])))
+					#hPtNumDM[ipath][index][ind].append(TH1F (histoname + "_Num_" + DM, "", len(binDM[trigger])-1, array('f',binDM[trigger])))
  
 for index, filename in enumerate(files):
 	print  "filename", filename
