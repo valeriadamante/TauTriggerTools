@@ -100,8 +100,8 @@ for ev in range (0, nentries):
 	if saveOnlyOS and not tIn.isOS:
 		continue
 		
-		for i in range (0, len(pt)):
-		briso[i][0] = 0
+        for i in range (0, len(pt)):
+                briso[i][0] = 0
 		brnoiso[i][0] = 0
 
 	for i in range (0, numberOfHLTTriggers):
@@ -144,7 +144,7 @@ for ev in range (0, nentries):
 				hltPathTriggered_OS[bitIndex][0] = 0
 		
 	if not MC:
-		if ((((RunNumber < 276215 and ((triggerBits >> 1) & 1) == 1)) or (RunNumber > 276215 and RunNumber < 278270 and ((triggerBits >> 0) & 1) == 1)) or (RunNumber > 278270 and ((triggerBits >> 0) & 1) == 1 and HLTpt >=30 and L1pt >= 26 and L1iso>0)):
+		if ((((RunNumber < 276215 and ((triggerBits >> 1) & 1) == 1)) or (RunNumber > 276215 and RunNumber < 278270 and ((triggerBits >> 0) & 1) == 1)) or (RunNumber > 278270 and ((triggerBits >> 0) & 1) == 1 and HLTpt[0] >=30 and L1pt >= 26 and L1iso>0)):
 			hltPathTriggered_OS[numberOfHLTTriggers+2][0] = 1  # this is the path for e-tau trigger. HLTpt and L1 cuts are required to have the same threshold on tau. Different mutau paths are used for etau meausurment for different runs
 		else:
 			hltPathTriggered_OS[numberOfHLTTriggers+2][0] = 0	
@@ -155,22 +155,22 @@ for ev in range (0, nentries):
 			hltPathTriggered_OS[numberOfHLTTriggers+2][0] = 0
 			
 	if not MC:
-	      	if ((("2016H" in fname) and ((triggerBits >> 4) & 1) == 1) or (("2016H" not in fname) and ((triggerBits >> 3) & 1) == 1 ) and (HLTpt>=35)): #just run once more!!! I modified this for HLT35GeV but did not produce new results!!!
+		if ((("2016H" in fname) and ((triggerBits >> 4) & 1) == 1) or (("2016H" not in fname) and ((triggerBits >> 3) & 1) == 1 ) and (HLTpt[3]>=35)): #just run once more!!! I modified this for HLT35GeV but did not produce new results!!!
 			hltPathTriggered_OS[numberOfHLTTriggers+3][0] = 1
 		else:
 	       		hltPathTriggered_OS[numberOfHLTTriggers+3][0] = 0
        	               #bitIndex==4:  # should be 4 for 2016H and 3 for 2016G
        	elif MC:
-	       	if (((((triggerBits >> 4) & 1) == 1) or (((triggerBits >> 3) & 1) == 1))  and (HLTpt>=35)): 
+		if (((((triggerBits >> 4) & 1) == 1) or (((triggerBits >> 3) & 1) == 1))  and (HLTpt[3]>=35)):
 			hltPathTriggered_OS[numberOfHLTTriggers+3][0] = 1
 		else:
 			hltPathTriggered_OS[numberOfHLTTriggers+3][0] = 0
 	 
-	if not "Run" in fname:				
+        if not "Run" in fname:
 		puweight = tIn.puweight
 	else:
 		puweight = 1
-	bkgSubW[0] = 1. if tIn.isOS else -1.
+        bkgSubW[0] = 1. if tIn.isOS else -1.
 
 
 	if(tIn.byVVLooseIsolationMVArun2017v2DBoldDMwLT2017 > 0.5):

@@ -95,18 +95,10 @@ for i in range (0, numberOfHLTTriggersForFit):
 	elif(i==numberOfHLTTriggers+5):
 		name = ("hasHLTditauPath_4or5or6noHPS")#_TightTau35TightIDor_MediumTau35TightIDplusHLTTau40or_TightTau35plusHLTTau40")
 	elif(i==numberOfHLTTriggers+6):
-		name = ("hasHLTditauPathnoHPS_L1pt32") # HLT_IsoMu24_eta2p1_MediumChargedIsoPFTauHPS35_Trk1_eta2p1_Reg_CrossL1_v
-	elif(i==numberOfHLTTriggers+7):
-		name = ("hasHLTditauPathnoHPS_L1pt34")
-	elif(i==numberOfHLTTriggers+8):
-		name = ("hasHLTditauPathHPS_L1pt32")
-	elif(i==numberOfHLTTriggers+9):
-		name = ("hasHLTditauPathHPS_L1pt34")
-	elif(i==numberOfHLTTriggers+10):
 		name = ("hasHLTetauPath_8and14")
-	elif(i==numberOfHLTTriggers+11):
+	elif(i==numberOfHLTTriggers+7):
 		name = ("hasHLTmutauPath_8and14")
-	elif(i==numberOfHLTTriggers+12):
+	elif(i==numberOfHLTTriggers+8):
 		name = ("hasHLTditauPath_4or5or6and15or20")
 	tOut.Branch(name, hltPathTriggered_OS[i], name+"/I")
 	
@@ -166,7 +158,7 @@ for ev in range (0, nentries):
 			hltPathTriggered_OS[bitIndex][0] = 0
 
 	if(bitIndex==14):  #mutau
-		if (((triggerBits >> bitIndex) & 1) == 1 and L1pt>=26 and L1iso>0 and HLTpt>=30):
+		if (((triggerBits >> bitIndex) & 1) == 1 and L1pt>=26 and L1iso>0 and HLTpt[bitIndex]>=30):
 			hltPathTriggered_OS[numberOfHLTTriggers][0] = 1	  # this is the path for etau trigger. So (L1iso) should be applied here!
 		else:
 			hltPathTriggered_OS[numberOfHLTTriggers][0] = 0
@@ -177,7 +169,7 @@ for ev in range (0, nentries):
 			hltPathTriggered_OS[numberOfHLTTriggers+1][0] = 0
 
 	if(bitIndex==8):  #mutau
-		if (((triggerBits >> bitIndex) & 1) == 1 and L1pt>=26 and L1iso>0 and HLTpt>=30):
+		if (((triggerBits >> bitIndex) & 1) == 1 and L1pt>=26 and L1iso>0 and HLTpt[bitIndex]>=30):
 			hltPathTriggered_OS[numberOfHLTTriggers+3][0] = 1	  # this is the path for etau trigger. So (L1iso) should be applied here!
 		else:
 			hltPathTriggered_OS[numberOfHLTTriggers+3][0] = 0
@@ -188,88 +180,70 @@ for ev in range (0, nentries):
 			hltPathTriggered_OS[numberOfHLTTriggers+4][0] = 0
 
 	# ditau
-    if (((((triggerBits >> 4) & 1) == 1 and HLTpt>=40) or (((triggerBits >> 5) & 1) == 1 and HLTpt>=40) or (((triggerBits >> 6) & 1) == 1))):
+    if (((((triggerBits >> 4) & 1) == 1 and HLTpt[4]>=40) or (((triggerBits >> 5) & 1) == 1 and HLTpt[5]>=40) or (((triggerBits >> 6) & 1) == 1))):
 	    hltPathTriggered_OS[numberOfHLTTriggers+5][0] = 1  # this is the path for di-tau trigger. HLTpt cut is required to have the same threshold on tau + L1Pt is needed due to L1 matching differences between MC and Data
-            if(L1pt>=32):
-                    hltPathTriggered_OS[numberOfHLTTriggers+6][0] = 1     # this is the path for ditau trigger for data with L1pt>=32
-            if(L1pt>=34):
-                    hltPathTriggered_OS[numberOfHLTTriggers+7][0] = 1     # this is the path for ditau trigger for data with L1pt>=32
     else:
 	    hltPathTriggered_OS[numberOfHLTTriggers+5][0] = 0
-            hltPathTriggered_OS[numberOfHLTTriggers+6][0] = 0
-            hltPathTriggered_OS[numberOfHLTTriggers+7][0] = 0
-
     if(MC):  #ditau
             if (((triggerBits >> 15) & 1) == 1):
                     hltPathTriggered_OS[numberOfHLTTriggers+2][0] = 1     # this is the path for ditau trigger for MC samples
-                    if(L1pt>=32):
-			    hltPathTriggered_OS[numberOfHLTTriggers+8][0] = 1     # this is the path for ditau trigger for MC samples with L1pt>=32
-                    if(L1pt>=34):
-                            hltPathTriggered_OS[numberOfHLTTriggers+9][0] = 1     # this is the path for ditau trigger for MC samples with L1pt>=34
             else:
                     hltPathTriggered_OS[numberOfHLTTriggers+2][0] = 0
-                    hltPathTriggered_OS[numberOfHLTTriggers+8][0] = 0
-                    hltPathTriggered_OS[numberOfHLTTriggers+9][0] = 0
+
     elif(not MC):  #ditau
             if (((triggerBits >> 20) & 1) == 1):
                     hltPathTriggered_OS[numberOfHLTTriggers+2][0] = 1     # this is the path for ditau trigger for data
-                    if(L1pt>=32):
-			    hltPathTriggered_OS[numberOfHLTTriggers+8][0] = 1     # this is the path for ditau trigger for data with L1pt>=32
-		    if(L1pt>=34):
-                            hltPathTriggered_OS[numberOfHLTTriggers+9][0] = 1     # this is the path for ditau trigger for data with L1pt>=32
             else:
                     hltPathTriggered_OS[numberOfHLTTriggers+2][0] = 0
-                    hltPathTriggered_OS[numberOfHLTTriggers+8][0] = 0
-                    hltPathTriggered_OS[numberOfHLTTriggers+9][0] = 0
 
     if(MC):
-            if (((triggerBits >> 14) & 1) == 1 and L1pt>=26 and L1iso>0 and HLTpt>=30):
-                    hltPathTriggered_OS[numberOfHLTTriggers+10][0] = 1	  # this is the path for etau trigger. So (L1iso) should be applied here!
+            if (((triggerBits >> 14) & 1) == 1 and L1pt>=26 and L1iso>0 and HLTpt[14]>=30):
+                    hltPathTriggered_OS[numberOfHLTTriggers+6][0] = 1	  # this is the path for etau trigger. So (L1iso) should be applied here!
             else:
-                    hltPathTriggered_OS[numberOfHLTTriggers+10][0] = 0
+                    hltPathTriggered_OS[numberOfHLTTriggers+6][0] = 0
 
             if ((triggerBits >> 14) & 1) == 1:
-                    hltPathTriggered_OS[numberOfHLTTriggers+11][0] = 1 # this is the path for mutau trigger. So no extra requirement is needed like: L1pt and L1iso and HLTpt
+                    hltPathTriggered_OS[numberOfHLTTriggers+7][0] = 1 # this is the path for mutau trigger. So no extra requirement is needed like: L1pt and L1iso and HLTpt
             else:
-                    hltPathTriggered_OS[numberOfHLTTriggers+11][0] = 0
+                    hltPathTriggered_OS[numberOfHLTTriggers+7][0] = 0
 
             if (((triggerBits >> 15) & 1) == 1):
-                    hltPathTriggered_OS[numberOfHLTTriggers+12][0] = 1
+                    hltPathTriggered_OS[numberOfHLTTriggers+8][0] = 1
             else:
-                    hltPathTriggered_OS[numberOfHLTTriggers+12][0] = 0
+                    hltPathTriggered_OS[numberOfHLTTriggers+8][0] = 0
     else:
             if(RunNumber < 317509):
-                    if (((triggerBits >> 8) & 1) == 1 and L1pt>=26 and L1iso>0 and HLTpt>=30):
-                            hltPathTriggered_OS[numberOfHLTTriggers+10][0] = 1	  # this is the path for etau trigger. So (L1iso) should be applied here!
+                    if (((triggerBits >> 8) & 1) == 1 and L1pt>=26 and L1iso>0 and HLTpt[8]>=30):
+                            hltPathTriggered_OS[numberOfHLTTriggers+6][0] = 1	  # this is the path for etau trigger. So (L1iso) should be applied here!
                     else:
-                            hltPathTriggered_OS[numberOfHLTTriggers+10][0] = 0
+                            hltPathTriggered_OS[numberOfHLTTriggers+6][0] = 0
 
                     if ((triggerBits >> 8) & 1) == 1:
-                            hltPathTriggered_OS[numberOfHLTTriggers+11][0] = 1 # this is the path for mutau trigger. So no extra requirement is needed like: L1pt and L1iso and HLTpt
+                            hltPathTriggered_OS[numberOfHLTTriggers+7][0] = 1 # this is the path for mutau trigger. So no extra requirement is needed like: L1pt and L1iso and HLTpt
                     else:
-                            hltPathTriggered_OS[numberOfHLTTriggers+11][0] = 0
+                            hltPathTriggered_OS[numberOfHLTTriggers+7][0] = 0
 
-                    if (((((triggerBits >> 4) & 1) == 1 and HLTpt>=40) or (((triggerBits >> 5) & 1) == 1 and HLTpt>=40) or (((triggerBits >> 6) & 1) == 1))):
+                    if (((((triggerBits >> 4) & 1) == 1 and HLTpt[4]>=40) or (((triggerBits >> 5) & 1) == 1 and HLTpt[5]>=40) or (((triggerBits >> 6) & 1) == 1))):
                     # this is the path for di-tau trigger. HLTpt cut is required to have the same threshold on tau + L1Pt is needed due to L1 matching differences between MC and Data
-                            hltPathTriggered_OS[numberOfHLTTriggers+12][0] = 1
+                            hltPathTriggered_OS[numberOfHLTTriggers+8][0] = 1
                     else:
-                            hltPathTriggered_OS[numberOfHLTTriggers+12][0] = 0
+                            hltPathTriggered_OS[numberOfHLTTriggers+8][0] = 0
             else:
 
-                    if (((triggerBits >> 14) & 1) == 1 and L1pt>=26 and L1iso>0 and HLTpt>=30):
-                            hltPathTriggered_OS[numberOfHLTTriggers+10][0] = 1  # this is the path for etau trigger. So (L1iso) should be applied here!
+                    if (((triggerBits >> 14) & 1) == 1 and L1pt>=26 and L1iso>0 and HLTpt[14]>=30):
+                            hltPathTriggered_OS[numberOfHLTTriggers+6][0] = 1  # this is the path for etau trigger. So (L1iso) should be applied here!
                     else:
-                            hltPathTriggered_OS[numberOfHLTTriggers+10][0] = 0
+                            hltPathTriggered_OS[numberOfHLTTriggers+6][0] = 0
 
                     if ((triggerBits >> 14) & 1) == 1:
-                            hltPathTriggered_OS[numberOfHLTTriggers+11][0] = 1 # this is the path for mutau trigger. So no extra requirement is needed like: L1pt and L1iso and HLTpt
+                            hltPathTriggered_OS[numberOfHLTTriggers+7][0] = 1 # this is the path for mutau trigger. So no extra requirement is needed like: L1pt and L1iso and HLTpt
                     else:
-                            hltPathTriggered_OS[numberOfHLTTriggers+11][0] = 0
+                            hltPathTriggered_OS[numberOfHLTTriggers+7][0] = 0
 
                     if (((triggerBits >> 20) & 1) == 1):
-                            hltPathTriggered_OS[numberOfHLTTriggers+12][0] = 1
+                            hltPathTriggered_OS[numberOfHLTTriggers+8][0] = 1
                     else:
-                            hltPathTriggered_OS[numberOfHLTTriggers+12][0] = 0
+                            hltPathTriggered_OS[numberOfHLTTriggers+8][0] = 0
 
 		
     bkgSubW[0] = 1. if tIn.isOS else -1.

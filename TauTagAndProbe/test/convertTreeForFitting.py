@@ -1,7 +1,7 @@
 from ROOT import *
 import numpy as n
 
-MC = False
+MC = True
 DYJets = True   # False means WJet enriched cuts will be used, True means cuts for DYJet enriched samples will be used
 
 if MC:
@@ -50,7 +50,7 @@ if MC:
 else:
 	suppressionType = "SSsubtraction"
 if DYJets:
-	outname = fname.replace ('.root', '_' + suppressionType + 'TightWPold2017v1_forFit.root')
+	outname = fname.replace ('.root', '_' + suppressionType + 'TightWPold2017v1_forFit2.root')
 else:
 	outname = fname.replace ('.root', '_' + suppressionType + '_WjetEnriched_MediumWP2017v2_forFit.root')
 fOut = TFile (outname, 'recreate')
@@ -125,7 +125,7 @@ for ev in range (0, nentries):
 	import itertools as it
     	if bitIndex in it.chain(range(6, 13), range(19, 23)):   # apply this L1 cut only for di-tau triggers
             if (bitIndex==9 or bitIndex==10):
-                if ((triggerBits >> bitIndex) & 1) == 1 and (L1pt>=32) and HLTpt>40:
+                if ((triggerBits >> bitIndex) & 1) == 1 and (L1pt>=32) and HLTpt[bitIndex]>=40:
                     hltPathTriggered_OS[bitIndex][0] = 1
                 else:
                     hltPathTriggered_OS[bitIndex][0] = 0
@@ -141,7 +141,7 @@ for ev in range (0, nentries):
                 hltPathTriggered_OS[bitIndex][0] = 0
                         
         if(bitIndex==13):	
-            if (((triggerBits >> bitIndex) & 1) == 1 and L1pt>=26 and L1iso>0 and HLTpt>30):
+            if (((triggerBits >> bitIndex) & 1) == 1 and L1pt>=26 and L1iso>0 and HLTpt[bitIndex]>=30):
                 hltPathTriggered_OS[numberOfHLTTriggers][0] = 1	  # this is the path for etau trigger. So (L1iso) should be applied here!
             else:
                 hltPathTriggered_OS[numberOfHLTTriggers][0] = 0
@@ -151,7 +151,7 @@ for ev in range (0, nentries):
             else:
                 hltPathTriggered_OS[numberOfHLTTriggers+1][0] = 0       		
         
-    if (((((triggerBits >> 9) & 1) == 1 and HLTpt>40) or (((triggerBits >> 10) & 1) == 1 and HLTpt>40) or (((triggerBits >> 11) & 1) == 1))  and L1pt>=32):
+    if (((((triggerBits >> 9) & 1) == 1 and HLTpt[9]>=40) or (((triggerBits >> 10) & 1) == 1 and HLTpt[10]>=40) or (((triggerBits >> 11) & 1) == 1))  and L1pt>=32):
         hltPathTriggered_OS[numberOfHLTTriggers+2][0] = 1  # this is the path for di-tau trigger. HLTpt cut is required to have the same threshold on tau + L1Pt is needed due to L1 matching differences between MC and Data
     else:
         hltPathTriggered_OS[numberOfHLTTriggers+2][0] = 0
