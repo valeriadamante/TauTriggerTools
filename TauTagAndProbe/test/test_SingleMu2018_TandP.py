@@ -4,7 +4,7 @@ import FWCore.ParameterSet.Config as cms
 process = cms.Process("TagAndProbe")
 import os
 
-isMC = True
+isMC = False
 useGenMatch = False
 useCustomHLT = False
 
@@ -31,7 +31,7 @@ else:
  	options.outputFile = 'NTuple_SingleMu_DYMC_2018.root'
 
 options.inputFiles = []
-options.maxEvents  = -999
+options.maxEvents  = 1000
 options.parseArguments()
 
 
@@ -124,7 +124,8 @@ na.runTauID()
 if not isMC:
     from Configuration.AlCa.autoCond import autoCond
     #process.GlobalTag.globaltag = '102X_dataRun2_Sep2018Rereco_v1' # for 2018 ReReco RunABC samples
-    process.GlobalTag.globaltag = '102X_dataRun2_Prompt_v12' # for 2018 PromtReco RunD samples
+    process.GlobalTag.globaltag = '102X_dataRun2_Sep2018ABC_v2' # for 2018 ReReco RunABC samples
+    #process.GlobalTag.globaltag = '102X_dataRun2_Prompt_v13' # for 2018 PromtReco RunD samples
     process.load('TauTagAndProbe.TauTagAndProbe.tagAndProbe_cff')
     process.source = cms.Source("PoolSource",
         fileNames = cms.untracked.vstring(
@@ -137,13 +138,18 @@ if not isMC:
 
 
 else:
-    process.GlobalTag.globaltag = '102X_upgrade2018_realistic_v16'
+    process.GlobalTag.globaltag = '102X_upgrade2018_realistic_v18'
     process.load('TauTagAndProbe.TauTagAndProbe.MCanalysis_cff')
     process.source = cms.Source("PoolSource",
         fileNames = cms.untracked.vstring(            
         #   '/store/mc/RunIIFall17MiniAOD/DY1JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/94X_mc2017_realistic_v10-v1/20000/12DB4A06-65D7-E711-8DA4-0CC47A78A456.root'
 	#'/store/mc/RunIIFall17MiniAODv2/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/PU2017RECOSIMstep_12Apr2018_94X_mc2017_realistic_v14-v1/20000/00D13F2E-6F44-E811-923E-001E0BED0560.root'
-	' /store/mc/RunIIAutumn18MiniAOD/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/80000/52E26FAC-370D-0742-96AF-3E5439F7CD9C.root'
+	#' /store/mc/RunIIAutumn18MiniAOD/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/80000/52E26FAC-370D-0742-96AF-3E5439F7CD9C.root'
+	'/store/mc/RunIIAutumn18MiniAOD/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/80000/FFDCFC59-4ABE-0646-AABE-BD5D65301169.root',
+	'/store/mc/RunIIAutumn18MiniAOD/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/80000/FC40474D-EE5A-C845-AEC3-E9B088F15648.root',
+	'/store/mc/RunIIAutumn18MiniAOD/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/80000/FA870652-56D3-1E45-B1EE-EF8A8FC89506.root',
+	'/store/mc/RunIIAutumn18MiniAOD/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/80000/FA553171-E5E9-5346-B634-6A64D6DEB64C.root',
+	'/store/mc/RunIIAutumn18MiniAOD/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/80000/FA553171-E5E9-5346-B634-6A64D6DEB64C.root'
         )
     )
 

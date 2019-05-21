@@ -92,6 +92,7 @@ class Ntuplizer : public edm::EDAnalyzer {
         float _tauEta;
         float _tauPhi;
         int _tauDM;
+        float _tauMass;
         float _mT;
         float _mVis;
         int _tau_genindex;
@@ -168,6 +169,7 @@ class Ntuplizer : public edm::EDAnalyzer {
         vector<float> _hltPt;
         vector<float> _hltEta;
         vector<float> _hltPhi;
+        vector<float> _hltMass;
         float _hltL2CaloJetPt;
         float _hltL2CaloJetEta;
         float _hltL2CaloJetPhi;
@@ -391,6 +393,7 @@ void Ntuplizer::Initialize() {
     _tauEta = -1.;
     _tauPhi = -1.;
     _tauDM = -1;
+    _tauMass = -1;
     _mT = -1.;
     _mVis = -1.;
     _tau_genindex = -1;
@@ -473,6 +476,7 @@ void Ntuplizer::Initialize() {
     _hltPt.assign(NUMBER_OF_MAXIMUM_TRIGGERS,-1);
     _hltEta.assign(NUMBER_OF_MAXIMUM_TRIGGERS,666);
     _hltPhi.assign(NUMBER_OF_MAXIMUM_TRIGGERS,666);
+    _hltMass.assign(NUMBER_OF_MAXIMUM_TRIGGERS,666);
     _hltL2CaloJetPt = -1;
     _hltL2CaloJetEta = 666;
     _hltL2CaloJetPhi = 666;
@@ -536,6 +540,7 @@ void Ntuplizer::beginJob()
     _tree -> Branch("tauEta", &_tauEta, "tauEta/F");
     _tree -> Branch("tauPhi", &_tauPhi, "tauPhi/F");
     _tree -> Branch("tauDM", &_tauDM, "tauDM/I");
+    _tree -> Branch("tauMass", &_tauMass, "tauMass/F");
     _tree -> Branch("mT", &_mT, "mT/F");
     _tree -> Branch("mVis", &_mVis, "mVis/F");
     _tree -> Branch("tau_genindex", &_tau_genindex, "tau_genindex/I");
@@ -617,6 +622,7 @@ void Ntuplizer::beginJob()
     _tree -> Branch("hltPt",  &_hltPt);
     _tree -> Branch("hltEta", &_hltEta);
     _tree -> Branch("hltPhi", &_hltPhi);
+    _tree -> Branch("hltMass",  &_hltMass);
     
     _tree -> Branch("hltL2CaloJetPt",  &_hltL2CaloJetPt,  "hltL2CaloJetPt/F");
     _tree -> Branch("hltL2CaloJetEta", &_hltL2CaloJetEta, "hltL2CaloJetEta/F");
@@ -794,6 +800,7 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
                         _hltPt[x] = obj.pt();
                         _hltEta[x] = obj.eta();
                         _hltPhi[x] = obj.phi();
+                        _hltMass[x] = obj.p4().mass();
                         _tauTriggerBitSet[x] = true;
                     }
                 }
@@ -932,6 +939,8 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
     _tauEta = tau -> eta();
     _tauPhi = tau -> phi();
     _tauDM = tau -> decayMode();
+    _tauMass = tau->p4().mass();
+
     _decayModeFinding = tau->tauID("decayModeFinding");
     _decayModeFindingNewDMs = tau->tauID("decayModeFindingNewDMs");
     

@@ -208,7 +208,7 @@ bjets = cms.EDFilter("PATJetRefSelector",
         src = cms.InputTag("slimmedJets"),
         cut = cms.string(
                 'pt > 20 && abs(eta) < 2.4 ' #kinematics
-                '&& bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags") > 0.8484' # b tag with medium WP
+                '&& (bDiscriminator("pfDeepFlavourJetTags:probb") + bDiscriminator("pfDeepFlavourJetTags:probbb") + bDiscriminator("pfDeepFlavourJetTags:problepb")) > 0.2770 ' # b tag with medium WP
         ),
         #filter = cms.bool(True)
 )
