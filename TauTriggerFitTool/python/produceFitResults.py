@@ -3,8 +3,7 @@ from array import array
 gROOT.SetBatch(True)
 from math import sqrt
 from functions import *
-from setFitParam2017 import *
-from setFitParam2018 import *
+from fittingTool import fittingTool
 
 year2017 = False
 year2018 = True
@@ -37,9 +36,9 @@ elif(year2018):
 
 outputfile = TFile( "../data/"+outputname, 'recreate')
 
+nfailed = 0
 # efficiency calculation after filling the histograms for 3 different triggers for each WPs of DATA and MC
 for ipath, trigger in enumerate(triggers):
-
 	for WPind, wp in enumerate(WPs):
 		f1 =[]
 		h_errBandDM68 = [[], []]
@@ -54,24 +53,23 @@ for ipath, trigger in enumerate(triggers):
 		
 		for index, typ in enumerate(types):
 			
-			f1.append(TF1( 'f1'+typ, '[5] - ROOT::Math::crystalball_cdf(-x, [0], [1], [2], [3])*([4])' ))
+			f1.append(TF1( 'f1'+typ, '[5] - ROOT::Math::crystalball_cdf(-x, [0], [1], [2], [3])*([4])'))
 			if(index ==0):
 				f1[index].SetLineColor( kBlue)
 			else:
 				f1[index].SetLineColor( kRed)
 			f1[index].SetParName( 0, "alpha" )
 			f1[index].SetParName( 1, "n" )
-			f1[index].SetParName( 2, "simga" )
+			f1[index].SetParName( 2, "sigma" )
 			f1[index].SetParName( 3, "x0" )
 			f1[index].SetParName( 4, "scale" )
 			f1[index].SetParName( 5, "y-rise" )
 
-			f2 = [[],[]]
+		f2 = [[],[]]
                 for idm, DM in enumerate(tauDMs):
                         f2.append([])
                         for index, typ in enumerate(types):
-                                f2[idm].append(TF1( 'f2_'+ DM  +"_" + typ, '[5] - ROOT::Math::crystalball_cdf(-x, [0], [1], [2], [3]\
-)*([4])' ))
+                                f2[idm].append(TF1( 'f2_'+ DM  +"_" + typ, '[5] - ROOT::Math::crystalball_cdf(-x, [0], [1], [2], [3])*([4])'))
                                 if(idm ==0): f2[idm][index].SetLineColor( kBlue )
                                 elif(idm ==1): f2[idm][index].SetLineColor( kRed )
                                 elif(idm ==2): f2[idm][index].SetLineColor( kGreen+3 )
@@ -80,7 +78,7 @@ for ipath, trigger in enumerate(triggers):
                                         elif index==1: f2[idm][1].SetLineColor( kRed )
                                 f2[idm][index].SetParName( 0, "alpha" )
                                 f2[idm][index].SetParName( 1, "n" )
-                                f2[idm][index].SetParName( 2, "simga" )
+                                f2[idm][index].SetParName( 2, "sigma" )
                                 f2[idm][index].SetParName( 3, "x0" )
                                 f2[idm][index].SetParName( 4, "scale" )
                                 f2[idm][index].SetParName( 5, "y-rise" )
@@ -89,27 +87,21 @@ for ipath, trigger in enumerate(triggers):
 		h_errBand68 = []
 		
 		for index, typ in enumerate(types):
+	
+			print "Fit is performed for", trigger, "trigger in", wp ,"WP for", typ
 			
 			gEfficiency = TGraphAsymmErrors()
 			gEfficiency = file.Get(trigger +"_gEfficiency_" + wp +"_"+ typ)
 
-			if(year2017):
-				fitparam = setFitParam2017(f1, f2, index, 0)
-			elif(year2018):
-				fitparam = setFitParam2018(f1, f2, index, 0)
+			fitter = fittingTool(f1[index], gEfficiency)
 
 			print "trigger", trigger
-			if(trigger == "ditau"): fitparam.setDiTauFitParameters()
-			if(trigger == "mutau"): fitparam.setMuTauFitParameters()
-			if(trigger == "etau"): fitparam.setETauFitParameters()
 
 			h_errBand68.append(TH1F(histoname+"_CL68","histo of 0.68 confidence band", 480, 20, 500))
 			g_errBand68.append(TGraphErrors())
 			
-			print "Fit is performed for", trigger, "trigger in", wp ,"WP for", typ 
-			print "Fit parameters:", f1[index].GetParameter(0), f1[index].GetParameter(1), f1[index].GetParameter(2), f1[index].GetParameter(3), f1[index].GetParameter(4), f1[index].GetParameter(5)    
-			
-			fit_result = gEfficiency.Fit('f1'+ typ, 'S')
+			fit_result = fitter.performFit()
+			if int(fit_result) != 0: nfailed += 1
 			
 			funct = functions(gEfficiency, "histo_" + trigger + "ErrorBand_" + wp +"_"+ typ, idm, index, f1, h_errBand68[index], g_errBand68[index], fit_result, 0.68)
 			
@@ -142,101 +134,17 @@ for ipath, trigger in enumerate(triggers):
 	
 			# per DM efficiencies
 			for idm, DM in enumerate(tauDMs):
+				print "Fit is performed for", trigger, "trigger in", wp ,"WP for", typ , " per DM", DM
 				
 				gEfficiencyDM = TGraphAsymmErrors()
 				gEfficiencyDM = file.Get(trigger +"_gEfficiency_" + wp +"_"+ typ +"_"+ DM)
-			
-				if(year2017):
-					fitparam2 = setFitParam2017(f1, f2, index, idm)
-				elif(year2018):
-					fitparam2 = setFitParam2018(f1, f2, index, idm)
-				print "wp", wp
-				if(year2017):
-                                        if(trigger == "ditau"):
-                                                if(DM =="dm0" or DM =="dm1"):
-                                                        fitparam2.setDiTauFitParametersDM0DM1()
-                                                elif(DM =="dm10"):
-                                                        if(wp=="tightTauMVA"): fitparam2.setDiTauFitParametersDM10_tightWP()
-                                                        elif(wp=="vtightTauMVA"): fitparam2.setDiTauFitParametersDM10_vtightWP()
-                                                        elif(wp=="vvtightTauMVA"): fitparam2.setDiTauFitParametersDM10_vvtightWP()
-                                                        elif(wp=="mediumTauMVA"): fitparam2.setDiTauFitParametersDM10_mediumWP()
-                                                        elif(wp=="looseTauMVA"): fitparam2.setDiTauFitParametersDM10_looseWP()
-                                                        elif(wp=="vlooseTauMVA"): fitparam2.setDiTauFitParametersDM10_vlooseWP()
-						
-                                        if(trigger == "mutau"):
-                                                if(DM =="dm0" or DM =="dm1"):
-                                                        fitparam2.setMuTauFitParametersDM0DM1()
-                                                elif(DM =="dm10"):
-                                                        if(wp=="tightTauMVA"): fitparam2.setMuTauFitParametersDM10_tightWP()
-                                                        elif(wp=="vtightTauMVA"): fitparam2.setMuTauFitParametersDM10_vtightWP()
-                                                        elif(wp=="vvtightTauMVA"): fitparam2.setMuTauFitParametersDM10_vvtightWP()
-                                                        elif(wp=="mediumTauMVA"): fitparam2.setMuTauFitParametersDM10_mediumWP()
-                                                        elif(wp=="looseTauMVA"): fitparam2.setMuTauFitParametersDM10_looseWP()
-                                                        elif(wp=="vlooseTauMVA"): fitparam2.setMuTauFitParametersDM10_vlooseWP()
-						
-                                        if(trigger == "etau"):
-                                                if(DM =="dm0"):
-                                                        fitparam2.setETauFitParametersDM0()
-                                                elif(DM =="dm1"):
-                                                        fitparam2.setETauFitParametersDM1()
-                                                elif(DM =="dm10"):
-                                                        if(wp=="tightTauMVA"): fitparam2.setETauFitParametersDM10_tightWP()
-                                                        elif(wp=="vtightTauMVA"): fitparam2.setETauFitParametersDM10_vtightWP()
-                                                        elif(wp=="vvtightTauMVA"): fitparam2.setETauFitParametersDM10_vvtightWP()
-                                                        elif(wp=="mediumTauMVA"): fitparam2.setETauFitParametersDM10_mediumWP()
-                                                        elif(wp=="looseTauMVA"): fitparam2.setETauFitParametersDM10_looseWP()
-                                                        elif(wp=="vlooseTauMVA"): fitparam2.setETauFitParametersDM10_vlooseWP()
+				
+				fitter = fittingTool(f2[idm][index], gEfficiencyDM)
 
-				elif(year2018):
-                                        if(trigger == "ditau"):
-                                                if(DM =="dm0"):
-                                                        if("tight" in wp): fitparam2.setDiTauFitParametersDM0_tighter()
-                                                        else: fitparam2.setDiTauFitParametersDM0_looser()
-                                                elif(DM =="dm1"):
-                                                        if("tight" in wp): fitparam2.setDiTauFitParametersDM1_tighter()
-                                                        else: fitparam2.setDiTauFitParametersDM1_looser()
-                                                elif(DM =="dm10"):
-                                                        if(wp=="tightTauMVA"): fitparam2.setDiTauFitParametersDM10_tightWP()
-                                                        elif(wp=="vtightTauMVA"): fitparam2.setDiTauFitParametersDM10_vtightWP()
-                                                        elif(wp=="vvtightTauMVA"): fitparam2.setDiTauFitParametersDM10_vvtightWP()
-                                                        elif(wp=="mediumTauMVA"): fitparam2.setDiTauFitParametersDM10_mediumWP()
-                                                        elif(wp=="looseTauMVA"): fitparam2.setDiTauFitParametersDM10_looseWP()
-                                                        elif("vlooseTauMVA" in wp): fitparam2.setDiTauFitParametersDM10_vlooseWP()
+				fit_result2 = fitter.performFit()
 
-                                        if(trigger == "mutau"):
-                                                if(DM =="dm0"):
-                                                        if("loose" not in wp): fitparam2.setMuTauFitParametersDM0_tighter()
-                                                        elif(wp =="looseTauMVA"): fitparam2.setMuTauFitParametersDM0_loose()
-                                                        elif("vlooseTauMVA" in wp): fitparam2.setMuTauFitParametersDM0_vloose()
-                                                elif(DM =="dm1"):
-                                                        if("tight" in wp): fitparam2.setMuTauFitParametersDM1_tighter()
-                                                        else: fitparam2.setMuTauFitParametersDM1_looser()
-                                                elif(DM =="dm10"):
-                                                        if("tight" in wp): fitparam2.setMuTauFitParametersDM10_tighter()
-                                                        elif(wp=="mediumTauMVA"): fitparam2.setMuTauFitParametersDM10_mediumWP()
-                                                        elif(wp=="looseTauMVA"): fitparam2.setMuTauFitParametersDM10_looseWP()
-                                                        elif("vlooseTauMVA" in wp): fitparam2.setMuTauFitParametersDM10_vlooseWP()
-
-                                        if(trigger == "etau"):
-                                                if(DM =="dm0"):
-                                                        if("vtight" in wp): fitparam2.setETauFitParametersDM0_tighter()
-                                                        else: fitparam2.setETauFitParametersDM0_looser()
-                                                elif(DM =="dm1"):
-                                                        fitparam2.setETauFitParametersDM1()
-                                                elif(DM =="dm10"):
-                                                        if(wp=="tightTauMVA"): fitparam2.setETauFitParametersDM10_tightWP()
-                                                        elif(wp=="vtightTauMVA"): fitparam2.setETauFitParametersDM10_vtightWP()
-                                                        elif(wp=="vvtightTauMVA"): fitparam2.setETauFitParametersDM10_vvtightWP()
-                                                        elif(wp=="mediumTauMVA"): fitparam2.setETauFitParametersDM10_mediumWP()
-                                                        elif(wp=="looseTauMVA"): fitparam2.setETauFitParametersDM10_looseWP()
-                                                        elif("vlooseTauMVA" in wp): fitparam2.setETauFitParametersDM10_vlooseWP()
-
-
-							
-				print "Fit is performed for", trigger, "trigger in", wp ,"WP for", typ , " per DM", DM
-				print "Fit parameters:", f2[idm][index].GetParameter(0), f2[idm][index].GetParameter(1), f2[idm][index].GetParameter(2), f2[idm][index].GetParameter(3), f2[idm][index].GetParameter(4), f2[idm][index].GetParameter(5)    
-							
-				fit_result2 = gEfficiencyDM.Fit('f2_'+ DM +"_" + typ, 'S')
+				if int(fit_result2) != 0: nfailed += 1			
+	
 				functDM = functions(gEfficiency, "histo_" + trigger + "_" + wp +"_"+ typ, idm, index, f2[idm] , h_errBandDM68[idm][index], g_errBandDM68[idm][index], fit_result2, 0.68)
 				h_errBandDM68[idm][index], g_errBandDM68[idm][index] = functDM.getConfidenceInterval()
 
@@ -278,5 +186,5 @@ for ipath, trigger in enumerate(triggers):
 			
 
 outputfile.Close()
+print nfailed, 'failed fits'
 print "The output ROOT file has been created: ../data/" + outputname
-
