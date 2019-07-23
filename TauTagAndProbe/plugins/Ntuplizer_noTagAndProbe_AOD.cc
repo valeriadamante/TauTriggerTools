@@ -80,8 +80,8 @@ private:
   virtual void endRun(edm::Run const&, edm::EventSetup const&);
   void Initialize();
   bool hasFilters(const pat::TriggerObjectStandAlone&  obj , const std::vector<std::string>& filtersToLookFor);
-  int FillJet(const edm::View<reco::Jet> *jets, const edm::Event& event, JetCorrectionUncertainty* jecUnc);  
-  // int FillJet(const edm::View<pat::Jet> *jets, const edm::Event& event, JetCorrectionUncertainty* jecUnc);  
+  int FillJet(const edm::View<reco::Jet> *jets, const edm::Event& event, JetCorrectionUncertainty* jecUnc);
+  // int FillJet(const edm::View<pat::Jet> *jets, const edm::Event& event, JetCorrectionUncertainty* jecUnc);
 
   TTree *_tree;
   TTree *_triggerNamesTree;
@@ -151,8 +151,8 @@ private:
   std::vector<Float_t> _jets_vtxNtrk;
   std::vector<Float_t> _jets_vtx3deL;
   std::vector<Float_t> _jets_leadTrackPt;
-  std::vector<Float_t> _jets_leptonPtRel; 
-  std::vector<Float_t> _jets_leptonPt;    
+  std::vector<Float_t> _jets_leptonPtRel;
+  std::vector<Float_t> _jets_leptonPt;
   std::vector<Float_t> _jets_leptonDeltaR;
   std::vector<Float_t> _jets_chEmEF;
   std::vector<Float_t> _jets_chHEF;
@@ -409,7 +409,7 @@ void Ntuplizer_noTagAndProbe_AOD::beginJob()
   this -> _tree -> Branch("isOS", &_isOS, "isOS/O");
   this -> _tree -> Branch("foundJet", &_foundJet, "foundJet/I");
   this -> _tree -> Branch("Nvtx", &_Nvtx, "Nvtx/I");
-	
+
   this -> _tree->Branch("JetsNumber",&_numberOfJets,"JetsNumber/I");
   this -> _tree->Branch("jets_px",&_jets_px);
   this -> _tree->Branch("jets_py",&_jets_py);
@@ -485,7 +485,7 @@ void Ntuplizer_noTagAndProbe_AOD::analyze(const edm::Event& iEvent, const edm::E
   iEvent.getByToken(this -> _VtxTag,vertexes);
 
   //! TagAndProbe on HLT taus
-  const edm::TriggerNames &names = iEvent.triggerNames(*triggerBits);
+  // const edm::TriggerNames &names = iEvent.triggerNames(*triggerBits);
   const reco::PFTau tau = (*tauHandle)[0] ;
   // const pat::TauRef tau = (*tauHandle)[0] ;
 
@@ -590,7 +590,7 @@ void Ntuplizer_noTagAndProbe_AOD::analyze(const edm::Event& iEvent, const edm::E
   if (L1EmuTauHandle.isValid())
     {
       minDR = 0.5;
-	
+
       for (l1t::TauBxCollection::const_iterator bx0EmuTauIt = L1EmuTauHandle->begin(0); bx0EmuTauIt != L1EmuTauHandle->end(0) ; bx0EmuTauIt++)
 	{
 	  TLorentzVector tauLV;
@@ -600,9 +600,9 @@ void Ntuplizer_noTagAndProbe_AOD::analyze(const edm::Event& iEvent, const edm::E
 
 	  const float dR = tauLV.DeltaR(l1tLV);
 	  const l1t::Tau& l1tEmuTau = *bx0EmuTauIt;
-	    
+
 	  cout<<"Emul Tau, pT = "<<l1tEmuTau.pt()<<", eta = "<<l1tEmuTau.eta()<<", phi = "<<l1tEmuTau.phi()<<endl;
-	    
+
 	  if (dR < minDR) //Uncomment for new match algo
 	    {
 	      minDR = dR; //Uncomment for new match algo
@@ -618,7 +618,7 @@ void Ntuplizer_noTagAndProbe_AOD::analyze(const edm::Event& iEvent, const edm::E
 	      this -> _l1tEmuTowerIPhi = l1tEmuTau.towerIPhi();
 	      this -> _l1tEmuRawEt     = l1tEmuTau.rawEt();
 	      this -> _l1tEmuIsoEt     = l1tEmuTau.isoEt();
-		
+
 	    }
 	}
     }
@@ -645,7 +645,7 @@ void Ntuplizer_noTagAndProbe_AOD::analyze(const edm::Event& iEvent, const edm::E
 
   const edm::View<reco::Jet>* jets = jetHandle.product();
   edm::ESHandle<JetCorrectorParametersCollection> JetCorParColl;
-  eSetup.get<JetCorrectionsRecord>().get("AK4PFchs",JetCorParColl); 
+  eSetup.get<JetCorrectionsRecord>().get("AK4PFchs",JetCorParColl);
   JetCorrectorParameters const & JetCorPar = (*JetCorParColl)["Uncertainty"];
   JetCorrectionUncertainty jecUnc (JetCorPar);
   _numberOfJets = FillJet(jets,iEvent, &jecUnc);
@@ -686,7 +686,7 @@ int Ntuplizer_noTagAndProbe_AOD::FillJet(const edm::View<reco::Jet> *jets, const
     _jets_px.push_back( (float) ijet->px());
     _jets_py.push_back( (float) ijet->py());
     _jets_pz.push_back( (float) ijet->pz());
-    _jets_e.push_back( (float) ijet->energy());    
+    _jets_e.push_back( (float) ijet->energy());
     _jets_mT.push_back( (float) ijet->mt());
     // _jets_Flavour.push_back(ijet->partonFlavour());
     // _jets_HadronFlavour.push_back(ijet->hadronFlavour());
@@ -704,7 +704,7 @@ int Ntuplizer_noTagAndProbe_AOD::FillJet(const edm::View<reco::Jet> *jets, const
     // _bdiscr2.push_back(ijet->bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags"));
     // _bdiscr3.push_back(ijet->bDiscriminator("pfCombinedMVAV2BJetTags"));
 
- 
+
     //PF jet ID
     float NHF = 0.;
     float NEMF = 0.;
@@ -726,15 +726,15 @@ int Ntuplizer_noTagAndProbe_AOD::FillJet(const edm::View<reco::Jet> *jets, const
     // float CHM = ijet->chargedMultiplicity();
     float absjeta = fabs(ijet->eta());
 
-    _jets_chEmEF .push_back(CEMF);  
-    _jets_chHEF  .push_back(CHF); 
+    _jets_chEmEF .push_back(CEMF);
+    _jets_chHEF  .push_back(CHF);
     _jets_nEmEF  .push_back(NEMF);
     _jets_nHEF   .push_back(NHF);
-    _jets_chMult .push_back(chargedMult);  
-    _jets_neMult .push_back(NumNeutralParticles);  
-    _jets_MUF    .push_back(MUF);  
+    _jets_chMult .push_back(chargedMult);
+    _jets_neMult .push_back(NumNeutralParticles);
+    _jets_MUF    .push_back(MUF);
 
-    int jetid=0; 
+    int jetid=0;
     bool looseJetID = false;
     bool tightJetID = false;
     bool tightLepVetoJetID = false;
@@ -753,7 +753,7 @@ int Ntuplizer_noTagAndProbe_AOD::FillJet(const edm::View<reco::Jet> *jets, const
     else
       {
 	looseJetID = (NEMF<0.90 && NumNeutralParticles>10 );
-	tightJetID = looseJetID;   
+	tightJetID = looseJetID;
       }
     if (looseJetID) ++jetid;
     if (tightJetID) ++jetid;
@@ -766,22 +766,22 @@ int Ntuplizer_noTagAndProbe_AOD::FillJet(const edm::View<reco::Jet> *jets, const
     // _jets_rawPt.push_back ( jetRawPt );
     // _jets_area.push_back (ijet->jetArea());
     // _jetrawf.push_back(jecFactor);
-  
+
     // loop on jet contituents to retrieve info for b jet regression
     int nDau = ijet -> numberOfDaughters();
     //cout << "JET: " << (ijet - jets->begin()) << " N daught: " << nDau << endl;
 
     // TLorentzVector vJet (0,0,0,0);
     // vJet.SetPxPyPzE (ijet->px(), ijet->py(), ijet->pz(), ijet->energy());
-    // TLorentzVector vDau (0,0,0,0); 
-    // TLorentzVector vSum (0,0,0,0); 
+    // TLorentzVector vDau (0,0,0,0);
+    // TLorentzVector vSum (0,0,0,0);
 
     float leadTrackPt = 0.;
     softLeptInJet.clear();
     for (int iDau = 0; iDau < nDau; ++iDau)
       {
 	// pdg id for packed pf candidates meaning is:
-	// the particle charge and pdgId: 11, 13, 22 for ele/mu/gamma, 211 for charged hadrons, 130 for neutral hadrons, 1 and 2 for hadronic and em particles in HF. 
+	// the particle charge and pdgId: 11, 13, 22 for ele/mu/gamma, 211 for charged hadrons, 130 for neutral hadrons, 1 and 2 for hadronic and em particles in HF.
 	const reco::Candidate * dau = ijet->daughter(iDau);
 	if (abs(dau->pdgId()) == 11 || abs(dau->pdgId()) == 13)
 	  {
@@ -795,7 +795,7 @@ int Ntuplizer_noTagAndProbe_AOD::FillJet(const edm::View<reco::Jet> *jets, const
 	  }
 	// vDau.SetPxPyPzE (dau->px(), dau->py(), dau->pz(), dau->energy());
 	// vSum += vDau;
-	// cout << " - " << iDau << " pdg: " << dau->pdgId() << " pt: " << dau->pt() << " charge = " << dau->charge() << endl; 
+	// cout << " - " << iDau << " pdg: " << dau->pdgId() << " pt: " << dau->pt() << " charge = " << dau->charge() << endl;
       }
 
     //cout << " ## LEAD TRACK PT = " << leadTrackPt << endl;

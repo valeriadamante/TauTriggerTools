@@ -2,7 +2,7 @@
 **
 ** Create a collection of filtered gen level objects
 ** (including the creation of hadronic taus)
-** 
+**
 ** \date:    13 May 2015
 ** \author:  L. Cadamuro (LLR)
 */
@@ -19,7 +19,7 @@
 #include <DataFormats/PatCandidates/interface/GenericParticle.h>
 #include <DataFormats/PatCandidates/interface/PackedGenParticle.h>
 #include <DataFormats/HepMCCandidate/interface/GenStatusFlags.h>
-#include "TauTagAndProbe/TauTagAndProbe/interface/GenHelper.h"
+#include "TauTriggerTools/TauTagAndProbe/interface/GenHelper.h"
 
 #include <vector>
 
@@ -32,10 +32,10 @@ class GenFiller : public edm::EDProducer {
   /// Constructor
   explicit GenFiller(const edm::ParameterSet&);
   /// Destructor
-  ~GenFiller(){};  
+  ~GenFiller(){};
 
  private:
-  virtual void beginJob(){};  
+  virtual void beginJob(){};
   virtual void produce(edm::Event&, const edm::EventSetup&);
   virtual void endJob(){};
 
@@ -67,10 +67,10 @@ void GenFiller::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     iEvent.getByToken (src_, genHandle);
     cands_.clear();
     tauHadcandsMothers_.clear();
-    
+
     // output collection
     std::unique_ptr<pat::GenericParticleCollection> result( new pat::GenericParticleCollection );
-    
+
     unsigned int Ngen = genHandle->size();
 
     // fill vector of interesting Candidate* object, also used later for indexes
@@ -80,15 +80,15 @@ void GenFiller::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
         const GenParticle& genP = (*genHandle)[iGen];
         if (IsInteresting (genP))
         {
-            cands_.push_back (&genP); 
+            cands_.push_back (&genP);
         }
-    }    
-    
+    }
+
     // loop on all previously filtered Gen Particles and establish relations between them + set flags
     unsigned int NGenSel = cands_.size();
     if (DEBUG) cout << "SELECTED PARTICLES: " << NGenSel << endl;
     for (unsigned int iGen = 0; iGen < NGenSel; iGen++)
-    {        
+    {
         const reco::Candidate* genP = cands_.at(iGen);
         const GenParticle* genPClone = (GenParticle*) cands_.at(iGen);
         int PdgId = genP->pdgId();
@@ -97,7 +97,7 @@ void GenFiller::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
         //only select some particles
         pat::GenericParticle filtGenP (*genP); // to be saved in output
         if (DEBUG) cout << iGen << " | id: " << genP->pdgId () << "   pt: " << genP->pt() << "   eta: " << genP->eta() << " | px: " << genP->px() << " , eta: " << genP->eta() << endl;
-        
+
         // ------------------- general info flag on particles
         filtGenP.addUserInt ("generalGenFlags", makeFlagVector (genPClone));
 
@@ -134,16 +134,16 @@ void GenFiller::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
             if (DEBUG) cout << "   --> Top decay: " << decay << endl;
 	}
 
-        
+
         // ------------------- mother info flag
-        
+
         const reco::Candidate* MothPtr;
 
-        // H        
+        // H
         MothPtr = genhelper::IsFromID (genP, 25);
         if (MothPtr != NULL) // save space, only add userfloats when valid
         {
-            filtGenP.addUserInt ("HMothIndex", genhelper::GetIndexInOutput(MothPtr, cands_));       
+            filtGenP.addUserInt ("HMothIndex", genhelper::GetIndexInOutput(MothPtr, cands_));
             if (DEBUG) cout << "   --> fromH: 1, indexH: " << genhelper::GetIndexInOutput(MothPtr, cands_) << endl;
         }
 
@@ -151,31 +151,31 @@ void GenFiller::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
         MothPtr = genhelper::IsFromID (genP, 36);
         if (MothPtr != NULL) // save space, only add userfloats when valid
         {
-            filtGenP.addUserInt ("MSSMHMothIndex", genhelper::GetIndexInOutput(MothPtr, cands_));       
+            filtGenP.addUserInt ("MSSMHMothIndex", genhelper::GetIndexInOutput(MothPtr, cands_));
             if (DEBUG) cout << "   --> fromH(MSSM): 1, indexH: " << genhelper::GetIndexInOutput(MothPtr, cands_) << endl;
         }
-	
-        // Z        
+
+        // Z
         MothPtr = genhelper::IsFromID (genP, 23);
         if (MothPtr != NULL) // save space, only add userfloats when valid
         {
-            filtGenP.addUserInt ("ZMothIndex", genhelper::GetIndexInOutput(MothPtr, cands_));       
+            filtGenP.addUserInt ("ZMothIndex", genhelper::GetIndexInOutput(MothPtr, cands_));
             if (DEBUG) cout << "   --> fromZ: 1, indexZ: " << genhelper::GetIndexInOutput(MothPtr, cands_) << endl;
         }
-        
+
         // top
         MothPtr = genhelper::IsFromID (genP, 6);
         if (MothPtr != NULL)
         {
-            filtGenP.addUserInt ("TopMothIndex", genhelper::GetIndexInOutput(MothPtr, cands_));       
+            filtGenP.addUserInt ("TopMothIndex", genhelper::GetIndexInOutput(MothPtr, cands_));
             if (DEBUG) cout << "   --> fromTop: 1, indexTop: " << genhelper::GetIndexInOutput(MothPtr, cands_) << endl;
         }
 
-        // W        
+        // W
         MothPtr = genhelper::IsFromID (genP, 24);
         if (MothPtr != NULL) // save space, only add userfloats when valid
         {
-            filtGenP.addUserInt ("WMothIndex", genhelper::GetIndexInOutput(MothPtr, cands_));       
+            filtGenP.addUserInt ("WMothIndex", genhelper::GetIndexInOutput(MothPtr, cands_));
             if (DEBUG) cout << "   --> fromW: 1, indexW: " << genhelper::GetIndexInOutput(MothPtr, cands_) << endl;
         }
 
@@ -183,7 +183,7 @@ void GenFiller::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
         MothPtr = genhelper::IsFromID (genP, 5);
         if (MothPtr != NULL)
         {
-            filtGenP.addUserInt ("bMothIndex", genhelper::GetIndexInOutput(MothPtr, cands_));       
+            filtGenP.addUserInt ("bMothIndex", genhelper::GetIndexInOutput(MothPtr, cands_));
             if (DEBUG) cout << "   --> fromb: 1, indexb: " << genhelper::GetIndexInOutput(MothPtr, cands_) << endl;
         }
 
@@ -191,7 +191,7 @@ void GenFiller::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
         MothPtr = genhelper::IsFromID (genP, 15);
         if (MothPtr != NULL)
         {
-            filtGenP.addUserInt ("TauMothIndex", genhelper::GetIndexInOutput(MothPtr, cands_));       
+            filtGenP.addUserInt ("TauMothIndex", genhelper::GetIndexInOutput(MothPtr, cands_));
             if (DEBUG) cout << "   --> fromTau: 1, indexTau: " << genhelper::GetIndexInOutput(MothPtr, cands_) << endl;
         }
 
@@ -204,7 +204,7 @@ void GenFiller::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  genhelper::GetTausDaughters(*genPClone,tauDaughters,true,false);
 	  int detailedDecayMode = genhelper::getDetailedTauDecayMode(tauDaughters);
 	  filtGenP.addUserInt("tauGenDetailedDecayMode", detailedDecayMode);
-	  
+
 	  reco::GenParticleRef leadChParticleRef = genhelper::GetLeadChParticle(tauDaughters);
 
 	  TLorentzVector p4LeadingChParticle(leadChParticleRef->px(),
@@ -222,7 +222,7 @@ void GenFiller::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     }
 
 
-    // finally, do the hadronic tau (leave as last step not to spoil internal ordering of mother / daughter vector)    
+    // finally, do the hadronic tau (leave as last step not to spoil internal ordering of mother / daughter vector)
     if (DEBUG) cout << "BUILDING tauH, size: " << tauHadcandsMothers_.size() << endl;
     for (unsigned int iTauH = 0; iTauH < tauHadcandsMothers_.size(); iTauH++)
     {
@@ -231,7 +231,7 @@ void GenFiller::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	pat::GenericParticle tauH_neutral (genhelper::GetTauHadNeutrals(cands_.at(tauMothInd)));
         tauH.addUserInt ("TauMothIndex", tauMothInd);
 	tauH_neutral.addUserInt ("TauMothIndex", tauMothInd);
-        
+
         // copy all the other flags from original tau
         pat::GenericParticle& tauMothGenP = result->at(tauMothInd);
         if (tauMothGenP.hasUserInt("HMothIndex") ){
@@ -259,22 +259,22 @@ void GenFiller::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  tauH_neutral.addUserInt ("ZMothIndex", tauMothGenP.userInt ("ZMothIndex"));
 	}
 
-	
-        
+
+
         // many flags change of meaning w.r.t. mother tau, put everything to 0 (can be changed in future)
-        int tauhFlags = 0;        
+        int tauhFlags = 0;
         tauH.addUserInt ("generalGenFlags", tauhFlags); // remember! TauH inherits ALL the flags from
-	tauH_neutral.addUserInt ("generalGenFlags", tauhFlags); // remember! TauH inherits ALL the flags from 
-        
+	tauH_neutral.addUserInt ("generalGenFlags", tauhFlags); // remember! TauH inherits ALL the flags from
+
         if (DEBUG){
 	  cout << " ++ " << iTauH << " id: " << tauH.pdgId() << " | pt: " << tauH.pt() << " | eta: " << tauH.eta() << endl;
 	  cout << " ++ " << iTauH << " id: " << tauH_neutral.pdgId() << " | pt: " << tauH_neutral.pt() << " | eta: " << tauH_neutral.eta() << endl;
 	}
         result->push_back (tauH);
 	result->push_back (tauH_neutral);
-    }      
+    }
 
-  
+
     iEvent.put(std::move(result));
 
 
@@ -292,15 +292,15 @@ bool GenFiller::IsInteresting (const GenParticle& p)
                       APdgId == 11 || APdgId == 12 || APdgId == 13 || APdgId == 14 || APdgId == 15 || APdgId == 16); // leptons
 
     if(isVBFParton(p)) return true ;
-            
+
     if (IsLast && GoodPdgId) return true;
-    
+
     // case of b quarks, just save first one (too many showering products)
     bool IsFirst = genhelper::IsFirstCopy(p, true);
     bool GoodFirstPdg = (APdgId == 5 || APdgId == 6 || APdgId == 11 || APdgId == 13 || APdgId == 15 || APdgId==25);
     if (storeLightFlavAndGlu_) // also light flavors and quarks
         GoodFirstPdg = (GoodFirstPdg || APdgId == 1 || APdgId == 2 || APdgId == 3 || APdgId == 4 || APdgId == 21);
-    
+
     if (GoodFirstPdg && IsFirst) return true;
 
 
@@ -312,7 +312,7 @@ int GenFiller::makeFlagVector (const GenParticle* p)
 {
     int flags = 0;
     const GenStatusFlags& fl = p->statusFlags();
-    
+
     if (fl.isPrompt())                  flags |= (1 << 0);
     if (fl.isDecayedLeptonHadron())     flags |= (1 << 1);
     if (fl.isTauDecayProduct())         flags |= (1 << 2);
@@ -328,7 +328,7 @@ int GenFiller::makeFlagVector (const GenParticle* p)
     if (fl.isFirstCopy())               flags |= (1 << 12);
     if (fl.isLastCopy())                flags |= (1 << 13);
     if (fl.isLastCopyBeforeFSR())       flags |= (1 << 14);
-    if (isVBFParton(*p))                 flags |= (1 << 15);   
+    if (isVBFParton(*p))                 flags |= (1 << 15);
     return flags;
 }
 
@@ -337,7 +337,7 @@ bool GenFiller::isVBFParton(const GenParticle& p)
   int APdgId = abs(p.pdgId());
   bool IsVBFPartonPdgId = (APdgId == 1 || APdgId == 2 || APdgId == 3 || APdgId == 4 || APdgId == 5 || APdgId == 21);// quark or gluon
   bool FoundHiggs = false;
-  
+
   if(IsVBFPartonPdgId)
     {
       for(unsigned int iMother = 0 ; iMother < p.numberOfMothers() ; ++iMother)
