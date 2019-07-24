@@ -1,14 +1,14 @@
-/* 
+/*
 **
 ** Helpers for gen info (implementation)
-** 
-** 
+**
+**
 ** \date:    13 May 2015
 ** \author:  L. Cadamuro (LLR)
 */
 
 #include <iostream>
-#include "TauTagAndProbe/TauTagAndProbe/interface/GenHelper.h"
+#include "TauTriggerTools/TauTagAndProbe/interface/GenHelper.h"
 #include <DataFormats/Candidate/interface/Candidate.h>
 #include <DataFormats/HepMCCandidate/interface/GenStatusFlags.h>
 #include "DataFormats/TauReco/interface/PFTauDecayMode.h"
@@ -20,7 +20,7 @@ bool genhelper::IsLastCopy (const reco::GenParticle& part)
 
     if (abs(thisPdgId) == 25 || abs(thisPdgId) == 23 || abs(thisPdgId) == 15) // H, Z, tau must decay
         if (part.numberOfDaughters() == 0) return false; // can happen to have a fake "clone" that does not decay --> reject (it is not a real "last")
-    
+
     // other particles, or H/Z/tau with sons
     for (unsigned int iDau = 0; iDau < part.numberOfDaughters(); iDau++)
     {
@@ -66,7 +66,7 @@ int genhelper::GetTauDecay (const reco::Candidate* part)
         if (dauId == 11) nele++;
         if (dauId == 13) nmu++;
     }
-    
+
     if (nmu == 1 && nele == 0) decay = 0;
     if (nmu == 0 && nele == 1) decay = 1;
     if (nmu == 0 && nele == 0) decay = 2;
@@ -96,10 +96,10 @@ const reco::Candidate* genhelper::GetFirstCopy (const reco::Candidate* part)
             break;
         }
     }
-    
+
     if (cloneInd == -1) return part;
     else return (GetFirstCopy (part->mother(cloneInd)));
-    
+
 }
 
 
@@ -123,10 +123,10 @@ const reco::Candidate* genhelper::GetLastCopy (const reco::Candidate* part)
             break;
         }
     }
-    
+
     if (cloneInd == -1) return part;
     else return (GetLastCopy (part->daughter(cloneInd)));
-    
+
 }
 
 genhelper::HZDecay genhelper::GetHZDecay (const reco::Candidate* part)
@@ -134,7 +134,7 @@ genhelper::HZDecay genhelper::GetHZDecay (const reco::Candidate* part)
     int ntau = 0;
     int nele = 0;
     int nmu = 0;
-    
+
     for (unsigned int iDau = 0; iDau < part->numberOfDaughters(); iDau++)
     {
         const reco::Candidate * Dau = part->daughter( iDau );
@@ -148,7 +148,7 @@ genhelper::HZDecay genhelper::GetHZDecay (const reco::Candidate* part)
             if (decay == 1) nele++;
         }
     }
-    
+
     // determine decay mode
     if (ntau == 0)
     {
@@ -156,19 +156,19 @@ genhelper::HZDecay genhelper::GetHZDecay (const reco::Candidate* part)
         else if (nele == 2 && nmu == 0) return genhelper::HZDecay::EEPrompt;
         else return genhelper::HZDecay::Other;
     }
-    
+
     else if (ntau == 2)
     {
-        if (nmu == 0 && nele == 0) return genhelper::HZDecay::HadHad;    
-        if (nmu == 0 && nele == 1) return genhelper::HZDecay::EHad;    
-        if (nmu == 0 && nele == 2) return genhelper::HZDecay::EE;    
-        if (nmu == 1 && nele == 0) return genhelper::HZDecay::MuHad;    
-        if (nmu == 1 && nele == 1) return genhelper::HZDecay::EMu;    
-        if (nmu == 2 && nele == 0) return genhelper::HZDecay::MuMu;    
+        if (nmu == 0 && nele == 0) return genhelper::HZDecay::HadHad;
+        if (nmu == 0 && nele == 1) return genhelper::HZDecay::EHad;
+        if (nmu == 0 && nele == 2) return genhelper::HZDecay::EE;
+        if (nmu == 1 && nele == 0) return genhelper::HZDecay::MuHad;
+        if (nmu == 1 && nele == 1) return genhelper::HZDecay::EMu;
+        if (nmu == 2 && nele == 0) return genhelper::HZDecay::MuMu;
     }
-    
+
     return genhelper::HZDecay::Other;
-    
+
 }
 
 
@@ -183,7 +183,7 @@ genhelper::WDecay genhelper::GetWDecay (const reco::Candidate* part)
     int nele = 0;
     int nmu = 0;
     int nquark = 0;
-    
+
     const reco::Candidate * W = genhelper::GetLastCopy(part);
 
     for (unsigned int iDau = 0; iDau < W->numberOfDaughters(); iDau++)
@@ -200,7 +200,7 @@ genhelper::WDecay genhelper::GetWDecay (const reco::Candidate* part)
             if (decay == 1) nele++;
         }
     }
-    
+
     // determine decay mode
     if (nquark == 2 && (nmu+nele+ntau)==0)
       return genhelper::WDecay::Had;
@@ -211,17 +211,17 @@ genhelper::WDecay genhelper::GetWDecay (const reco::Candidate* part)
         else if (nele == 1 && nmu == 0) return genhelper::WDecay::EPrompt;
         else return genhelper::WDecay::other;
     }
-    
+
     else if (nquark==0 && ntau == 1)
     {
-        if (nmu == 0 && nele == 0) return genhelper::WDecay::TauHad;    
-        if (nmu == 0 && nele == 1) return genhelper::WDecay::TauE;    
+        if (nmu == 0 && nele == 0) return genhelper::WDecay::TauHad;
+        if (nmu == 0 && nele == 1) return genhelper::WDecay::TauE;
         if (nmu == 1 && nele == 0) return genhelper::WDecay::TauMu;
 	else return genhelper::WDecay::other;
     }
-    
+
     return genhelper::WDecay::other;
-    
+
 }
 
 
@@ -233,7 +233,7 @@ genhelper::WDecay genhelper::GetTopDecay (const reco::Candidate* part)
 
     if (abs(part->pdgId()) != 6) return genhelper::WDecay::other; // only on tops
     const reco::Candidate * top = genhelper::GetLastCopy(part);
-    
+
 
     for (unsigned int iDau = 0; iDau < top->numberOfDaughters(); iDau++)
     {
@@ -241,9 +241,9 @@ genhelper::WDecay genhelper::GetTopDecay (const reco::Candidate* part)
 	if(abs(Dau->pdgId()) == 24  ) return genhelper::GetWDecay(Dau);
 
     }
-       
+
     return genhelper::WDecay::other;
-    
+
 }
 
 
@@ -255,9 +255,9 @@ reco::GenParticle genhelper::GetTauHad (const reco::Candidate* part)
     {
         reco::GenParticle fakeTauH = reco::GenParticle (0, reco::Candidate::LorentzVector(0.,0.,0.,0.), reco::Candidate::Point (0.,0.,0.), -999999, 0, true);
         std::cout << "Warning: building had tau from a particle with pdgId != 15 --> dummy entry returned" << std::endl;
-        return fakeTauH;        
+        return fakeTauH;
     }
-    
+
     reco::Candidate::LorentzVector p4Had (0,0,0,0);
     for (unsigned int iDau = 0; iDau < part->numberOfDaughters(); iDau++)
     {
@@ -266,7 +266,7 @@ reco::GenParticle genhelper::GetTauHad (const reco::Candidate* part)
         if (dauId != 12 && dauId != 14 && dauId != 16) // no neutrinos
             p4Had += Dau->p4();
     }
-    
+
     int sign = part->pdgId() / abs(part->pdgId());
     reco::GenParticle TauH = reco::GenParticle (part->charge(), p4Had, part->vertex(), sign*66615, part->status(), true);
     return TauH;
@@ -278,9 +278,9 @@ reco::GenParticle genhelper::GetTauHadNeutrals (const reco::Candidate* part)
     {
         reco::GenParticle fakeTauH = reco::GenParticle (0, reco::Candidate::LorentzVector(0.,0.,0.,0.), reco::Candidate::Point (0.,0.,0.), -999999, 0, true);
         std::cout << "Warning: building had tau from a particle with pdgId != 15 --> dummy entry returned" << std::endl;
-        return fakeTauH;        
+        return fakeTauH;
     }
-    
+
     reco::Candidate::LorentzVector p4Had (0,0,0,0);
     for (unsigned int iDau = 0; iDau < part->numberOfDaughters(); iDau++)
     {
@@ -289,7 +289,7 @@ reco::GenParticle genhelper::GetTauHadNeutrals (const reco::Candidate* part)
         if (dauId != 12 && dauId != 14 && dauId != 16 && Dau->charge()==0) // no neutrinos
             p4Had += Dau->p4();
     }
-    
+
     int sign = part->pdgId() / abs(part->pdgId());
     reco::GenParticle TauH = reco::GenParticle (part->charge(), p4Had, part->vertex(), sign*77715, part->status(), true);
     return TauH;
@@ -297,7 +297,7 @@ reco::GenParticle genhelper::GetTauHadNeutrals (const reco::Candidate* part)
 
 const reco::Candidate* genhelper::IsFromID (const reco::Candidate* part, int targetPDGId)
 {
-    if (abs(part->pdgId()) == targetPDGId){ 
+    if (abs(part->pdgId()) == targetPDGId){
       if(abs(part->pdgId()) == 5) return GetFirstCopy(part);
       else return part;
     }
@@ -307,10 +307,10 @@ const reco::Candidate* genhelper::IsFromID (const reco::Candidate* part, int tar
         const reco::Candidate* matchMoth = genhelper::IsFromID(part->mother(i), targetPDGId);
         if ( matchMoth != NULL) return matchMoth;
     }
-    
+
     // nothing found, mothers finished, exiting...
     return NULL;
-    
+
 }
 
 int genhelper::GetIndexInOutput (const reco::Candidate* part, std::vector<const reco::Candidate *> cands)
@@ -332,7 +332,7 @@ TVector3 genhelper::ImpactParameter(const TVector3& pv, const TVector3& sv, cons
 void genhelper::GetTausDaughters(const reco::GenParticle& tau,
 				 reco::GenParticleRefVector& products,
 				 bool ignoreNus, bool direct){
-    
+
   products.clear();
   if(!direct)
     FindDescendents(tau, products, 1, 0);
@@ -357,18 +357,18 @@ void genhelper::GetTausDaughters(const reco::GenParticle& tau,
 ///////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////
 //copy of function from PhysicsTools/HepMCCandAlgos/interface/GenParticlesHelper.h" which allows ignore status
-void genhelper::FindDescendents(const reco::GenParticle& base, 
-				reco::GenParticleRefVector& descendents, 
+void genhelper::FindDescendents(const reco::GenParticle& base,
+				reco::GenParticleRefVector& descendents,
 				int status, int pdgId,
 				bool skipPhotonsPi0AndFSR) {
-  
+
   //one form status or pdgId has to be specifed!
   if(status<0 && pdgId==0) return;
-  
+
   const reco::GenParticleRefVector& daughterRefs = base.daughterRefVector();
-  
+
   for(IGR idr = daughterRefs.begin(); idr != daughterRefs.end(); ++idr ) {
-    
+
     ///Skip leptons from pi0 decays
     if(skipPhotonsPi0AndFSR && (*idr)->mother(0) && (abs((*idr)->mother(0)->pdgId())==22 || abs((*idr)->mother(0)->pdgId())==111)) continue;
     ///Skip electrons from FSR from muons
@@ -376,9 +376,9 @@ void genhelper::FindDescendents(const reco::GenParticle& base,
     ///Skip muons and electrons from FSR
     if(skipPhotonsPi0AndFSR && (*idr)->mother(0) && abs((*idr)->mother(0)->pdgId())==13 && abs((*idr)->pdgId())==11) continue;
     if(skipPhotonsPi0AndFSR && (*idr)->mother(0) && abs((*idr)->mother(0)->pdgId())==11 && abs((*idr)->pdgId())==13) continue;
-    
-    
-    if( (status<0 || (*idr)->status() == status ) && 
+
+
+    if( (status<0 || (*idr)->status() == status ) &&
 	(!pdgId || std::abs((*idr)->pdgId()) == std::abs(pdgId) )) {
       descendents.push_back(*idr);
     }
@@ -388,7 +388,7 @@ void genhelper::FindDescendents(const reco::GenParticle& base,
 ///////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////
 const reco::GenParticleRef genhelper::GetLeadChParticle(const reco::GenParticleRefVector& products){
-    
+
     float maxPt=0;
     reco::GenParticleRef part;
     std::set<int> charged;
@@ -396,7 +396,7 @@ const reco::GenParticleRef genhelper::GetLeadChParticle(const reco::GenParticleR
     charged.insert(321);//K
     charged.insert(11);//e
     charged.insert(13);//mu
-    
+
     for(IGR idr = products.begin(); idr != products.end(); ++idr ){
       if( (*idr)->pt() > maxPt &&
 	  //charged.find( std::abs( (*idr)->pdgId() ) )!=charged.end() //MB: Logix used in pure Pythia code when charge not defined
@@ -413,7 +413,7 @@ const reco::GenParticleRef genhelper::GetLeadChParticle(const reco::GenParticleR
 int genhelper::getDetailedTauDecayMode(const reco::GenParticleRefVector& products){
 
   int tauDecayMode = reco::PFTauDecayMode::tauDecayOther;
-  
+
   int numElectrons      = 0;
   int numMuons          = 0;
   int numChargedPions   = 0;
@@ -421,15 +421,15 @@ int genhelper::getDetailedTauDecayMode(const reco::GenParticleRefVector& product
   int numPhotons        = 0;
   int numNeutrinos      = 0;
   int numOtherParticles = 0;
-  
+
   for(IGR idr = products.begin(); idr != products.end(); ++idr ) {
     int pdg_id = std::abs((*idr)->pdgId());
     if(pdg_id == 11) numElectrons++;
     else if(pdg_id == 13) numMuons++;
     else if(pdg_id == 211 || pdg_id == 321 ) numChargedPions++; //Count both pi+ and K+
     else if(pdg_id == 111 || pdg_id == 130 || pdg_id == 310 ) numNeutralPions++; //Count both pi0 and K0_L/S
-    else if(pdg_id == 12 || 
-	    pdg_id == 14 || 
+    else if(pdg_id == 12 ||
+	    pdg_id == 14 ||
 	    pdg_id == 16) {
       numNeutrinos++;
     }
@@ -438,11 +438,11 @@ int genhelper::getDetailedTauDecayMode(const reco::GenParticleRefVector& product
       numOtherParticles++;
     }
   }
-  if(numElectrons>1){//sometimes there are gamma->ee conversions 
+  if(numElectrons>1){//sometimes there are gamma->ee conversions
     numPhotons += numElectrons/2;
     numElectrons -= 2*(numElectrons/2);
   }
-  
+
   if( numOtherParticles == 0 ){
     if( numElectrons == 1 ){
       //--- tau decays into electrons
@@ -479,25 +479,25 @@ int genhelper::getDetailedTauDecayMode(const reco::GenParticleRefVector& product
 	  break;
 	}
 	break;
-      case 3 : 
+      case 3 :
 	if( numNeutralPions != 0 ){
 	  tauDecayMode = reco::PFTauDecayMode::tauDecayOther;
 	  break;
 	}
 	switch ( numPhotons ){
-	case 0 : 
+	case 0 :
 	  tauDecayMode = reco::PFTauDecayMode::tauDecay3ChargedPion0PiZero;
 	  break;
-	case 2 : 
+	case 2 :
 	  tauDecayMode = reco::PFTauDecayMode::tauDecay3ChargedPion1PiZero;
 	  break;
-	case 4 : 
+	case 4 :
 	  tauDecayMode = reco::PFTauDecayMode::tauDecay3ChargedPion2PiZero;
 	  break;
-	case 6 : 
+	case 6 :
 	  tauDecayMode = reco::PFTauDecayMode::tauDecay3ChargedPion3PiZero;
 	  break;
-	case 8 : 
+	case 8 :
 	  tauDecayMode = reco::PFTauDecayMode::tauDecay3ChargedPion4PiZero;
 	  break;
 	default:
