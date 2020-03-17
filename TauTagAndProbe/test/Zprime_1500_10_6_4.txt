@@ -1,0 +1,7 @@
+/store/mc/RunIIAutumn18MiniAOD/ZprimeToTauTau_M-1500_TuneCP5_13TeV-pythia8-tauola/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/280000/2F416B26-5B9C-6F42-A0D7-342C77D4B0C9.root
+/store/mc/RunIIAutumn18MiniAOD/ZprimeToTauTau_M-1500_TuneCP5_13TeV-pythia8-tauola/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/280000/93570E59-BF57-8A40-BED3-191B9FF15435.root
+/store/mc/RunIIAutumn18MiniAOD/ZprimeToTauTau_M-1500_TuneCP5_13TeV-pythia8-tauola/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/280000/34E1E372-8E2E-B945-B7AC-A9BAF8725E2A.root
+/store/mc/RunIIAutumn18MiniAOD/ZprimeToTauTau_M-1500_TuneCP5_13TeV-pythia8-tauola/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/280000/9C79F1D2-564E-8A46-B682-4AEFF0B7DA2A.root
+/store/mc/RunIIAutumn18MiniAOD/ZprimeToTauTau_M-1500_TuneCP5_13TeV-pythia8-tauola/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/280000/E280B871-0844-724E-8491-54BAAB8B2D67.root
+/store/mc/RunIIAutumn18MiniAOD/ZprimeToTauTau_M-1500_TuneCP5_13TeV-pythia8-tauola/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/280000/D36AD6CE-4AE1-F543-AB57-14B2AE5FFCFA.root
+/store/mc/RunIIAutumn18MiniAOD/ZprimeToTauTau_M-1500_TuneCP5_13TeV-pythia8-tauola/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/280000/E236096E-A41A-7941-A8A8-EFCF000CCF66.root
