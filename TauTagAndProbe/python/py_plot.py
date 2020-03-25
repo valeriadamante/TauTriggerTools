@@ -51,7 +51,7 @@ def createCanvasPads():
     
     return c, pad1, pad2
 
-def ratioplot(eff_a,eff_b,vari,label1,label2):
+def ratioplotPt(eff_a,eff_b,gr,vari,label1,label2,ch,ext):
     eff_a.SetLineWidth(2)
     eff_b.SetLineWidth(2)
     eff_a.SetLineColor(kBlack)
@@ -60,82 +60,14 @@ def ratioplot(eff_a,eff_b,vari,label1,label2):
     # draw everything
     pad1.cd()
     hbase = TH1D()
-    if vari=='pt':
+    if(vari=='pt' and ext==True):
         ext_bins = np.arange(0, 70, step=10)
         ext_bins = np.append(ext_bins, [80, 100,150, 200, 300, 500, 1000])
-        xbins=np.arange(0,100,10)
-        xbins=np.append(xbins,[100,150,200])
         hbase = TH1D('hbase','',len(ext_bins)-1,array('d',ext_bins))
-    else:
-        xbins = np.arange(-2.5,3,0.5)
-        hbase = TH1D('hbase','',len(xbins)-1,array('d',xbins))
-        
-    hbase.Draw()
-    #eff_a.Chi2Test(eff_b,'UU')
-    eff_a.Draw("sameP")
-    eff_b.Draw("sameP")
-    hbase.SetMaximum(1)
-    #hbase.SetStats(0)
-    #axis.Draw()
-    leg = TLegend(.6,.32,.75,.53)
-    leg.SetFillStyle(0)
-    leg.SetBorderSize(0)
-    leg.SetFillColor(10)
-    leg.SetTextSize(0.03)
-    leg.AddEntry(eff_a,label1,'l')
-    leg.AddEntry(eff_b,label2,'l')
-    leg.Draw()
-    pad2.cd()
-    if vari=='pt':
-        xbins=np.arange(0,100,10)
-        xbins=np.append(xbins,[100,150,200])
-        ext_bins = np.arange(0, 70, step=10)
-        ext_bins = np.append(ext_bins, [80, 100,150, 200, 300, 500, 1000])
-        ratio_ab = TH1D('ratio_ab','',len(ext_bins)-1,array('d',ext_bins))
-    else:
-        xbins = np.arange(-2.5,3,0.5)
-        ratio_ab = TH1D('ratio_ab','',len(xbins)-1,array('d',xbins))
-
-        for n in range(1, ratio_ab.GetNbinsX()+1):
-            if eff_b.GetEfficiency(n) != 0:
-                ratio_ab.SetBinContent(n, eff_a.GetEfficiency(n) / eff_b.GetEfficiency(n))
-                #yerr = eff_a.GetBinError(n)
-        
-    ratio_ab.SetMaximum(2)
-    ratio_ab.SetMinimum(0)
-    ratio_ab.SetStats(0)
-    ratio_ab.SetMarkerStyle(21)
-    #axis = TGaxis(-5, 20, -5, 220, 20, 220, 510, "")
-    ratio_ab.GetXaxis().SetLabelFont(43)
-    ratio_ab.GetYaxis().SetLabelFont(43)
-    ratio_ab.GetXaxis().SetLabelSize(15)
-    ratio_ab.GetYaxis().SetLabelSize(15)
-    if vari == 'pt':
-        ratio_ab.GetXaxis().SetTitle('pT(GeV)')
-        ratio_ab.GetXaxis().SetTitleSize(15)
-    else:
-        ratio_ab.GetXaxis().SetTitle('#eta_{#tau}')
-        ratio_ab.GetXaxis().SetTitleSize(15)
-    
-    ratio_ab.Draw('ep')
-    
-    c1.SaveAs(label1+label2+"_Medium_{}.png".format(vari))
-
-def ratioplotPt(eff_a,eff_b,gr,vari,label1,label2):
-    eff_a.SetLineWidth(2)
-    eff_b.SetLineWidth(2)
-    eff_a.SetLineColor(kBlack)
-    eff_b.SetLineColor(kRed)
-    c1, pad1, pad2 = createCanvasPads()
-    # draw everything
-    pad1.cd()
-    hbase = TH1D()
-    if vari=='pt':
-        ext_bins = np.arange(0, 70, step=10)
-        ext_bins = np.append(ext_bins, [80, 100,150, 200, 300, 500, 1000])
-        xbins=np.arange(0,100,10)
-        #xbins=np.append(xbins,[100,150,200])
-        hbase = TH1D('hbase','',len(xbins)-1,array('d',xbins))
+    elif(vari=='pt' and ext==False):
+         xbins=np.arange(0,100,10)
+         xbins=np.append(xbins,[100,150,200])
+         hbase = TH1D('hbase','',len(xbins)-1,array('d',xbins))
     else:
         xbins = np.arange(-2.5,3,0.5)
         hbase = TH1D('hbase','',len(xbins)-1,array('d',xbins))
@@ -176,10 +108,10 @@ def ratioplotPt(eff_a,eff_b,gr,vari,label1,label2):
     ratio_ab.GetXaxis().SetLabelSize(15)
     ratio_ab.GetYaxis().SetLabelSize(15)
     if vari == 'pt':
-        ratio_ab.GetXaxis().SetTitle('pT(GeV)')
+        ratio_ab.GetXaxis().SetTitle('gen_pT(GeV)')
         ratio_ab.GetXaxis().SetTitleSize(15)
     else:
-        ratio_ab.GetXaxis().SetTitle('#eta_{#tau}')
+        ratio_ab.GetXaxis().SetTitle('gen_#eta_{#tau}')
         ratio_ab.GetXaxis().SetTitleSize(15)
         
     ratio_ab.GetXaxis().SetTitle('nVtx')
@@ -188,6 +120,6 @@ def ratioplotPt(eff_a,eff_b,gr,vari,label1,label2):
     #gr.SetMarkerSize(2)
     gr.Draw("sameP")
     
-    c1.SaveAs(label1+label2+"_Loose_10_6_8_{}.png".format(vari))
+    c1.SaveAs("./output"+"/"+label1+label2+"_"+vari+"_"+ch+".png".format(vari))
 
 
