@@ -142,10 +142,8 @@ def CreateEtaHistograms(input_file, selection_id,pt_cut, hlt_paths, label, var, 
 def CreateL1PtHistograms(input_file, selection_id,label, var, hist_model, output_file):
     df = ROOT.RDataFrame('events;2', input_file)
     df = df.Filter('(tau_sel & {}) != 0 && abs(tau_gen_vis_eta) < 2.1 && tau_gen_vis_pt > 0'.format(selection_id))
-    if(args.ch == 'et'):
-        df = df.Filter('(tau_sel & {}) != 0 && abs(tau_gen_vis_eta) < 2.1 && tau_gen_vis_pt > 0 && l1Tau_pt > 26'.format(selection_id))
     hist_total = df.Histo1D(hist_model, var,'puweight')
-    hist_passed = df.Filter('l1Tau_hwIso > 0') \
+    hist_passed = df.Filter('l1Tau_hwIso > 0 && l1Tau_pt > 32') \
                     .Histo1D(hist_model, var,'puweight')
     eff = ROOT.TEfficiency(hist_passed.GetPtr(), hist_total.GetPtr())
     #eff = ROOT.TGraphAsymmErrors(hist_passed.GetPtr(), hist_total.GetPtr())
@@ -300,6 +298,6 @@ output_file.WriteTObject(pt_ratio, 'pt_ratio', 'Overwrite')
 output_file.WriteTObject(eta_ratio, 'eta_ratio', 'Overwrite')
 output_file.Close()
 plt.ratioplotPt(pt_eff_a,pt_eff_b,pt_ratio,'pt',labels[0],labels[1],args.ch,False)
-plt.ratioplotPt(L1pt_eff_a,L1pt_eff_b,l1pt_ratio,'pt',labels[0],labels[1],args.ch,True)
+plt.ratioplotPt(L1pt_eff_a,L1pt_eff_b,l1pt_ratio,'pt',labels[0],labels[1],args.ch,False)
 plt.ratioplotPt(eta_eff_a,eta_eff_b,eta_ratio,'eta',labels[0],labels[1],args.ch,args.ext)
 #plt.ratioplotPt(npv_eff_a,npv_eff_b,npv_ratio,'pt',labels[0],labels[1],args.ch,False)
