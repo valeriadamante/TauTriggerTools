@@ -153,7 +153,7 @@ process.hltFilter = hlt.hltHighLevel.clone(
 )
 
 process.patTriggerUnpacker = cms.EDProducer("PATTriggerObjectStandAloneUnpacker",
-    patTriggerObjectsStandAlone = cms.InputTag("slimmedPatTrigger"), #selectedPatTrigger
+    patTriggerObjectsStandAlone = cms.InputTag("selectedPatTrigger"), #slimmedPatTrigger
     triggerResults              = cms.InputTag('TriggerResults', '', options.triggerProcess),
     unpackFilterLabels          = cms.bool(True)
 )

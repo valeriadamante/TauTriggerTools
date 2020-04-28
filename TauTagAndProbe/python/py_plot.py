@@ -65,8 +65,8 @@ def ratioplotPt(eff_a,eff_b,gr,vari,label1,label2,ch,ext):
         ext_bins = np.append(ext_bins, [80, 100,150, 200, 300, 500, 1000])
         hbase = TH1D('hbase','',len(ext_bins)-1,array('d',ext_bins))
     elif(vari=='pt' and ext==False):
-         xbins=np.arange(0,100,10)
-         xbins=np.append(xbins,[100,150,200])
+         xbins=np.arange(0,120,10)
+         #xbins=np.append(xbins,[100,150,200])
          hbase = TH1D('hbase','',len(xbins)-1,array('d',xbins))
     else:
         xbins = np.arange(-2.5,3,0.5)
@@ -76,7 +76,7 @@ def ratioplotPt(eff_a,eff_b,gr,vari,label1,label2,ch,ext):
     #eff_a.Chi2Test(eff_b,'UU')
     eff_a.Draw("sameP")
     eff_b.Draw("sameP")
-    hbase.SetMaximum(1)
+    hbase.SetMaximum(1.2)
     hbase.SetStats(0)
     #axis.Draw()
     leg = TLegend(.6,.32,.75,.53)
@@ -120,6 +120,6 @@ def ratioplotPt(eff_a,eff_b,gr,vari,label1,label2,ch,ext):
     #gr.SetMarkerSize(2)
     gr.Draw("sameP")
     
-    c1.SaveAs("./output"+"/"+label1+label2+"_"+vari+"_"+ch+".png".format(vari))
+    c1.SaveAs("./plots"+"/"+label1+label2+"_"+vari+"_"+ch+".png".format(vari))
 
 

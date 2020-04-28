@@ -139,11 +139,14 @@ def CreateEtaHistograms(input_file, selection_id,pt_cut, hlt_paths, label, var, 
     output_file.WriteTObject(eff, label + '_eta_eff', 'Overwrite')
     return eff,hist_total,hist_passed
 
-def CreateL1PtHistograms(input_file, selection_id,label, var, hist_model, output_file):
+def CreateL1PtHistograms(input_file, selection_id,hlt_paths,label, var, hist_model, output_file):
     df = ROOT.RDataFrame('events;2', input_file)
     df = df.Filter('(tau_sel & {}) != 0 && abs(tau_gen_vis_eta) < 2.1 && tau_gen_vis_pt > 0'.format(selection_id))
+    match_mask = 0
+    for path_name, path_index in hlt_paths.items():
+        match_mask = match_mask | (1 << path_index)
     hist_total = df.Histo1D(hist_model, var,'puweight')
-    hist_passed = df.Filter('l1Tau_hwIso > 0 && l1Tau_pt > 32') \
+    hist_passed = df.Filter('l1Tau_hwIso > 0 && l1Tau_pt>20') \
                     .Histo1D(hist_model, var,'puweight')
     eff = ROOT.TEfficiency(hist_passed.GetPtr(), hist_total.GetPtr())
     #eff = ROOT.TGraphAsymmErrors(hist_passed.GetPtr(), hist_total.GetPtr())
@@ -181,8 +184,8 @@ hist_model_npv = ROOT.RDF.TH1DModel('npv', '', len(bins)-1, array('d', bins))
 hist_model_eta = ROOT.RDF.TH1DModel('tau_eta', '', len(eta_bins)-1, array('d',eta_bins))
 pt_eff_a,pt_total_a,pt_passed_a = CreatePtHistograms(args.input_a, selection_id, hlt_paths_a, labels[0], args.var_a, hist_model, output_file)
 pt_eff_b,pt_total_b,pt_passed_b = CreatePtHistograms(args.input_b, selection_id, hlt_paths_b, labels[1], args.var_a, hist_model, output_file)
-L1pt_eff_a,L1pt_total_a,L1pt_passed_a = CreateL1PtHistograms(args.input_a, selection_id, labels[0], args.var_a, hist_model, output_file)
-L1pt_eff_b,L1pt_total_b,L1pt_passed_b = CreateL1PtHistograms(args.input_b, selection_id, labels[1], args.var_a, hist_model, output_file)
+L1pt_eff_a,L1pt_total_a,L1pt_passed_a = CreateL1PtHistograms(args.input_a, selection_id,hlt_paths_a, labels[0], args.var_a, hist_model, output_file)
+L1pt_eff_b,L1pt_total_b,L1pt_passed_b = CreateL1PtHistograms(args.input_b, selection_id,hlt_paths_b, labels[1], args.var_a, hist_model, output_file)
 eta_eff_a,eta_total_a,eta_passed_a = CreateEtaHistograms(args.input_a, selection_id,args.pTT, hlt_paths_a, labels[0], args.var_b, hist_model_eta, output_file)
 eta_eff_b,eta_total_b,eta_passed_b = CreateEtaHistograms(args.input_b, selection_id,args.pTT, hlt_paths_b, labels[1], args.var_b, hist_model_eta, output_file)
 npv_eff_a,npv_total_a,npv_passed_a = CreateNVtxHistograms(args.input_a, selection_id,args.pTT, hlt_paths_a, labels[0], args.var_a, hist_model_npv, output_file)
@@ -298,6 +301,6 @@ output_file.WriteTObject(pt_ratio, 'pt_ratio', 'Overwrite')
 output_file.WriteTObject(eta_ratio, 'eta_ratio', 'Overwrite')
 output_file.Close()
 plt.ratioplotPt(pt_eff_a,pt_eff_b,pt_ratio,'pt',labels[0],labels[1],args.ch,False)
-plt.ratioplotPt(L1pt_eff_a,L1pt_eff_b,l1pt_ratio,'pt',labels[0],labels[1],args.ch,False)
+plt.ratioplotPt(L1pt_eff_a,L1pt_eff_b,l1pt_ratio,'pt',labels[0],labels[1],args.ch,True)
 plt.ratioplotPt(eta_eff_a,eta_eff_b,eta_ratio,'eta',labels[0],labels[1],args.ch,args.ext)
 #plt.ratioplotPt(npv_eff_a,npv_eff_b,npv_ratio,'pt',labels[0],labels[1],args.ch,False)
