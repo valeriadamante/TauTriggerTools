@@ -20,7 +20,7 @@ scram b -j4
 ### How to run
 
 ```
-cmsRun TauTriggerTools/TauTagAndProbe/test/produceTuples.py inputFiles=DY_2018.root fileNamePrefix=file: period=Run2018 isMC=True runDeepTau=True maxEvents=1000
+cmsRun TauTriggerTools/TauTagAndProbe/test/produceTuples.py inputFileList=RelValZpTT_1500_13UP18.txt period=Run2018 isMC=True runDeepTau=False pureGenMode=True globalTag=102X_upgrade2018_realistic_v15 maxEvents=-1 outputTupleFile=RelValZpTT_1500_13UP18_CMSSW_10_6_2.root
 ```
 
 To list all the available options run:
@@ -32,9 +32,15 @@ python TauTriggerTools/TauTagAndProbe/test/produceTuples.py help
 
 Submitting task:
 ```
-crab_submit.py --workArea work-area --cfg TauTriggerTools/TauTagAndProbe/test/produceTuples.py --site T2_IT_Pisa --output trigger_tuples TauTagAndProbe/data/2018/DY.txt
+crab_submit.py --workArea work-area --cfg TauTriggerTools/TauTagAndProbe/test/produceTuples.py --site T2_IN_TIFR --output trigger_tuples mytasks.txt
 ```
+Example of mytaks.txt:
+```
+period=Run2018 isMC=True runDeepTau=False pureGenMode=True globalTag=102X_upgrade2018_realistic_v15
 
+RelValZpTT_1500_13UP18 /RelValZpTT_1500_13UP18/CMSSW_10_6_2-PUpmx25ns_106X_upgrade2018_realistic_v6_ul18hlt_premix_rs-v1/MINIAODSIM
+RelValQQH1352T_13 /RelValQQH1352T_13/CMSSW_10_2_5-PUpmx25ns_102X_upgrade2018_realistic_v15_ECAL-v1/MINIAODSIM
+```
 To list all the available options run:
 ```
 crab_submit.py --help
