@@ -8,7 +8,7 @@ import numpy as np
 from array import array
 import py_plot as plt
 import math
-
+import os
 
 parser = argparse.ArgumentParser(description='Copmare two turnon curves.')
 parser.add_argument('--input-a', required=True, type=str, help="the first input")
@@ -22,14 +22,29 @@ parser.add_argument('--var-b', required=True, type=str, help="eta variable to dr
 parser.add_argument('--pTT', required=True, type=float, help="Threshold pT")
 parser.add_argument('--ch', required=True, type=str, help="tt,et,mt")
 parser.add_argument('--ext', required=True, type=bool, help="True for hight pT")
+#parser.add_argument('--pu', required=False, type=bool, help="For Data set to False")
 args = parser.parse_args()
 
-sys.path.insert(0, 'Common/python')
+path_prefix = '' if 'TauTriggerTools' in os.getcwd() else 'TauTriggerTools/'
+sys.path.insert(0, path_prefix+'Common/python')
 from AnalysisTypes import *
 ROOT.gROOT.SetBatch(True)
+ROOT.gInterpreter.Declare('#include "{}TauTagAndProbe/interface/PyInterface.h"'.format(path_prefix))
+
+pu_bins = np.arange(0, 80, step=10)
+hist_pu1 = ROOT.RDF.TH1DModel('hist_pu1', '', len(pu_bins)-1, array('d', pu_bins))
+hist_pu2 = ROOT.RDF.TH1DModel('hist_pu2', '', len(pu_bins)-1, array('d', pu_bins))
+ref_df = ROOT.RDataFrame('all_events',args.input_b)
+tar_df = ROOT.RDataFrame('all_events',args.input_a)
+ref_pu = ref_df.Histo1D(hist_pu1, 'npu')
+tar_pu = tar_df.Histo1D(hist_pu2, 'npu')
+ROOT.PileUpWeightProvider.Initialize(ref_pu.GetPtr(), tar_pu.GetPtr())
+
 chs=['tt','mt','et']
 if(args.ch not in chs):
-    print("please choose the ch within {tt,et,mt}")
+    print("please choose the trigger path within {tt,et,mt}")
+
+
 def KatzLog(passed, total):
     """Returns 1-sigma confidence interval for a ratio of proportions using Katz-log method."""
     if np.count_nonzero(total) != len(total):
@@ -83,8 +98,9 @@ def ReportHLTPaths(hlt_paths, label):
     print(line)
 
 def CreatePtHistograms(input_file, selection_id, hlt_paths, label, var, hist_model, output_file):
-    df = ROOT.RDataFrame('events;2', input_file)
+    df = ROOT.RDataFrame('events', input_file)
     df = df.Filter('(tau_sel & {}) != 0 && abs(tau_gen_vis_eta) < 2.1 && tau_gen_vis_pt > 0'.format(selection_id))
+    df = df.Define('puweight', "PileUpWeightProvider::GetDefault().GetWeight(npu)")
     if(args.ch == 'et'):
         df = df.Filter('(tau_sel & {}) != 0 && abs(tau_gen_vis_eta) < 2.1 && tau_gen_vis_pt > 0 && l1Tau_pt > 26'.format(selection_id))
     match_mask = 0
@@ -104,6 +120,7 @@ def CreatePtHistograms(input_file, selection_id, hlt_paths, label, var, hist_mod
 def CreateNVtxHistograms(input_file, selection_id,pt_cut, hlt_paths, label, var, hist_model, output_file):
     df = ROOT.RDataFrame('events', input_file)
     df = df.Filter('(tau_sel & {}) != 0 && abs(tau_gen_vis_pt) > {}'.format(selection_id,pt_cut))
+    df = df.Define('puweight', "PileUpWeightProvider::GetDefault().GetWeight(npu)")
     if(args.ch == 'et'):
         df = df.Filter('(tau_sel & {}) != 0 && abs(tau_gen_vis_pt) > {} && l1Tau_pt >26'.format(selection_id,pt_cut))
     match_mask = 0
@@ -124,6 +141,7 @@ def CreateNVtxHistograms(input_file, selection_id,pt_cut, hlt_paths, label, var,
 def CreateEtaHistograms(input_file, selection_id,pt_cut, hlt_paths, label, var, hist_model, output_file):
     df = ROOT.RDataFrame('events', input_file)
     df = df.Filter('(tau_sel & {}) != 0 && tau_gen_vis_pt > {}'.format(selection_id,pt_cut))
+    df = df.Define('puweight', "PileUpWeightProvider::GetDefault().GetWeight(npu)")
     if(args.ch == 'et'):
         df = df.Filter('(tau_sel & {}) != 0 && abs(tau_gen_vis_pt) > {} && l1Tau_pt >26'.format(selection_id,pt_cut))
     match_mask = 0
@@ -140,7 +158,8 @@ def CreateEtaHistograms(input_file, selection_id,pt_cut, hlt_paths, label, var, 
     return eff,hist_total,hist_passed
 
 def CreateL1PtHistograms(input_file, selection_id,hlt_paths,label, var, hist_model, output_file):
-    df = ROOT.RDataFrame('events;2', input_file)
+    df = ROOT.RDataFrame('events', input_file)
+    df = df.Define('puweight', "PileUpWeightProvider::GetDefault().GetWeight(npu)")
     df = df.Filter('(tau_sel & {}) != 0 && abs(tau_gen_vis_eta) < 2.1 && tau_gen_vis_pt > 0'.format(selection_id))
     match_mask = 0
     for path_name, path_index in hlt_paths.items():
@@ -170,8 +189,9 @@ hlt_paths_b = GetMatchedTriggers(trigger_dict_b, args.pattern)
 ReportHLTPaths(hlt_paths_b, labels[1])
 
 output_file = ROOT.TFile(args.output, 'RECREATE')
-
-ext = args.ext
+ext = False
+if(args.ext==True):
+    ext=True
 ext_bins = np.arange(0, 70, step=10)
 ext_bins = np.append(ext_bins, [80, 100,150, 200, 300, 500, 1000])
 bins = np.arange(0, 100, step=10)
@@ -300,7 +320,9 @@ npv_ratio = ROOT.TGraphAsymmErrors(len(npv_xval),npv_xval_,npv_yval_,npv_exl,npv
 output_file.WriteTObject(pt_ratio, 'pt_ratio', 'Overwrite')
 output_file.WriteTObject(eta_ratio, 'eta_ratio', 'Overwrite')
 output_file.Close()
-plt.ratioplotPt(pt_eff_a,pt_eff_b,pt_ratio,'pt',labels[0],labels[1],args.ch,False)
-plt.ratioplotPt(L1pt_eff_a,L1pt_eff_b,l1pt_ratio,'pt',labels[0],labels[1],args.ch,True)
+plt.ratioplotPt(pt_eff_a,pt_eff_b,pt_ratio,'pt',labels[0],labels[1],args.ch,ext)
+plt.ratioplotPt(L1pt_eff_a,L1pt_eff_b,l1pt_ratio,'L1pt',labels[0],labels[1],args.ch,ext)
 plt.ratioplotPt(eta_eff_a,eta_eff_b,eta_ratio,'eta',labels[0],labels[1],args.ch,args.ext)
 #plt.ratioplotPt(npv_eff_a,npv_eff_b,npv_ratio,'pt',labels[0],labels[1],args.ch,False)
+print("Everything is fine Till here")
+
