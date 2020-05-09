@@ -29,16 +29,8 @@ path_prefix = '' if 'TauTriggerTools' in os.getcwd() else 'TauTriggerTools/'
 sys.path.insert(0, path_prefix+'Common/python')
 from AnalysisTypes import *
 ROOT.gROOT.SetBatch(True)
-ROOT.gInterpreter.Declare('#include "{}TauTagAndProbe/interface/PyInterface.h"'.format(path_prefix))
 
-pu_bins = np.arange(0, 80, step=10)
-hist_pu1 = ROOT.RDF.TH1DModel('hist_pu1', '', len(pu_bins)-1, array('d', pu_bins))
-hist_pu2 = ROOT.RDF.TH1DModel('hist_pu2', '', len(pu_bins)-1, array('d', pu_bins))
-ref_df = ROOT.RDataFrame('all_events',args.input_b)
-tar_df = ROOT.RDataFrame('all_events',args.input_a)
-ref_pu = ref_df.Histo1D(hist_pu1, 'npu')
-tar_pu = tar_df.Histo1D(hist_pu2, 'npu')
-ROOT.PileUpWeightProvider.Initialize(ref_pu.GetPtr(), tar_pu.GetPtr())
+
 
 chs=['tt','mt','et']
 if(args.ch not in chs):
@@ -100,15 +92,15 @@ def ReportHLTPaths(hlt_paths, label):
 def CreatePtHistograms(input_file, selection_id, hlt_paths, label, var, hist_model, output_file):
     df = ROOT.RDataFrame('events', input_file)
     df = df.Filter('(tau_sel & {}) != 0 && abs(tau_gen_vis_eta) < 2.1 && tau_gen_vis_pt > 0'.format(selection_id))
-    df = df.Define('puweight', "PileUpWeightProvider::GetDefault().GetWeight(npu)")
+    # df = df.Define('puweight', "PileUpWeightProvider::GetDefault().GetWeight(npu)")
     if(args.ch == 'et'):
         df = df.Filter('(tau_sel & {}) != 0 && abs(tau_gen_vis_eta) < 2.1 && tau_gen_vis_pt > 0 && l1Tau_pt > 26'.format(selection_id))
     match_mask = 0
     for path_name, path_index in hlt_paths.items():
         match_mask = match_mask | (1 << path_index)
-    hist_total = df.Histo1D(hist_model, var,'puweight')
+    hist_total = df.Histo1D(hist_model, var)#,'puweight'
     hist_passed = df.Filter('(hlt_acceptAndMatch & {}) != 0'.format(match_mask)) \
-                    .Histo1D(hist_model, var,'puweight')
+                    .Histo1D(hist_model, var)#,'puweight'
     eff = ROOT.TEfficiency(hist_passed.GetPtr(), hist_total.GetPtr())
     #eff = ROOT.TGraphAsymmErrors(hist_passed.GetPtr(), hist_total.GetPtr())
     output_file.WriteTObject(hist_total.GetPtr(), label + '_pt_total', 'Overwrite')
@@ -120,7 +112,7 @@ def CreatePtHistograms(input_file, selection_id, hlt_paths, label, var, hist_mod
 def CreateNVtxHistograms(input_file, selection_id,pt_cut, hlt_paths, label, var, hist_model, output_file):
     df = ROOT.RDataFrame('events', input_file)
     df = df.Filter('(tau_sel & {}) != 0 && abs(tau_gen_vis_pt) > {}'.format(selection_id,pt_cut))
-    df = df.Define('puweight', "PileUpWeightProvider::GetDefault().GetWeight(npu)")
+    # df = df.Define('puweight', "PileUpWeightProvider::GetDefault().GetWeight(npu)")
     if(args.ch == 'et'):
         df = df.Filter('(tau_sel & {}) != 0 && abs(tau_gen_vis_pt) > {} && l1Tau_pt >26'.format(selection_id,pt_cut))
     match_mask = 0
@@ -141,15 +133,15 @@ def CreateNVtxHistograms(input_file, selection_id,pt_cut, hlt_paths, label, var,
 def CreateEtaHistograms(input_file, selection_id,pt_cut, hlt_paths, label, var, hist_model, output_file):
     df = ROOT.RDataFrame('events', input_file)
     df = df.Filter('(tau_sel & {}) != 0 && tau_gen_vis_pt > {}'.format(selection_id,pt_cut))
-    df = df.Define('puweight', "PileUpWeightProvider::GetDefault().GetWeight(npu)")
+    # df = df.Define('puweight', "PileUpWeightProvider::GetDefault().GetWeight(npu)")
     if(args.ch == 'et'):
         df = df.Filter('(tau_sel & {}) != 0 && abs(tau_gen_vis_pt) > {} && l1Tau_pt >26'.format(selection_id,pt_cut))
     match_mask = 0
     for path_name, path_index in hlt_paths.items():
         match_mask = match_mask | (1 << path_index)
-    hist_total = df.Histo1D(hist_model, var,'puweight')
+    hist_total = df.Histo1D(hist_model, var)#,'puweight'
     hist_passed = df.Filter('(hlt_acceptAndMatch & {}) != 0'.format(match_mask)) \
-                    .Histo1D(hist_model, var,'puweight')
+                    .Histo1D(hist_model, var)# ,'puweight'
     eff = ROOT.TEfficiency(hist_passed.GetPtr(), hist_total.GetPtr())
     #eff = hist_passed.GetPtr().Divide(hist_total.GetPtr())
     output_file.WriteTObject(hist_total.GetPtr(), label + '_eta_total', 'Overwrite')
@@ -159,14 +151,14 @@ def CreateEtaHistograms(input_file, selection_id,pt_cut, hlt_paths, label, var, 
 
 def CreateL1PtHistograms(input_file, selection_id,hlt_paths,label, var, hist_model, output_file):
     df = ROOT.RDataFrame('events', input_file)
-    df = df.Define('puweight', "PileUpWeightProvider::GetDefault().GetWeight(npu)")
+    # df = df.Define('puweight', "PileUpWeightProvider::GetDefault().GetWeight(npu)")
     df = df.Filter('(tau_sel & {}) != 0 && abs(tau_gen_vis_eta) < 2.1 && tau_gen_vis_pt > 0'.format(selection_id))
     match_mask = 0
     for path_name, path_index in hlt_paths.items():
         match_mask = match_mask | (1 << path_index)
-    hist_total = df.Histo1D(hist_model, var,'puweight')
+    hist_total = df.Histo1D(hist_model, var)#,'puweight'
     hist_passed = df.Filter('l1Tau_hwIso > 0 && l1Tau_pt>20') \
-                    .Histo1D(hist_model, var,'puweight')
+                    .Histo1D(hist_model, var)#,'puweight'
     eff = ROOT.TEfficiency(hist_passed.GetPtr(), hist_total.GetPtr())
     #eff = ROOT.TGraphAsymmErrors(hist_passed.GetPtr(), hist_total.GetPtr())
     output_file.WriteTObject(hist_total.GetPtr(), label + '_pt_total', 'Overwrite')
@@ -320,9 +312,9 @@ npv_ratio = ROOT.TGraphAsymmErrors(len(npv_xval),npv_xval_,npv_yval_,npv_exl,npv
 output_file.WriteTObject(pt_ratio, 'pt_ratio', 'Overwrite')
 output_file.WriteTObject(eta_ratio, 'eta_ratio', 'Overwrite')
 output_file.Close()
-plt.ratioplotPt(pt_eff_a,pt_eff_b,pt_ratio,'pt',labels[0],labels[1],args.ch,ext)
-plt.ratioplotPt(L1pt_eff_a,L1pt_eff_b,l1pt_ratio,'L1pt',labels[0],labels[1],args.ch,ext)
-plt.ratioplotPt(eta_eff_a,eta_eff_b,eta_ratio,'eta',labels[0],labels[1],args.ch,args.ext)
+plt.ratioplotPt(pt_eff_a,pt_eff_b,pt_ratio,'pt',labels[0],labels[1],args.ch,False)
+plt.ratioplotPt(L1pt_eff_a,L1pt_eff_b,l1pt_ratio,'L1pt',labels[0],labels[1],args.ch,False)
+plt.ratioplotPt(eta_eff_a,eta_eff_b,eta_ratio,'eta',labels[0],labels[1],args.ch,False)
 #plt.ratioplotPt(npv_eff_a,npv_eff_b,npv_ratio,'pt',labels[0],labels[1],args.ch,False)
 print("Everything is fine Till here")
 

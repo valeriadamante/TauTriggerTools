@@ -54,7 +54,7 @@ config.General.transferLogs = False
 config.Data.publication = False
 
 config.Site.storageSite = args.site
-config.Data.outLFNDirBase = "/store/user/{}/{}".format(getUsernameFromSiteDB(), args.output)
+config.Data.outLFNDirBase = "/store/user/{}/{}".format("vmuralee", args.output)
 
 if len(args.blacklist) != 0:
 	config.Site.blacklist = re.split(',', args.blacklist)
@@ -62,7 +62,7 @@ if len(args.whitelist) != 0:
 	config.Site.whitelist = re.split(',', args.whitelist)
 
 job_names = Set(filter(lambda s: len(s) != 0, re.split(",", args.jobNames)))
-
+config.JobType.allowUndistributedCMSSW = True
 from TauTriggerTools.Common.crabTools import JobCollection
 try:
     for job_file in args.job_file:

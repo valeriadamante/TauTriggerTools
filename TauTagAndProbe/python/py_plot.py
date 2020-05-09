@@ -131,6 +131,6 @@ def ratioplotPt(eff_a,eff_b,gr,vari,label1,label2,ch,ext):
     #gr.SetMarkerSize(2)
     gr.Draw("sameP")
     
-    c1.SaveAs("./"+label1+label2+"_"+vari+"_"+ch+".png".format(vari))
+    c1.SaveAs("./UL16_plots/"+label1+label2+"_"+vari+"_"+ch+".png".format(vari))
 
 
