@@ -17,3 +17,20 @@ class TauSelection:
     pt = 2
     MVA = 4
     DeepTau = 8
+
+class Channel:
+    etau = 1
+    mutau = 2
+    ditau = 4
+
+class DiscriminatorWP:
+    VVVLoose = 0
+    VVLoose = 1
+    VLoose = 2
+    Loose = 3
+    Medium = 4
+    Tight = 5
+    VTight = 6
+    VVTight = 7
+    VVVTight = 8
+

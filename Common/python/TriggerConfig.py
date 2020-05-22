@@ -1,4 +1,6 @@
 import json
+import numpy as np
+import re
 
 def Load(file_name):
     with open(file_name) as f:
@@ -33,3 +35,37 @@ def LoadAsVPSet(file_name):
         if is_tag:
             tag_path_names.append(str(trig_name))
     return trig_vpset, tag_path_names
+def _CreateDictionary(summary, key_name, value_name, name):
+    result_dict = {}
+    for entry_id in range(len(summary[key_name])):
+        keys = np.array(summary[key_name][entry_id])
+        values = np.array(summary[value_name][entry_id])
+        for n in range(len(keys)):
+            if keys[n] in result_dict:
+                if result_dict[keys[n]] != values[n]:
+                    raise RuntimeError("Inconsistent {} information in the input ROOT files.".format(name))
+            else:
+                result_dict[keys[n]] = values[n]
+    return result_dict
+
+def LoadTriggerDictionary(files):
+    import ROOT
+    df_support = ROOT.RDataFrame('summary', files)
+    summary = df_support.AsNumpy()
+    trigger_dict = _CreateDictionary(summary, 'trigger_pattern', 'trigger_index', 'trigger')
+    filter_dict = _CreateDictionary(summary, 'filter_name', 'filter_hash', 'filter')
+    return trigger_dict, filter_dict
+
+def GetMatchedTriggers(trigger_dict, pattern):
+    reg_ex = re.compile(pattern)
+    matched = {}
+    for name, pos in trigger_dict.items():
+        if reg_ex.match(name) is not None:
+            matched[name] = pos
+    return matched
+
+def GetMatchMask(hlt_paths):
+    match_mask = 0
+    for path_name, path_index in hlt_paths.items():
+        match_mask = match_mask | (1 << path_index)
+    return match_mask
