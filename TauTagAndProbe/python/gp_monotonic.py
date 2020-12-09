@@ -5,47 +5,55 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.gaussian_process import GaussianProcessRegressor
+from sklearn.gaussian_process import GaussianProcessRegressor,GaussianProcessClassifier
 from sklearn.gaussian_process.kernels import Matern, ConstantKernel,RBF
 import seaborn as sns
 import scipy.stats as st
 from scipy.special import erfinv,erf,logit,erfc
 import math
 import copy
-import theano.tensor as Te
-from theano.tensor.nlinalg import matrix_inverse
-import pymc3 as pm
+#import theano.tensor as Te
+#from theano.tensor.nlinalg import matrix_inverse
+#import pymc3 as pm
 
 class gp_monotonic:
-    def __init__(self,model,gp,yerr,mp,xvals,ydata):
-        self.model = model # default gp model
-        self.gp    = gp    # gp object
-        self.mp    = mp    # maximum apriori
+    def __init__(self,gp,yerr,xvals,ydata):
+        self.gp    = gp    # default gp object
         self.xvals = xvals # input labels
         self.ydata = ydata # data points
 
         self.sigma2_n = yerr
-        x_temp = xvals#np.linspace(xvals[0],xvals[-1],len(xvals)+40)
-        with self.model:
-            y_pred,y_cov = self.gp.predict(np.atleast_2d(x_temp).T,self.mp)
+        
+        x_temp = np.linspace(xvals[0],xvals[-1],len(xvals))
+        y_pred = self.gp.predict(np.atleast_2d(x_temp).T,return_cov=False)
 
+        print(ydata)
+        ### Selecting Virtual Points ##################################
+        
         deriv = np.gradient(y_pred,x_temp)
         xm = [x_temp[pt] for pt in range(len(deriv)) if deriv[pt]<0]
         ym = [y_pred[pt] for pt in range(len(deriv)) if deriv[pt]<0]
-
-        self.xm_ar = np.array(xm,dtype='float32')
+        ym_ = [1. if x_temp[pt]>90 else 0 for pt in range(len(x_temp)) ]
+        
+        self.xm_ar = np.array(xm,dtype='float32')#np.random.choice(x_temp,int(len(x_temp)/8),replace=False)
         self.ym_ar = np.array(ym,dtype='float32')
+        
+        
         N,M = len(self.xvals),len(self.xm_ar)
         print('No. of virtual points : ',M)
-
-        self.kernel = ConstantKernel() * Matern(length_scale=self.mp['l_'], length_scale_bounds=(10,100), nu=1.5)
-        Kff  = self.kernel.__call__(np.atleast_2d(xvals).T,np.atleast_2d(xvals).T)
-        Kff1 = self.kernel.__call__(np.atleast_2d(xvals).T,np.atleast_2d(self.xm_ar).T)
-        Kf1f = self.kernel.__call__(np.atleast_2d(self.xm_ar).T,np.atleast_2d(xvals).T)
-        Kf1f1= self.kernel.__call__(np.atleast_2d(self.xm_ar).T,np.atleast_2d(self.xm_ar).T)
+        ################################################################
+        kernel = Matern(length_scale=50, length_scale_bounds=(10,100), nu=2.0)
+        gp_new = GaussianProcessRegressor(kernel=kernel, n_restarts_optimizer=0)
+        
+        gp_new.fit(np.atleast_2d(self.xm_ar).T,self.ym_ar)
+        self.kernel_opt = gp_new.kernel_
+        Kff  = self.kernel_opt(np.atleast_2d(xvals).T,np.atleast_2d(xvals).T)
+        Kff1 = self.kernel_opt(np.atleast_2d(xvals).T,np.atleast_2d(self.xm_ar).T)
+        Kf1f = self.kernel_opt(np.atleast_2d(self.xm_ar).T,np.atleast_2d(xvals).T)
+        Kf1f1= self.kernel_opt(np.atleast_2d(self.xm_ar).T,np.atleast_2d(self.xm_ar).T)
 
         
-        A = np.concatenate((Kff+0.001*np.eye(N) , Kf1f), axis=0)
+        A = np.concatenate((Kff, Kf1f), axis=0)#+0.001*np.eye(N) 
         B = np.concatenate((Kff1, Kf1f1), axis=0)
             
         self.K_joint = np.concatenate((A,B),axis=1)
@@ -59,7 +67,7 @@ class gp_monotonic:
         old_mi = copy.copy(mu_tilde)
         old_si = copy.copy(Z_tilde)
         
-        for iteration in range(20):
+        for iteration in range(50):
             print('No. of iterations: ',iteration)
             mi,vi = self.post_vars(mu_tilde,v_tilde,M)
             for i in range(M):
@@ -92,8 +100,8 @@ class gp_monotonic:
         return mu[-ndim:],sigma_diag[-ndim:]
 
     def predict(self,x_star,return_cov=False):
-        K_starf   = self.kernel.__call__(np.atleast_2d(x_star).T,np.atleast_2d(self.x_joint).T)
-        K_star2   = self.kernel.__call__(np.atleast_2d(x_star).T,np.atleast_2d(x_star).T)
+        K_starf   = self.kernel_opt(np.atleast_2d(x_star).T,np.atleast_2d(self.x_joint).T)
+        K_star2   = self.kernel_opt(np.atleast_2d(x_star).T,np.atleast_2d(x_star).T)
 
         print('K_starf shape : ',K_starf.shape)
         print('K_star2 shape : ',K_star2.shape)
@@ -104,14 +112,13 @@ class gp_monotonic:
         if(return_cov==True):
             return f_pred,f_cov
         return f_pred
-        
-        
+    
     def compute_moments(self,y_i,cavity_m,cavity_v):
         nu = 10**(-6)
-        a = math.sqrt(1+cavity_v/nu**2)
+        a = math.sqrt(1+abs(cavity_v)/nu**2)
         zi = y_i*cavity_m/(nu*a)
         normc_zi = 0.5*erfc(-zi/math.sqrt(2))
-        normp_zi = np.exp(-0.5*zi**2 -0.918938533204673)
+        normp_zi = math.exp(-0.5*zi**2)
         mu_hat     = cavity_m + (y_i*cavity_v * normp_zi)/(normc_zi*nu*a)
         sigma_hat  = cavity_v - (cavity_v**2 * normp_zi)/((nu**2 + cavity_v)*normc_zi)*(zi+normp_zi/normc_zi)
         return mu_hat,sigma_hat,normc_zi
@@ -133,10 +140,19 @@ class gp_monotonic:
     
     def update_approximate_factor(self,cavity_m,cavity_v,mu_hat,v_hat,Z_hat):
         inv_v,inv_vhat = 1.0/cavity_v,1.0/v_hat
-        v_new  = 1.0/(inv_vhat-inv_v)
-        mu_new = v_new*(inv_vhat*mu_hat-inv_v*cavity_m)
+        v_new,mu_new = cavity_v,cavity_m
+        if(self.division_zero(cavity_v,v_hat)):
+            v_new  = 1.0/(inv_vhat-inv_v)
+        else:
+            v_new = np.infty
+        if v_new == np.infty and (inv_v == 0 or mu_new == cavity_m):
+            mu_new = cavity_m
+        else:
+            mu_new = v_new*(inv_vhat*mu_hat-inv_v*cavity_m)
         Z_new = Z_hat*np.sqrt(2*np.pi)*np.sqrt(cavity_v+v_hat)*np.exp(0.5*((cavity_m-mu_hat)**2)/(cavity_v+v_hat))
+       
         return mu_new,v_new,Z_new
+        
     
     def param_dist(self,new, old):
         """Measures distance between two vectors of parameters."""
@@ -164,8 +180,4 @@ class gp_monotonic:
         print(mu_joint.shape,'  ',s_joint.shape)
         return mu_joint,s_joint
     
-    def kernel_func(self,x1,x2,param1):
-        squared_distance = lambda x, y: np.array([[(x[i] - y[j])**2 for i in range(len(x))] for j in range(len(y))])
-        D = squared_distance(x1,x2)
-        cov = (1+np.sqrt(3*D)/param1)*np.exp(-np.sqrt(3*D)/param1)
-        return cov
+    
