@@ -15,7 +15,7 @@ import ROOT
 ROOT.gROOT.SetBatch(True)
 ROOT.TH1.SetDefaultSumw2()
 import numpy as np
-from gp_monotonic import gp_monotonic
+from gp_monotonic2 import gp_monotonic
 from sklearn.gaussian_process import GaussianProcessRegressor,GaussianProcessClassifier
 from sklearn.gaussian_process.kernels import Matern, ConstantKernel,RBF
 
@@ -32,6 +32,14 @@ parser.add_argument('--working-points', required=False, type=str,
                     default='VVVLoose,VVLoose,VLoose,Loose,Medium,Tight,VTight,VVTight',
                     help="working points to process")
 args = parser.parse_args()
+
+def add_fakepoint(eff,pos):
+    eff_x = np.insert(eff.x,len(eff.x),pos)
+    eff_y = np.insert(eff.y,len(eff.y),eff.y[-1])
+    y_err = np.maximum(eff.y_error_low, eff.y_error_high)
+    y_err = np.insert(y_err,len(y_err),y_err[-1])
+    return eff_x,eff_y,y_err
+
 def MinTarget(dy, eff):
     y = np.cumsum(dy)
     return np.sum(((eff.y - y) / (eff.y_error_high + eff.y_error_low)) ** 2)
@@ -53,6 +61,7 @@ class FitResults:
         #eff.y = new_y
         yerr = np.maximum(eff.y_error_low, eff.y_error_high)
         kernel_default = Matern(length_scale=10.0, length_scale_bounds=(10, 100.0), nu=1)
+        eff.x,eff.y,yerr = add_fakepoint(eff,200)
         gp_default = GaussianProcessRegressor(kernel=kernel_default,alpha = yerr**2, n_restarts_optimizer=10)
         gp_default.fit(np.atleast_2d(eff.x).T,eff.y)
         gp_mon = gp_monotonic(gp_default,yerr,eff.x,eff.y)
