@@ -14,12 +14,14 @@ import math
 import copy
 
 class gp_monotonic:
-    def __init__(self,gp,yerr,xvals,ydata):
+    def __init__(self,gp,yerr,xvals,ydata,ch):
         self.gp    = gp    # default gp object
         self.xvals = xvals # input labels
         self.ydata = ydata # data points
-
-        self.sigma2_n = yerr
+        ch_validity_thrs = { 'etau': 35, 'mutau': 32, 'ditau': 40 }
+        pt_th = ch_validity_thrs[ch]
+        
+        
         
         ### Selecting Virtual Points ###
 
@@ -29,8 +31,11 @@ class gp_monotonic:
         
         N,M = len(self.xvals),len(self.xm_ar)
         print('No. of virtual points : ',M)
-
-        self.kernel_opt = gp.kernel_
+        
+        alpha_ar = [yerr[i] if xvals[i] > pt_th else yerr[i]**2 for i in range(N) ]
+        self.sigma2_n = np.array(alpha_ar)
+        self.kernel_opt = Matern(length_scale=120.0, length_scale_bounds=(100, 150.0), nu=1.5)
+        
         Kff  = self.kernel_opt(np.atleast_2d(xvals).T,np.atleast_2d(xvals).T)
         Kff1 = self.kernel_opt(np.atleast_2d(xvals).T,np.atleast_2d(self.xm_ar).T)
         Kf1f = self.kernel_opt(np.atleast_2d(self.xm_ar).T,np.atleast_2d(xvals).T)
@@ -94,6 +99,7 @@ class gp_monotonic:
             old_mi = copy.copy(mu_tilda)
             old_si = copy.copy(Z_tilda)
 
+        #self.sigma2_n = np.repeat(np.max(self.sigma2_n),self.sigma2_n.size)  # Need to Optimize the variable using Log Marginal Likelihood
         self.mu_tilda_joint, self.S_tilda_joint = self.joint_vector(ydata,mu_tilda,self.sigma2_n,v_tilda)
         self.x_joint = np.concatenate((self.xvals, self.xm_ar), axis=0)
         print('Sucessfully created the montonic object')

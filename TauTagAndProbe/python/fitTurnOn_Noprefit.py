@@ -35,7 +35,7 @@ args = parser.parse_args()
 
 def add_fakepoint(eff,pos):
     eff_x = np.insert(eff.x,len(eff.x),pos)
-    eff_y = np.insert(eff.y,len(eff.y),eff.y[-1])
+    eff_y = np.insert(eff.y,len(eff.y),1)
     y_err = np.maximum(eff.y_error_low, eff.y_error_high)
     y_err = np.insert(y_err,len(y_err),y_err[-1])
     return eff_x,eff_y,y_err
@@ -44,7 +44,7 @@ def MinTarget(dy, eff):
     y = np.cumsum(dy)
     return np.sum(((eff.y - y) / (eff.y_error_high + eff.y_error_low)) ** 2)
 class FitResults:
-    def __init__(self, eff, x_pred):
+    def __init__(self, eff, x_pred,channel):
         N = eff.x.shape[0]
         res = scipy.optimize.minimize(MinTarget, np.zeros(N), args=(eff,), bounds = [ [0, 1] ] * N,
                                       options={"maxfun": int(1e6)})
@@ -60,11 +60,11 @@ class FitResults:
         eff.y_error_high = np.sqrt(eff.y_error_high ** 2 + delta ** 2)
         #eff.y = new_y
         yerr = np.maximum(eff.y_error_low, eff.y_error_high)
-        kernel_default = Matern(length_scale=10.0, length_scale_bounds=(10, 100.0), nu=1)
-        eff.x,eff.y,yerr = add_fakepoint(eff,200)
+        kernel_default = Matern(length_scale=20.0, length_scale_bounds=(10, 100.0), nu=1)
+        eff.x,eff.y,yerr = add_fakepoint(eff,300)
         gp_default = GaussianProcessRegressor(kernel=kernel_default,alpha = yerr**2, n_restarts_optimizer=10)
         gp_default.fit(np.atleast_2d(eff.x).T,eff.y)
-        gp_mon = gp_monotonic(gp_default,yerr,eff.x,eff.y)
+        gp_mon = gp_monotonic(gp_default,yerr,eff.x,eff.y,channel)
         self.y_pred,y_cov = gp_mon.predict(x_pred,return_cov=True)
         self.sigma_pred = np.diag(y_cov)
         
@@ -93,8 +93,8 @@ for channel in channels:
                 x_low, x_high = 20, 1000
                 x_pred = np.arange(x_low, x_high + pred_step / 2, pred_step)
 
-                eff_data_fitted = FitResults(eff_data, x_pred)
-                eff_mc_fitted = FitResults(eff_mc, x_pred)
+                eff_data_fitted = FitResults(eff_data, x_pred,channel)
+                eff_mc_fitted = FitResults(eff_mc, x_pred,channel)
 
                 sf = eff_data_fitted.y_pred / eff_mc_fitted.y_pred
                 sf_sigma = np.sqrt( (eff_data_fitted.sigma_pred / eff_mc_fitted.y_pred) ** 2 \
