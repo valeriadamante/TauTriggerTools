@@ -12,135 +12,147 @@ import scipy.stats as st
 from scipy.special import erfinv,erf,logit,erfc
 import math
 import copy
-#import theano.tensor as Te
-#from theano.tensor.nlinalg import matrix_inverse
-#import pymc3 as pm
+from numpy import sqrt
+from numpy.linalg import inv
 
-class gp_monotonic:
-    def __init__(self,gp,yerr,xvals,ydata):
-        self.gp    = gp    # default gp object
-        self.xvals = xvals # input labels
-        self.ydata = ydata # data points
 
-        self.sigma2_n = yerr
-        
-        x_temp = np.linspace(xvals[0],xvals[-1],len(xvals))
-        y_pred = self.gp.predict(np.atleast_2d(x_temp).T,return_cov=False)
+class monotonic:
+    def __init__(self,gp,xl,yl,yerr):
+        self.xl = xl
+        self.yl = yl
+        self.sigma_2n = np.repeat(0.04985623,len(xl))# Need to optimize 
+        self.l,self.eta = 15.0,1.0
 
-        print(ydata)
-        ### Selecting Virtual Points ##################################
+        self.Xm = np.linspace(xl[80],xl[-1],int(len(xl)*0.1))
+        #np.insert(self.Xm,len(self.Xm),200)
+        ##To Force monotoncity
+        Xtemp = np.linspace(xl[0],xl[-1],int(len(xl)*0.25))
+        latent_der = np.dot(self.D1RBF(Xtemp,self.xl,self.l,self.eta),
+                            np.dot(inv(self.RBF_cov(self.xl,self.xl,self.l,self.eta)+self.sigma_2n*np.eye(len(xl))),self.yl))
+        Xm_list = [Xtemp[i] for i in range(len(Xtemp)) if latent_der[i]<0]
+        Xm_list = [80,100,125,150]
         
-        deriv = np.gradient(y_pred,x_temp)
-        xm = [x_temp[pt] for pt in range(len(deriv)) if deriv[pt]<0]
-        ym = [y_pred[pt] for pt in range(len(deriv)) if deriv[pt]<0]
-        ym_ = [1. if x_temp[pt]>90 else 0 for pt in range(len(x_temp)) ]
+        #self.Xm = np.array(Xm_list)
+        #self.Xm = Xm
+        self.y_pred,y_std= gp.predict(np.atleast_2d(self.Xm).T,return_std=True)
         
-        self.xm_ar = np.array(xm,dtype='float32')#np.random.choice(x_temp,int(len(x_temp)/8),replace=False)
-        self.ym_ar = np.array(ym,dtype='float32')
-        
-        
-        N,M = len(self.xvals),len(self.xm_ar)
-        print('No. of virtual points : ',M)
-        ################################################################
-        kernel = Matern(length_scale=50, length_scale_bounds=(10,100), nu=2.0)
-        gp_new = GaussianProcessRegressor(kernel=kernel, n_restarts_optimizer=0)
-        
-        gp_new.fit(np.atleast_2d(self.xm_ar).T,self.ym_ar)
-        self.kernel_opt = gp_new.kernel_
-        Kff  = self.kernel_opt(np.atleast_2d(xvals).T,np.atleast_2d(xvals).T)
-        Kff1 = self.kernel_opt(np.atleast_2d(xvals).T,np.atleast_2d(self.xm_ar).T)
-        Kf1f = self.kernel_opt(np.atleast_2d(self.xm_ar).T,np.atleast_2d(xvals).T)
-        Kf1f1= self.kernel_opt(np.atleast_2d(self.xm_ar).T,np.atleast_2d(self.xm_ar).T)
+        M,N = len(self.Xm),len(self.xl)
 
+        ## Computing GP prior with derivatives
         
-        A = np.concatenate((Kff, Kf1f), axis=0)#+0.001*np.eye(N) 
-        B = np.concatenate((Kff1, Kf1f1), axis=0)
-            
-        self.K_joint = np.concatenate((A,B),axis=1)
+        Kff  = self.RBF_cov(self.xl,self.xl,self.l,self.eta)
+        Kff1 = self.D1RBF(self.xl,self.Xm,self.l,self.eta)
+        Kf1f = self.D1RBF(self.Xm,self.xl,self.l,self.eta)
+        Kf1f1= self.D2RBF(self.Xm,self.Xm,self.l,self.eta)
         
-        #Initialise
-        mu_tilde = np.zeros(M)
-        v_tilde  = np.repeat(np.inf,M)
-        Z_tilde  = np.ones(M)
+        A = np.concatenate((Kff , Kff1), axis=1)
+        B = np.concatenate((Kf1f, Kf1f1), axis=1)
 
-        old_vi = copy.copy(v_tilde)
-        old_mi = copy.copy(mu_tilde)
-        old_si = copy.copy(Z_tilde)
+        self.ym = np.dot(Kff1.T,np.dot(inv(Kff+np.diag(self.sigma_2n)),self.yl))
+        self.K_joint = np.concatenate((A,B),axis=0)
+        self.f_joint = np.concatenate((self.yl,self.ym))
+        ## Initialise posterior
+
+        mu_tilda,v_tilda = np.zeros(M),np.repeat(0.04985623,M)
         
-        for iteration in range(50):
-            print('No. of iterations: ',iteration)
-            mi,vi = self.post_vars(mu_tilde,v_tilde,M)
-            for i in range(M):
-                cavity_mi,cavity_vi = self.compute_cavity(mi[i],vi[i],mu_tilde[i],v_tilde[i])
-                mu_hat,v_hat,Z_hat = self.compute_moments(self.ym_ar[i],cavity_mi,cavity_vi)
-                mu_tilde[i],v_tilde[i],Z_tilde[i] = self.update_approximate_factor(cavity_mi,cavity_vi,mu_hat,v_hat,Z_hat)
-
-            
-            self.mu_tilda_joint, self.S_tilda_joint = self.joint_vector(self.ydata,mu_tilde,self.sigma2_n,v_tilde)
-            self.x_joint = np.concatenate((self.xvals, self.xm_ar), axis=0)
+        self.mu_tilda,self.v_tilda,self.Z_tilda = self.deploy_EP(mu_tilda,v_tilda)
+        self.mu_tilda_joint,self.S_tilda_joint = self.joint_vector(yl,self.mu_tilda,self.sigma_2n,self.v_tilda)
+        #self.mu_tilda_joint,self.S_tilda_joint = self.deploy_EP(mu_tilda,v_tilda)
         
-            # Check for convergence, after iteration
-            if self.check_convergence(mu_tilde, v_tilde, Z_tilde, old_mi, old_vi, old_si):
-                print ("Convergence reached.")
-                break
-                
-            old_vi = copy.copy(v_tilde)
-            old_mi = copy.copy(mu_tilde)
-            old_si = copy.copy(Z_tilde)
-            
+    def predict(self,xstar):
+        Kffstar = self.RBF_cov(xstar,self.xl,self.l,self.eta)
+        Kf1fstar= self.D1RBF(xstar,self.Xm,self.l,self.eta)
+        x_joint = np.concatenate((self.xl,self.Xm))
+        K_starf   = np.concatenate((Kffstar,Kf1fstar),axis=1)
+        K_star2   = self.RBF_cov(xstar,xstar,self.l,self.eta)
         
-        print('Sucessfully created the montonic object')
-                
-
-    def post_vars(self,mu_t,v_t,ndim):
-        mu_joint,sigma_joint = self.joint_vector(self.ydata,mu_t,self.sigma2_n,v_t)
-        sigma = np.linalg.inv(np.linalg.inv(self.K_joint) + np.linalg.inv(sigma_joint))
-        mu = np.dot(np.dot(sigma,np.linalg.inv(sigma_joint)),mu_joint)
-        sigma_diag = np.diag(sigma)
-        return mu[-ndim:],sigma_diag[-ndim:]
-
-    def predict(self,x_star,return_cov=False):
-        K_starf   = self.kernel_opt(np.atleast_2d(x_star).T,np.atleast_2d(self.x_joint).T)
-        K_star2   = self.kernel_opt(np.atleast_2d(x_star).T,np.atleast_2d(x_star).T)
-
-        print('K_starf shape : ',K_starf.shape)
-        print('K_star2 shape : ',K_star2.shape)
+        f_pred = np.dot(self.mu_tilda_joint,np.dot(np.linalg.inv(self.K_joint+self.S_tilda_joint),K_starf.T))
+        f_cov  = K_star2 - np.dot(K_starf,np.dot(np.linalg.inv(self.K_joint+self.S_tilda_joint),K_starf.T))
         
-        f_pred = np.dot(np.dot(K_starf,np.linalg.inv(self.K_joint+self.S_tilda_joint)),self.mu_tilda_joint)
-        f_cov  = K_star2 - np.dot(np.dot(K_starf,np.linalg.inv(self.K_joint+self.S_tilda_joint)),K_starf.T)
-
-        if(return_cov==True):
-            return f_pred,f_cov
-        return f_pred
+        return f_pred,np.diag(f_cov)
     
-    def compute_moments(self,y_i,cavity_m,cavity_v):
-        nu = 10**(-6)
-        a = math.sqrt(1+abs(cavity_v)/nu**2)
-        zi = y_i*cavity_m/(nu*a)
-        normc_zi = 0.5*erfc(-zi/math.sqrt(2))
-        normp_zi = math.exp(-0.5*zi**2)
-        mu_hat     = cavity_m + (y_i*cavity_v * normp_zi)/(normc_zi*nu*a)
-        sigma_hat  = cavity_v - (cavity_v**2 * normp_zi)/((nu**2 + cavity_v)*normc_zi)*(zi+normp_zi/normc_zi)
-        return mu_hat,sigma_hat,normc_zi
+    def joint_vector(self,y,mu_t,s2,s2_t):
+        n,m = len(y),len(mu_t)
+        mu_joint = np.concatenate((y, mu_t), axis=0)
+        s_diag = np.concatenate((s2,s2_t),axis=0)
+        s_joint =  np.diag(s_diag)
+        #print(mu_joint.shape,'  ',s_joint.shape)
+        return mu_joint,s_joint
 
+    def approx_post(self,mu_t,v_t):
+        M = len(self.Xm)
+        #mu_t,v_t = np.zeros(M),np.repeat(np.infty,M)
+        mu_t_joint,v_t_joint = self.joint_vector(self.yl,mu_t,self.sigma_2n,v_t)
+        sigma_post = inv(inv(self.K_joint)+inv(v_t_joint))
+        mu_post = np.dot(np.dot(sigma_post,inv(v_t_joint)),mu_t_joint)
+        return mu_post[-M:],np.diag(sigma_post)[-M:]
+
+        
+    def deploy_EP(self,mu_tilda,v_tilda):
+        M = len(self.Xm)
+        N = len(self.xl)
+        # Initialise data terms.
+        Z_tilda = np.ones(M)
+        y_i = np.ones(M)
+        #mu_post,v_post =np.ones(M),np.repeat(np.infty,M)
+        for iteration in range(0):
+            print ("Iteration ", iteration)
+            # Approximate the posterior
+            mu_post,v_post = self.approx_post(mu_tilda,v_tilda)
+            
+            for i in range(M):
+                ######################################################################################
+                # Find the cavity distribution parameters.
+                if self.division_zero(v_tilda[i], v_post[i]):
+                    cavity_m, cavity_v = self.remove_factor(mu_tilda[i], v_tilda[i],mu_post[i], v_post[i])
+                else:
+                    print ("Skipping ", i, " for division of zero when removing factor for cavity funtion iiii")
+                    continue
+                ######################################################################################
+                # minimise KL divergence, update posterior
+                
+                m_hat, v_hat, Z_hat = self.compute_moments(y_i[i],cavity_m,cavity_v)
+                
+                ######################################################################################
+                # Update/remove approximate factor fi from q_new (moment matched from min KL)    
+                mu_tilda[i], v_tilda[i], Z_tilda[i] = self.update_approximate_factor(cavity_m, cavity_v,m_hat,v_hat, Z_hat)
+                
+                
+        return mu_tilda,v_tilda,Z_tilda
     
     def division_zero(self,v1, v2):
         # check if the variances divide by zero
         inv_v1 = 1. / v1
         inv_v2 = 1. / v2
-        if inv_v1 == inv_v2:
+
+        if(inv_v1 == inv_v2):
             return False
         else:
             return True
-    def compute_cavity(self,mi, vi, m_t, v_t):
-        inv_vi,inv_vt = 1.0/vi,1.0/v_t
-        cavity_v = 1.0/(inv_vi-inv_vt)
-        cavity_m = cavity_v*(inv_vi*mi-inv_vt*m_t)
-        return cavity_m,cavity_v
     
+    
+    def remove_factor(self,mi, vi, m_new, v_new):
+        # remove factor from posterior
+        inv_vi = 1. / vi
+        inv_v_new = 1. / v_new
+        cavity_v = 1. / (inv_v_new - inv_vi)
+        cavity_m = cavity_v * (m_new * inv_v_new - mi * inv_vi)
+        return cavity_m, cavity_v
+    def compute_moments(self,y_i,cavity_m,cavity_v):
+        nu = 10**(-6)
+        a = math.sqrt(nu**2+abs(cavity_v))
+        zi = y_i*cavity_m/(a)
+        normc_zi = 0.5*erfc(-zi/math.sqrt(2))#0.35*(1+erf(zi))
+        normp_zi = math.exp(-0.5*(zi**2-0.918938533204673))#/sqrt(2*math.pi)#
+        
+        mu_hat     = cavity_m + (y_i*cavity_v * normp_zi)/(normc_zi*a)
+        sigma_hat  = cavity_v - (cavity_v**2 * normp_zi)/((nu**2 + abs(cavity_v))*normc_zi)*(zi+normp_zi/normc_zi)
+
+        return mu_hat,sigma_hat,normc_zi
+
     def update_approximate_factor(self,cavity_m,cavity_v,mu_hat,v_hat,Z_hat):
         inv_v,inv_vhat = 1.0/cavity_v,1.0/v_hat
-        v_new,mu_new = cavity_v,cavity_m
+        v_new,mu_new,Z_new = cavity_v,cavity_m,1
         if(self.division_zero(cavity_v,v_hat)):
             v_new  = 1.0/(inv_vhat-inv_v)
         else:
@@ -149,35 +161,24 @@ class gp_monotonic:
             mu_new = cavity_m
         else:
             mu_new = v_new*(inv_vhat*mu_hat-inv_v*cavity_m)
-        Z_new = Z_hat*np.sqrt(2*np.pi)*np.sqrt(cavity_v+v_hat)*np.exp(0.5*((cavity_m-mu_hat)**2)/(cavity_v+v_hat))
-       
-        return mu_new,v_new,Z_new
-        
-    
-    def param_dist(self,new, old):
-        """Measures distance between two vectors of parameters."""
-        new_finfo = np.finfo(new.dtype)
-        new_clipped = np.clip(new, new_finfo.min, new_finfo.max)
-        old_finfo = np.finfo(old.dtype)
-        old_clipped = np.clip(old, old_finfo.min, old_finfo.max)
-        return max(np.sum(np.atleast_2d((new_clipped - old_clipped) ** 2), axis=1))
-
-    def check_convergence(self,mi, vi, si, old_mi, old_vi, old_si):
-        tol = 10**4
-        dist = max(self.param_dist(new, old) for (new, old) in ((vi, old_vi), (mi, old_mi), (si, old_si)))
-        #print("m_new = ", self.m_new, " v_new = ", self.v_new)
-        print ("Maximum distance from last parameter values: ", dist)
-    
-        if dist <= tol:
-            return True
+        if(math.isnan(Z_new)):
+            Z_new = 1.
         else:
-            return False
-    def joint_vector(self,y,mu_t,s2,s2_t):
-        n,m = len(y),len(mu_t)
-        mu_joint = np.concatenate((y, mu_t), axis=0)
-        s_diag   = np.concatenate((s2,s2_t),axis=0)
-        s_joint =  np.diag(s_diag)
-        print(mu_joint.shape,'  ',s_joint.shape)
-        return mu_joint,s_joint
+            Z_new = Z_hat*np.sqrt(2*np.pi)*np.sqrt(abs(cavity_v+v_hat))*np.exp(0.5*((cavity_m-mu_hat)**2)/(cavity_v+v_hat))
+
+        return mu_new,v_new,Z_new
+
+    def RBF_cov(self,x1,x2,rho,eta):
+        D = np.array([[(i-j)**2 for j in x2] for i in x1])
+        return eta**2 * np.exp(D/(-2*rho**2))
     
-    
+    def D1RBF(self,x1,x2,rho,eta):
+        D = np.array([[(i-j)**2 for j in x2] for i in x1])
+        M = -np.array([[(i-j) for j in x2] for i in x1])/(rho**2)
+        return self.RBF_cov(x1,x2,rho,eta)*M
+
+    def D2RBF(self,x1,x2,rho,eta):
+        D = np.array([[(i-j)**2 for j in x2] for i in x1])
+        M = (1-D*rho**(-2))/rho**2
+        return self.RBF_cov(x1,x2,rho,eta)*M
+        
