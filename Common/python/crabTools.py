@@ -11,11 +11,11 @@ def submit(config):
     try:
         crabCommand('submit', config = config)
     except HTTPException as hte:
-        print str(hte)
-        print "\n{}\nERROR: failed to submit task due to HTTPException.\n{}".format(hte, hte.headers)
+        print (str(hte))
+        print ("\n{}\nERROR: failed to submit task due to HTTPException.\n{}".format(hte, hte.headers))
     except ClientException as cle:
-        print "ERROR: failed to submit task due to ClientException.\n{}".format(cle)
-
+        print ("ERROR: failed to submit task due to ClientException.\n{}".format(cle))
+        
 class Job:
     def __init__(self, line, jobNameSuffix = ''):
         items = filter(lambda s: len(s) != 0, re.split(" |\t", line))
