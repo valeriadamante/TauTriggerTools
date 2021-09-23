@@ -11,5 +11,6 @@
 <use name="HLTrigger/HLTcore"/>
 <use name="TauTriggerTools/TauTagAndProbe"/>
 <use name="TauTriggerTools/Common"/>
+<use name="SimDataFormats/GeneratorProducts"/>
 
 <flags EDM_PLUGIN="1"/>
