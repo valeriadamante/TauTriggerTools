@@ -21,7 +21,7 @@ def LoadAsVPSet(file_name):
         trig_desc = json.load(f)
     trig_vpset = cms.VPSet()
     tag_path_names = []
-    for trig_name, desc in trig_desc.iteritems():
+    for trig_name, desc in trig_desc.items():
         filters = [ str(','.join(path_list)) for path_list in desc['filters'] ]
         is_tag = 'is_tag' in desc and desc['is_tag'] > 0
         leg_types = [ str(leg_type) for leg_type in desc['leg_types'] ]
