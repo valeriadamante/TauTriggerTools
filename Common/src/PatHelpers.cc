@@ -19,7 +19,7 @@ std::vector<TauEntry> CollectTaus(const LorentzVectorM& muon_p4, const pat::TauC
                                   const std::vector<gen_truth::LeptonMatchResult>& genLeptons, double deltaR2Thr)
 {
     static const std::string mvaIdName = "byIsolationMVArun2017v2DBoldDMwLTraw2017";
-    static const std::string deepIdName = "byDeepTau2017v2p1VSjetraw";
+    static const std::string deepIdName = "byDeepTau2018v2p5VSjetraw";
     std::map<TauSelection, const pat::Tau*> best_tau;
     for(const auto& tau : taus) {
         auto leadChargedHadrCand = dynamic_cast<const pat::PackedCandidate*>(tau.leadChargedHadrCand().get());
@@ -27,9 +27,9 @@ std::vector<TauEntry> CollectTaus(const LorentzVectorM& muon_p4, const pat::TauC
                 && leadChargedHadrCand && std::abs(leadChargedHadrCand->dz()) < 0.2
                 && reco::deltaR2(muon_p4, tau.polarP4()) > deltaR2Thr) {
             const bool pass_mva_sel = tau.tauID("againstMuonLoose3") > 0.5f;
-            const bool pass_deep_sel = tau.isTauIDAvailable("byDeepTau2017v2p1VSjetraw")
-                && tau.tauID("byVVVLooseDeepTau2017v2p1VSe") > 0.5f
-                && tau.tauID("byVLooseDeepTau2017v2p1VSmu") > 0.5f;
+            const bool pass_deep_sel = tau.isTauIDAvailable("byDeepTau2018v2p5VSjetraw")
+                && tau.tauID("byVVVLooseDeepTau2018v2p5VSe") > 0.5f
+                && tau.tauID("byVLooseDeepTau2018v2p5VSmu") > 0.5f;
             if((pass_mva_sel || pass_deep_sel) && (!best_tau.count(TauSelection::pt)
                     || best_tau.at(TauSelection::pt)->polarP4().pt() < tau.polarP4().pt()))
                 best_tau[TauSelection::pt] = &tau;
