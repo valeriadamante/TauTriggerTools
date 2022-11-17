@@ -31,7 +31,12 @@ python TauTriggerTools/TauTagAndProbe/test/produceTuples.py help
 
 ### How to submit jobs on CRAB
 
-Submitting task:
+This is below script is not fixed yet for Run3. For current purpose try to use the crab configutation file,
+``` 
+crab submit TauTriggerTools/TauTagAndProbe/test/crabConfig.py 
+
+```
+Submitting task (working progress):
 ```
 crab_submit.py --workArea work-area --cfg TauTriggerTools/TauTagAndProbe/test/produceTuples.py --site T2_IN_TIFR --output trigger_tuples mytasks.txt
 ```
