@@ -4,24 +4,24 @@ Set of tools to evaluate tau trigger performance on T&amp;P
 ### How to install
 
 ```
-cmsrel CMSSW_10_2_16
-cd CMSSW_10_2_16/src
+cmsrel CMSSW_12_4_6
+cd CMSSW_12_4_6/src
 cmsenv
 git cms-init
+# Necessary for run 2 
 git cms-addpkg RecoMET/METFilters
 git cms-merge-topic cms-egamma:EgammaPostRecoTools
-# if you want to run DeepTau
-git cms-merge-topic -u cms-tau-pog:CMSSW_10_2_X_tau-pog_DeepTau2017v2p1_nanoAOD
 
+#clone the tool
 git clone https://github.com/vmuralee/TauTriggerTools.git
-git checkout new-ana
+git checkout Run3
 scram b -j4
 ```
 
 ### How to run
 
 ```
-cmsRun TauTriggerTools/TauTagAndProbe/test/produceTuples.py inputFileList=RelValZpTT_1500_13UP18.txt period=Run2018 isMC=True runDeepTau=False pureGenMode=True globalTag=102X_upgrade2018_realistic_v15 maxEvents=-1 outputTupleFile=RelValZpTT_1500_13UP18_CMSSW_10_6_2.root
+cmsRun TauTriggerTools/TauTagAndProbe/test/produceTuples.py inputFileList=run2022F.txt period=Run2022 isMC=False runDeepTau=True globalTag=124X_dataRun3_HLT_Pixel_w37_2022_v2  maxEvents=-1 outputTupleFile=run2022F.root
 ```
 
 To list all the available options run:
@@ -35,13 +35,8 @@ Submitting task:
 ```
 crab_submit.py --workArea work-area --cfg TauTriggerTools/TauTagAndProbe/test/produceTuples.py --site T2_IN_TIFR --output trigger_tuples mytasks.txt
 ```
-Example of mytaks.txt:
-```
-period=Run2018 isMC=True runDeepTau=False pureGenMode=True globalTag=102X_upgrade2018_realistic_v15
+Example of mytaks.txt can find at data/2022/crab/MuonF.txt 
 
-RelValZpTT_1500_13UP18 /RelValZpTT_1500_13UP18/CMSSW_10_6_2-PUpmx25ns_106X_upgrade2018_realistic_v6_ul18hlt_premix_rs-v1/MINIAODSIM
-RelValQQH1352T_13 /RelValQQH1352T_13/CMSSW_10_2_5-PUpmx25ns_102X_upgrade2018_realistic_v15_ECAL-v1/MINIAODSIM
-```
 To list all the available options run:
 ```
 crab_submit.py --help
