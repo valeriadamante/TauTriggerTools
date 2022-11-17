@@ -1,0 +1,1 @@
+cmsRun TauTagAndProbe/test/produceTuples.py inputFileList=DYToLL_M50Run3.txt period=Run2018 isMC=True runDeepTau=False pureGenMode=True globalTag=110X_mcRun3_2021_realistic_v6 maxEvents=-1 outputTupleFile=DYToLL_M50Run3.root
