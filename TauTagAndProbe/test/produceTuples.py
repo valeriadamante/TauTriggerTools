@@ -67,6 +67,8 @@ year = getYear(options.period)
 # Update electron ID according recommendations from https://twiki.cern.ch/twiki/bin/view/CMS/EgammaMiniAODV2
 if options.pureGenMode:
     process.egammaPostRecoSeq = cms.Sequence()
+elif year == 2022:
+    process.egammaPostRecoSeq = cms.Sequence()
 else:
     from RecoEgamma.EgammaTools.EgammaPostRecoTools import setupEgammaPostRecoSeq
     ele_era = {
@@ -80,9 +82,14 @@ else:
 import RecoTauTag.RecoTau.tools.runTauIdMVA as tauIdConfig
 updatedTauName = "slimmedTausNewID"
 tauIdsToKeep = [ "2017v2" ]
+
 if options.runDeepTau:
     tauIdsToKeep.append("deepTau2017v2p1")
-tauIdEmbedder = tauIdConfig.TauIDEmbedder(process, cms, debug=False, updatedTauName=updatedTauName,
+    if year == 2022:
+        tauIdsToKeep.append("deepTau2018v2p5")
+
+
+tauIdEmbedder = tauIdConfig.TauIDEmbedder(process, debug=False, updatedTauName=updatedTauName,
                                           toKeep=tauIdsToKeep)
 tauIdEmbedder.runTauID()
 tauSrc_InputTag = cms.InputTag(updatedTauName)
@@ -113,7 +120,7 @@ if not options.pureGenMode and year in [ 2017, 2018 ]:
 
 if len(options.metFiltersProcess) == 0:
     metFiltersProcess = 'PAT'
-    if year in [ 2016, 2018 ] and not options.isMC:
+    if year in [ 2016, 2018, 2022 ] and not options.isMC:
         metFiltersProcess = 'RECO'
 else:
     metFiltersProcess = options.metFiltersProcess
@@ -212,4 +219,4 @@ process.p = cms.Path(
 # Verbosity customization
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.cerr.FwkReport.reportEvery = getReportInterval(process.maxEvents.input.value())
-process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(options.wantSummary) )
+process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(options.wantSummary), SkipEvent = cms.untracked.vstring('ProductNotFound'))

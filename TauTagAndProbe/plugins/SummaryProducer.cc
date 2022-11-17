@@ -1,5 +1,5 @@
 /*! Creates tuple for tau analysis.
-This file is part of https://github.com/cms-tau-pog/TauTriggerTools. */
+  This file is part of https://github.com/cms-tau-pog/TauTriggerTools. */
 
 #include "Compression.h"
 
@@ -22,121 +22,105 @@ This file is part of https://github.com/cms-tau-pog/TauTriggerTools. */
 
 namespace tau_trigger {
 
-using namespace analysis;
+  using namespace analysis;
 
-struct SummaryProducerData {
-    using Mutex = SummaryTuple::Mutex;
-    using LockGuard = std::lock_guard<Mutex>;
-    using clock = std::chrono::system_clock;
-
-    const clock::time_point start;
-    std::unique_ptr<SummaryTuple> summaryTuple;
-    std::unique_ptr<ExpressTuple> expressTuple;
-
-    SummaryProducerData(TFile& file, bool createExpressTuple) :
-        start(clock::now()),
-        summaryTuple(std::make_unique<SummaryTuple>("summary", &file, false))
-    {
-        if(createExpressTuple)
-            expressTuple = std::make_unique<ExpressTuple>("all_events", &file, false);
-    }
-};
-
-class SummaryProducer : public edm::stream::EDProducer<edm::GlobalCache<SummaryProducerData>> {
-public:
-    SummaryProducer(const edm::ParameterSet& cfg, const SummaryProducerData* data) :
-        isMC(cfg.getParameter<bool>("isMC")),
-        genEvent_token(mayConsume<GenEventInfoProduct>(cfg.getParameter<edm::InputTag>("genEvent"))),
-        puInfo_token(mayConsume<std::vector<PileupSummaryInfo>>(cfg.getParameter<edm::InputTag>("puInfo"))),
-        vertices_token(mayConsume<std::vector<reco::Vertex> >(cfg.getParameter<edm::InputTag>("vertices"))),
-        summaryTuple(*data->summaryTuple),
-        expressTuple(data->expressTuple.get())
-    {
-        produces<bool>();
-    }
+  class SummaryProducer : public edm::stream::EDProducer<edm::GlobalCache<SummaryProducerData>> {
+  public:
+    SummaryProducer(const edm::ParameterSet& cfg, const SummaryProducerData* globalData) :
+      isMC(cfg.getParameter<bool>("isMC")),
+      genEvent_token(mayConsume<GenEventInfoProduct>(cfg.getParameter<edm::InputTag>("genEvent"))),
+      puInfo_token(mayConsume<std::vector<PileupSummaryInfo>>(cfg.getParameter<edm::InputTag>("puInfo"))),
+      vertices_token(mayConsume<std::vector<reco::Vertex> >(cfg.getParameter<edm::InputTag>("vertices"))),
+      data(*globalData)
+	{
+	  produces<bool>();
+	}
 
     static std::unique_ptr<SummaryProducerData> initializeGlobalCache(const edm::ParameterSet& cfg)
     {
-        TFile& file = edm::Service<TFileService>()->file();
-        file.SetCompressionAlgorithm(ROOT::kLZ4);
-        file.SetCompressionLevel(4);
-        const bool isMC = cfg.getParameter<bool>("isMC");
-        auto data = std::make_unique<SummaryProducerData>(file, isMC);
-        (*data->summaryTuple)().numberOfProcessedEvents = 0;
-        (*data->summaryTuple)().totalGenEventWeight = 0;
-
-        TriggerDescriptorCollection hltPaths(cfg.getParameter<edm::VParameterSet>("hltPaths"));
-        for(unsigned n = 0; n < hltPaths.size(); ++n) {
-            (*data->summaryTuple)().trigger_index.push_back(n);
-            (*data->summaryTuple)().trigger_pattern.push_back(hltPaths.at(n).path);
-        }
-        return data;
+      TFile& file = edm::Service<TFileService>()->file();
+      file.SetCompressionAlgorithm(ROOT::kLZ4);
+      file.SetCompressionLevel(4);
+      const bool isMC = cfg.getParameter<bool>("isMC");
+      auto data = std::make_unique<SummaryProducerData>(file, isMC);
+      SummaryTuple& summaryTuple = *data->getSummaryTuple();
+      summaryTuple().numberOfProcessedEvents = 0;
+      summaryTuple().totalGenEventWeight = 0;
+      TriggerDescriptorCollection hltPaths(cfg.getParameter<edm::VParameterSet>("hltPaths"));
+      for(unsigned n = 0; n < hltPaths.size(); ++n) {
+	summaryTuple().trigger_index.push_back(n);
+	summaryTuple().trigger_pattern.push_back(hltPaths.at(n).path);
+      }
+      return data;
     }
 
     static void globalEndJob(SummaryProducerData* data)
     {
-        SummaryProducerData::LockGuard lock(data->summaryTuple->GetMutex());
-        if(data->expressTuple)
-            data->expressTuple->Write();
-        const auto stop = SummaryProducerData::clock::now();
-        (*data->summaryTuple)().exeTime = std::chrono::duration_cast<std::chrono::seconds>(stop - data->start).count();
-        data->summaryTuple->Fill();
-        data->summaryTuple->Write();
+      SummaryProducerData::LockGuard lock(data->getMutex());
+      if(data->getExpressTuple())
+	data->getExpressTuple()->Write();
+      SummaryTuple& summaryTuple = *data->getSummaryTuple();
+      const auto& filters = data->getFilters();
+      for(const auto& entry : filters) {
+	summaryTuple().filter_name.push_back(entry.first);
+	summaryTuple().filter_hash.push_back(entry.second);
+      }
+      summaryTuple().exeTime = data->getElapsedTime();
+      summaryTuple.Fill();
+      summaryTuple.Write();
     }
 
-private:
+  private:
     static constexpr float default_value = ::tau_trigger::DefaultFillValue<float>();
     static constexpr int default_int_value = ::tau_trigger::DefaultFillValue<int>();
 
     virtual void produce(edm::Event& event, const edm::EventSetup&) override
     {
-        event.put(std::make_unique<bool>(true));
+      event.put(std::make_unique<bool>(true));
 
-        SummaryProducerData::LockGuard lock(summaryTuple.GetMutex());
+      SummaryProducerData::LockGuard lock(data.getMutex());
 
-        summaryTuple().numberOfProcessedEvents++;
+      SummaryTuple& summaryTuple = *data.getSummaryTuple();
+      summaryTuple().numberOfProcessedEvents++;
 
-        if(expressTuple) {
-            (*expressTuple)().run  = event.id().run();
-            (*expressTuple)().lumi = event.id().luminosityBlock();
-            (*expressTuple)().evt  = event.id().event();
+      float genWeight = default_value;
+      int npu = default_int_value;
+      if(isMC) {
+	edm::Handle<GenEventInfoProduct> genEvent;
+	event.getByToken(genEvent_token, genEvent);
+	genWeight = static_cast<float>(genEvent->weight());
+	summaryTuple().totalGenEventWeight += genWeight;
 
-            edm::Handle<std::vector<reco::Vertex>> vertices;
-            event.getByToken(vertices_token, vertices);
-            (*expressTuple)().npv = static_cast<int>(vertices->size());
-        }
+	edm::Handle<std::vector<PileupSummaryInfo>> puInfo;
+	event.getByToken(puInfo_token, puInfo);
+	npu = gen_truth::GetNumberOfPileUpInteractions(puInfo);
+      }
 
-        if(isMC) {
-            edm::Handle<GenEventInfoProduct> genEvent;
-            event.getByToken(genEvent_token, genEvent);
-            const float genWeight = static_cast<float>(genEvent->weight());
-            summaryTuple().totalGenEventWeight += genWeight;
-            if(expressTuple) {
-                (*expressTuple)().genEventWeight = genWeight;
+      if(data.getExpressTuple()) {
+	ExpressTuple& expressTuple = *data.getExpressTuple();
+	expressTuple().run  = event.id().run();
+	expressTuple().lumi = event.id().luminosityBlock();
+	expressTuple().evt  = event.id().event();
 
-                edm::Handle<std::vector<PileupSummaryInfo>> puInfo;
-                event.getByToken(puInfo_token, puInfo);
-                (*expressTuple)().npu = gen_truth::GetNumberOfPileUpInteractions(puInfo);
-            }
-        } else if(expressTuple) {
-            (*expressTuple)().genEventWeight = default_int_value;
-            (*expressTuple)().npu = default_int_value;
-        }
+	edm::Handle<std::vector<reco::Vertex>> vertices;
+	event.getByToken(vertices_token, vertices);
+	expressTuple().npv = static_cast<int>(vertices->size());
+	expressTuple().genEventWeight = genWeight;
+	expressTuple().npu = npu;
 
-        if(expressTuple)
-            expressTuple->Fill();
+	expressTuple.Fill();
+      }
     }
 
-private:
+  private:
     const bool isMC;
 
     edm::EDGetTokenT<GenEventInfoProduct> genEvent_token;
     edm::EDGetTokenT<std::vector<PileupSummaryInfo>> puInfo_token;
     edm::EDGetTokenT<std::vector<reco::Vertex>> vertices_token;
 
-    SummaryTuple& summaryTuple;
-    ExpressTuple* expressTuple;
-};
+    const SummaryProducerData& data;
+  };
 
 } // namespace tau_trigger
 
