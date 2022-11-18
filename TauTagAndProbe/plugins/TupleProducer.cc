@@ -221,12 +221,17 @@ private:
         for(const auto& jet : *jets) {
             if (reco::deltaR2(muon_ref_p4, jet.polarP4()) < deltaR2Thr)
                 continue;
+            bool matched_with_tau = false;
             for(const auto& tau_entry : selected_taus) {
                 const pat::Tau* tau = tau_entry.reco_tau;
                 if (tau)
-                    if (reco::deltaR2(tau->polarP4(), jet.polarP4()) < deltaR2Thr)
-                        continue;
+                    if (reco::deltaR2(tau->polarP4(), jet.polarP4()) < deltaR2Thr) {
+                        matched_with_tau = true;
+                        break;
+                    }
             }
+            if (matched_with_tau)
+                continue;
             eventTuple().jet_pt = jet.polarP4().pt();
             eventTuple().jet_eta = jet.polarP4().eta();
             eventTuple().jet_phi = jet.polarP4().phi();

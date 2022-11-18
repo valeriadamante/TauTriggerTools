@@ -142,7 +142,7 @@
         "filters": [
             ["hltL3crIsoL1sVeryBigOrMu18erTauXXerL1f0L2f10QL3f24QL3trkIsoFiltered","hltHpsOverlapFilterDeepTauPFTau30VeryBigOrMu18erTauXXPFJet60"],
             ["hltHpsSelectedPFTau30MediumDitauWPDeepTauL1HLTVeryBigOrMu18erTauXXerMatched", "hltHpsOverlapFilterDeepTauPFTau30VeryBigOrMu18erTauXXPFJet60"],
-            ["hlt1PFJet60L1HLTMatched ", "hltHpsOverlapFilterDeepTauPFTau30VeryBigOrMu18erTauXXPFJet60"],
+            ["hlt1PFJet60L1HLTMatched", "hltHpsOverlapFilterDeepTauPFTau30VeryBigOrMu18erTauXXPFJet60"]
         ],
         "leg_types": [ "mu", "tau", "jet" ],
         "target_channels": [ "ditaujet_jetleg" ],
