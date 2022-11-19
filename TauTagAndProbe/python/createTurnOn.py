@@ -1,191 +1,129 @@
 #!/usr/bin/env python
 
-import argparse
-from array import array
-import math
-import numpy as np
-import os
-import re
-import sys
 import ROOT
+import argparse
+import sys
+import re
+import numpy as np
+from array import array
+import py_plot as plt
+import math
+import os
 
-parser = argparse.ArgumentParser(description='Create turn on curves.')
-parser.add_argument('--input-data', required=True, type=str, help="skimmed data input")
-parser.add_argument('--input-dy-mc', required=True, type=str, help="skimmed DY MC input")
-parser.add_argument('--output', required=True, type=str, help="output file prefix")
-parser.add_argument('--channels', required=False, type=str, default='etau,mutau,ditau', help="channels to process")
-parser.add_argument('--decay-modes', required=False, type=str, default='all,0,1,10,11', help="decay modes to process")
-parser.add_argument('--working-points', required=False, type=str,
-                    default='VVVLoose,VVLoose,VLoose,Loose,Medium,Tight,VTight,VVTight',
-                    help="working points to process")
+
+parser = argparse.ArgumentParser(description='Create turnon curves.')
+parser.add_argument('--input', required=True, type=str, nargs='+', help="the input")
+parser.add_argument('--pattern', required=True, type=str, help="trigger name pattern")
+parser.add_argument('--selection', required=True, type=str, help="Tau selection")
+parser.add_argument('--output', required=True, type=str, help="output file")
+parser.add_argument('--vars', required=True, type=str, help="variable to draw")
+
 args = parser.parse_args()
-path_prefix = '' if 'TauTriggerTools' in os.getcwd() else 'TauTriggerTools/'
-sys.path.insert(0, path_prefix + 'Common/python')
+
+
+sys.path.insert(0, 'Common/python')
 from AnalysisTypes import *
 from AnalysisTools import *
 import RootPlotting
-ROOT.ROOT.EnableImplicitMT(4)
+import TriggerConfig
 ROOT.gROOT.SetBatch(True)
 ROOT.TH1.SetDefaultSumw2()
 RootPlotting.ApplyDefaultGlobalStyle()
 
-bin_scans = {
-    2:  [ 0.01 ],
-    5:  [ 0.01, 0.05 ],
-    10: [ 0.05, 0.1 ],
-    20: [ 0.1, 0.2 ],
-    #50: [ 0.2, 0.4 ],
-    100: [ 0.2 ],
-}
-bin_scan_pairs = []
-for max_bin_delta_pt, max_rel_err_vec in bin_scans.items():
-    for max_rel_err in max_rel_err_vec:
-        bin_scan_pairs.append([max_bin_delta_pt, max_rel_err])
-#print(bin_scan_pairs)
-def CreateBins(max_pt, for_fitting):
-    if for_fitting:
-        step=1
-        return np.arange(20, 1000+step, step=step), False
-        #high_pt_bins = np.arange(100, 501, step=5)
-    else:
-        #bins = np.arange(20, 100, step=10)
-        bins = np.arange(20, 40, step=4)
-        bins = np.append(bins, np.arange(40, 60, step=5))
-        bins = np.append(bins, np.arange(60, 100, step=10))
-        high_pt_bins = [ 100, 150, 200, 300, 400, 500, 650, 800, 1000 ]
-        n = 0
-        while n < len(high_pt_bins) and high_pt_bins[n] < max_pt:
-            n += 1
-        use_logx = max_pt > 200
-        return np.append(bins, high_pt_bins[0:n+1]), use_logx
+# ccp_methods = '''
+# int FindBestMatchedHLTObject(float tau_eta, float tau_phi, ULong64_t match_mask, float deltaRThr,
+#                              const ROOT::VecOps::RVec<float>& hltObj_eta, const ROOT::VecOps::RVec<float>& hltObj_phi,
+#                              const ROOT::VecOps::RVec<ULong64_t>& hltObj_hasPathName,
+#                              const ROOT::VecOps::RVec<ULong64_t>& hltObj_hasFilters_2)
+# {
+#     int best_match_index = -1;
+#     float best_deltaR2 = std::pow(deltaRThr, 2);
+#     for(size_t n = 0; n < hltObj_eta.size(); ++n) {
+#         //if((match_mask & hltObj_hasPathName.at(n) & hltObj_hasFilters_2.at(n)) == 0) continue;
+#         if((match_mask & hltObj_hasPathName.at(n)) == 0) continue;
+#         const float deta = tau_eta - hltObj_eta.at(n);
+#         const float dphi = ROOT::Math::VectorUtil::Phi_mpi_pi(tau_phi - hltObj_phi.at(n));
+#         const float deltaR2 = std::pow(deta, 2) + std::pow(dphi, 2);
+#         if(deltaR2 >= best_deltaR2) continue;
+#         best_match_index = static_cast<int>(n);
+#         best_deltaR2 = deltaR2;
+#     }
+#     return best_match_index;
+# }
+# '''
+# ROOT.gInterpreter.Declare(ccp_methods)
 
-class TurnOnData:
-     def __init__(self):
-        self.hist_total = None
-        self.hist_passed = None
-        self.eff = None
-def CreateHistograms(input_file, channels, decay_modes, discr_name, working_points, hist_models, label, var,
-                     output_file):
-    df = ROOT.RDataFrame('events', input_file)
-    turnOn_data = {}
-    dm_labels = {}
+def CreateBins(var_name):
+    if var_name in [ 'tau_pt' ]:
+        bins = np.arange(20, 40, step=10)
+        bins = np.append(bins, np.arange(40, 120, step=4))
+        high_pt_bins = [ 120, 150, 200]
+        bins = np.append(bins,high_pt_bins)
+        return bins,False,False
+    elif var_name in [ 'tau_eta', 'tau_gen_vis_eta' ]:
+        return np.linspace(-2.3, 2.3, 20), False, False
+    elif var_name in [ 'npu', 'npv' ]:
+        return np.linspace(0, 80, 20), False, False
+    raise RuntimeError("Can't find binning for \"{}\"".format(var_name))
 
-    for dm in decay_modes:
-        if dm == 'all':
-            dm_labels[dm] = ''
-            df_dm = df
-        else:
-            dm_labels[dm] = '_dm{}'.format(dm)
-            df_dm = df.Filter('tau_decayMode == {}'.format(dm))
-        turnOn_data[dm] = {}
-        for wp in working_points:
-            wp_bit = ParseEnum(DiscriminatorWP, wp)
-            df_wp = df_dm.Filter('({} & (1 << {})) != 0'.format(discr_name, wp_bit))
-            turnOn_data[dm][wp] = {}
-            for channel in channels:
-                turnOn_data[dm][wp][channel] = {}
-                df_ch = df_wp.Filter('pass_{} > 0.5'.format(channel))
-                for model_name, hist_model in hist_models.items():
-                    turn_on = TurnOnData()
-                    turn_on.hist_total = df_wp.Histo1D(hist_model, var, 'weight')
-                    turn_on.hist_passed = df_ch.Histo1D(hist_model, var, 'weight')
-                    turnOn_data[dm][wp][channel][model_name] = turn_on
+def CreateHistograms(input_file, selection_id, hlt_paths, var, hist_model, output_file):
+    df = ROOT.RDataFrame('events',input_file)
+    df = df.Filter('(tau_sel & {}) != 0 && muon_pt > 27 && muon_iso < 0.1 && muon_mt < 30 && tau_decayMode != 5 && tau_decayMode != 6 && abs(tau_eta) < 2.3 && tau_pt > 20 && vis_mass > 40 && vis_mass < 80'.format(selection_id))
+    df = df.Filter('(byDeepTau2017v2p1VSmu & (1 << 5)) != 0 && (byDeepTau2017v2p1VSjet & (1 << 4)) != 0')
+    match_mask = 0
+    for path_name, path_index in hlt_paths.items():
+        match_mask = match_mask | (1 << path_index)
+    
+    hist_total = df.Histo1D(hist_model,var)
+    hist_pass  = df.Filter('(hlt_acceptAndMatch & {}) != 0'.format(match_mask)) \
+                    .Histo1D(hist_model, var)
+    eff = ROOT.TEfficiency(hist_pass.GetPtr(), hist_total.GetPtr())
+    return hist_pass,hist_total,eff
+        
+selection_id = ParseEnum(TauSelection, args.selection)
+print('Tau selection: {}'.format(args.selection))
 
-    for dm in decay_modes:
-        for wp in working_points:
-            for channel in channels:
-                for model_name, hist_model in hist_models.items():
-                    turn_on = turnOn_data[dm][wp][channel][model_name]
-                    name_pattern = '{}_{}_{}{}_{}_{{}}'.format(label, channel, wp, dm_labels[dm], model_name)
-                    turn_on.name_pattern = name_pattern
-                    if 'fit' in model_name:
-                        passed, total, eff = AutoRebinAndEfficiency(turn_on.hist_passed.GetPtr(),
-                                                                    turn_on.hist_total.GetPtr(), bin_scan_pairs)
-                    else:
-                        passed, total = turn_on.hist_passed.GetPtr(), turn_on.hist_total.GetPtr()
-                        FixEfficiencyBins(passed, total)
-                        turn_on.eff = ROOT.TEfficiency(passed, total)
-                        eff = turn_on.eff
-                    output_file.WriteTObject(total, name_pattern.format('total'), 'Overwrite')
-                    output_file.WriteTObject(passed, name_pattern.format('passed'), 'Overwrite')
-                    output_file.WriteTObject(eff, name_pattern.format('eff'), 'Overwrite')
-    return turnOn_data
+n_inputs = len(args.input)
+var = args.vars
+
+trigger_dict = [None] * n_inputs
+hlt_paths = [None] * n_inputs
+for input_id in range(n_inputs):
+    trigger_dict[input_id] = TriggerConfig.LoadTriggerDictionary(args.input[input_id])
+    print trigger_dict[input_id]
+    hlt_paths[input_id] = TriggerConfig.GetMatchedTriggers(trigger_dict[input_id][0], args.pattern)
+    #ReportHLTPaths(hlt_paths[input_id], labels[input_id])
 
 output_file = ROOT.TFile(args.output + '.root', 'RECREATE')
-input_files = [ args.input_data, args.input_dy_mc ]
-n_inputs = len(input_files)
-labels = [ 'data', 'mc' ]
-var = 'tau_pt'
-title, x_title = '#tau p_{T}', '#tau p_{T} (GeV)'
-decay_modes = args.decay_modes.split(',')
-channels = args.channels.split(',')
-working_points = args.working_points.split(',')
-bins, use_logx = CreateBins(200, False)
-bins_fit, _ = CreateBins(200, True)
-hist_models = {
-    'plot': ROOT.RDF.TH1DModel(var, var, len(bins) - 1, array('d', bins)),
-    'fit': ROOT.RDF.TH1DModel(var, var, len(bins_fit) - 1, array('d', bins_fit))
-}
 
-turnOn_data = [None] * n_inputs
+bins, x_scales, divide_by_bw = CreateBins(var)
+hist_models = ROOT.RDF.TH1DModel(var, var, len(bins) - 1, array('d', bins))
+
+
+hist_passed = [None] * n_inputs
+hist_total = [None] * n_inputs
+eff = [None] * n_inputs
+
 for input_id in range(n_inputs):
-    print("Creating {} histograms...".format(labels[input_id]))
-    turnOn_data[input_id] = CreateHistograms(input_files[input_id], channels, decay_modes, 'byDeepTau2017v2p1VSjet',
-                                             working_points, hist_models, labels[input_id], var, output_file)
-colors = [ ROOT.kRed, ROOT.kBlack ]
-canvas = RootPlotting.CreateCanvas()
+    hist_passed[input_id], hist_total[input_id], eff[input_id] = \
+        CreateHistograms(args.input[input_id], selection_id, hlt_paths[input_id],var, hist_models,output_file)
 
-n_plots = len(decay_modes) * len(channels) * len(working_points)
-plot_id = 0
-for channel in channels:
-    for wp in working_points:
-        for dm in decay_modes:
-            if dm == 'all':
-                dm_label = ''
-                dm_plain_label = ''
-            else:
-                dm_label = ' DM={}'.format(dm)
-                dm_plain_label = '_dm{}'.format(dm)
-            ratio_graph = None
-            ref_hist = hist_models['plot'].GetHistogram()
-            ratio_ref_hist = ref_hist.Clone()
-            turnOns = [None] * n_inputs
-            curves = [None] * n_inputs
-            for input_id in range(n_inputs):
-                turnOns[input_id] = turnOn_data[input_id][dm][wp][channel]['plot']
-                curves[input_id] = turnOns[input_id].eff
-            y_min, y_max = (0, 1)
-            y_title = 'Efficiency'
-            title = '{} {}{}'.format(channel, wp, dm_label)
-            plain_title = '{}_{}{}'.format(channel, wp, dm_plain_label)
-            main_pad, ratio_pad, title_controls = RootPlotting.CreateTwoPadLayout(canvas, ref_hist, ratio_ref_hist,
-                                                                                  log_x=use_logx, title=title)
-            RootPlotting.ApplyAxisSetup(ref_hist, ratio_ref_hist, x_title=x_title, y_title=y_title,
-                                        ratio_y_title='Ratio', y_range=(y_min, y_max * 1.1), max_ratio=1.5)
-            legend = RootPlotting.CreateLegend(pos=(0.78, 0.28), size=(0.2, 0.15))
-            for input_id in range(n_inputs):
-                curve = curves[input_id]
-                curve.Draw('SAME')
-                RootPlotting.ApplyDefaultLineStyle(curve, colors[input_id])
-                legend.AddEntry(curve, labels[input_id], 'PLE')
 
-                if input_id < n_inputs - 1:
-                    ratio_graph = RootPlotting.CreateEfficiencyRatioGraph(turnOns[input_id].hist_passed,
-                                                                          turnOns[input_id].hist_total,
-                                                                          turnOns[-1].hist_passed,
-                                                                          turnOns[-1].hist_total)
-                    if ratio_graph:
-                        output_file.WriteTObject(ratio_graph, 'ratio_{}'.format(plain_title), 'Overwrite')
-                        ratio_pad.cd()
-                        ratio_color = colors[input_id] if n_inputs > 2 else ROOT.kBlack
-                        RootPlotting.ApplyDefaultLineStyle(ratio_graph, ratio_color)
-                        ratio_graph.Draw("0PE SAME")
-                        main_pad.cd()
-            legend.Draw()
 
-            canvas.Update()
-            output_file.WriteTObject(canvas, 'canvas_{}'.format(plain_title), 'Overwrite')
-            RootPlotting.PrintAndClear(canvas, args.output + '.pdf', plain_title, plot_id, n_plots,
-                                       [ main_pad, ratio_pad ])
-            plot_id += 1
-output_file.Close()
+ROOT.gStyle.SetOptStat(0); ROOT.gStyle.SetTextFont(42)
+c = ROOT.TCanvas("c", "", 800, 700)
+# use multiplotter for multiple graphs
+mg = ROOT.TMultiGraph("mg", "")
+
+graphs = {}
+icolor = 2
+for input_id in range(n_inputs):
+    graphs[input_id] =  ROOT.TGraphAsymmErrors(hist_passed[input_id].GetPtr(),hist_total[input_id].GetPtr(), "n")
+    graphs[input_id].SetLineColor(icolor)
+    graphs[input_id].SetLineWidth(3)
+    icolor = icolor + 1
+    mg.Add(graphs[input_id])
+
+mg.Draw("AP")
+c.SaveAs("./test.pdf")
+    
