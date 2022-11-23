@@ -176,5 +176,24 @@
             [ "hltSelectedPFTau180MediumChargedIsolationL1HLTMatched" ]
         ],
         "leg_types": [ "tau" ]
-    }
+    },
+    "HLT_IsoMu24_eta2p1_MediumDeepTauPFTauHPS45_L2NN_eta2p1_CrossL1_v": {
+        "filters": [
+            ["hltL3crIsoL1sBigOrMuXXerIsoTauYYerL1f0L2f10QL3f24QL3trkIsoFiltered","hltHpsOverlapFilterIsoMu24MediumDitauWPDeepTauPFTau45MonitoringForVBFIsoTau"],
+            ["hltHpsSelectedPFTau45MediumDitauWPDeepTauL1HLTBigOrMuXXerIsoTauYYerMatchedForVBFIsoTau","hltHpsOverlapFilterIsoMu24MediumDitauWPDeepTauPFTau45MonitoringForVBFIsoTau"]
+        ],
+        "leg_types": ["mu", "tau"],
+        "selection_vbfasymtaus_upper_leg": { "l1Tau_pt": 45, "l1Tau_hwIso": 1}
+        "target_channels": ["VBFaysmtaus"],
+        "sample_types": ["data", "mc"]
+    },
+    "HLT_IsoMu24_eta2p1_MediumDeepTauPFTauHPS20_eta2p1_SingleL1_v": {
+        "filters": [
+            ["hltL3crIsoL1sSingleMu22erL1f0L2f10QL3f24QL3trkIsoFiltered","hltHpsOverlapFilterIsoMu24MediumDeepTauPFTau20"],
+            ["hltHpsSinglePFTau20MediumDitauWPDeepTauNoMatchForVBFIsoTau","hltHpsOverlapFilterIsoMu24MediumDeepTauPFTau20"]
+        ],
+        "leg_types": ["mu", "tau"],
+        "target_channels": ["VBFaysmtaus"],
+        "sample_types": ["data", "mc"]
+    },
 }
