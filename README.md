@@ -54,13 +54,7 @@ crab_cmd.py --workArea work-area --cmd status
 
 
 ### Producing turn-On curves
-
-A simple python script is written for producing trigger performance plots. There are so many dependencies compact for python2, so the script follows python2 version, contributers are welcome to edit for python3. Call the root enviorment first,
-
+The plotting script,
 ```
-source /cvmfs/sft.cern.ch/lcg/app/releases/ROOT/6.18.04/x86_64-centos7-gcc48-opt/bin/thisroot.sh
-```
-then run the plotting script,
-```
-python TauTagAndProbe/python/createTurnOn.py --input  /eos/home-v/vmuralee/run3_tuples/SingleMuon2022F.root --pattern HLT_IsoMu24_eta2p1_MediumDeepTauPFTauHPS35_L2NN_eta2p1_CrossL1_v --selection DeepTau --var tau_pt --output example
+python3 TauTagAndProbe/python/createTurnOn.py --input  /eos/home-v/vmuralee/run3_tuples/SingleMuon2022*.root --selection DeepTau --var tau_pt --output example --channel ditau
 ```

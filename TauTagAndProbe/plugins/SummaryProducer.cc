@@ -51,6 +51,8 @@ namespace tau_trigger {
 	summaryTuple().trigger_index.push_back(n);
 	summaryTuple().trigger_pattern.push_back(hltPaths.at(n).path);
       }
+      
+
       return data;
     }
 
@@ -60,12 +62,13 @@ namespace tau_trigger {
       if(data->getExpressTuple())
 	data->getExpressTuple()->Write();
       SummaryTuple& summaryTuple = *data->getSummaryTuple();
+      summaryTuple().exeTime = data->getElapsedTime();
       const auto& filters = data->getFilters();
       for(const auto& entry : filters) {
+	std::cout<<"filter name "<<entry.first<<std::endl;
 	summaryTuple().filter_name.push_back(entry.first);
 	summaryTuple().filter_hash.push_back(entry.second);
       }
-      summaryTuple().exeTime = data->getElapsedTime();
       summaryTuple.Fill();
       summaryTuple.Write();
     }

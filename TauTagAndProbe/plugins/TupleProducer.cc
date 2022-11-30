@@ -217,6 +217,21 @@ private:
 
         const auto& selected_taus = CollectTaus(muon_ref_p4, *taus, genLeptons, deltaR2Thr);
         cut(!selected_taus.empty(), "has_tau");
+	for(const auto& jet : *jets) {
+	  if (reco::deltaR2(muon_ref_p4, jet.polarP4()) < deltaR2Thr)
+	    continue;
+	  for(const auto& tau_entry : selected_taus) {
+	    const pat::Tau* tau = tau_entry.reco_tau;
+	    if (tau)
+	      if (reco::deltaR2(tau->polarP4(), jet.polarP4()) < deltaR2Thr)
+		continue;
+	  }
+	  eventTuple().jet_pt = jet.polarP4().pt();
+	  eventTuple().jet_eta = jet.polarP4().eta();
+	  eventTuple().jet_phi = jet.polarP4().phi();
+	  eventTuple().jet_mass = jet.polarP4().mass();
+	  break;  // storing only the first jet
+	}
         bool has_good_tau = false;
         for(const auto& tau_entry : selected_taus) {
             const pat::Tau* tau = tau_entry.reco_tau;
@@ -225,7 +240,7 @@ private:
             const LorentzVectorM tau_ref_p4 = tau ? tau->polarP4() : LorentzVectorM(gen_tau.visible_p4);
             if(!tau && !has_gen_tau)
                 throw exception("Inconsistent tau entry");
-            if(btagThreshold > 0  && !PassBtagVeto(muon_ref_p4, tau_ref_p4, *jets, btagThreshold, deltaR2Thr)) continue;
+            // if(btagThreshold > 0  && !PassBtagVeto(muon_ref_p4, tau_ref_p4, *jets, btagThreshold, deltaR2Thr)) continue;
 
             eventTuple().tau_sel = tau_entry.selection;
             eventTuple().tau_pt = tau ? static_cast<float>(tau->polarP4().pt()) : default_value;
