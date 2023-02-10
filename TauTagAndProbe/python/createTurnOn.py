@@ -69,39 +69,47 @@ def CreateBins(var_name):
     elif var_name in [ 'tau_eta', 'tau_gen_vis_eta' ]:
         return np.linspace(-2.3, 2.3, 7), False, False
     elif var_name in [ 'npu', 'npv' ]:
-        return np.linspace(0, 80, 20), False, False
+        return np.linspace(20, 70, 5), False, False
     raise RuntimeError("Can't find binning for \"{}\"".format(var_name))
 
 def CreateHistograms(input_file, selection_id, hlt_paths, var, hist_model, output_file,ch):
     df = ROOT.RDataFrame('events',input_file)
-    if ch == "VBFditau_lo":
-        df = df.Filter('(tau_sel & {}) != 0  && muon_pt > 27 && muon_iso < 0.1 && muon_mt < 30 && tau_decayMode != 5 && tau_decayMode != 6 && abs(tau_eta) < 2.3 && tau_pt > 5 && vis_mass > 40 && vis_mass < 80'.format(selection_id))
-    elif ch == "etau":
-        df = df.Filter('(tau_sel & {}) != 0  && l1Tau_pt >= 26 && l1Tau_hwIso > 0 && muon_pt > 27 && muon_iso < 0.1 && muon_mt < 30 && tau_decayMode != 5 && tau_decayMode != 6 && abs(tau_eta) < 2.3 && tau_pt > 20 && vis_mass > 40 && vis_mass < 80'.format(selection_id))
-    # elif ch == "ditau":
-    #     df = df.Filter('(tau_sel & {}) != 0  && muon_pt > 27 && muon_iso < 0.1 && muon_mt < 30 && tau_decayMode != 5 && tau_decayMode != 6 && abs(tau_eta) < 2.3 && tau_pt > 20 && l1Tau_pt > 32 && vis_mass > 40 && vis_mass < 80'.format(selection_id))
-    else:
-        df = df.Filter('(tau_sel & {}) != 0  && muon_pt > 27 && muon_iso < 0.1 && muon_mt < 30 && tau_decayMode != 5 && tau_decayMode != 6 && abs(tau_eta) < 2.3 && tau_pt > 20 && vis_mass > 40 && vis_mass < 80'.format(selection_id))
+    eta_th = {"ditau":35,"mutau":30,"etau":30}
     
+    # if ch == "VBFditau_lo":
+    #     df = df.Filter('(tau_sel & {}) != 0  && muon_pt > 27 && muon_iso < 0.1 && muon_mt < 30 && tau_decayMode != 5 && tau_decayMode != 6 && abs(tau_eta) < 2.3 && tau_pt > 5 && vis_mass > 40 && vis_mass < 80'.format(selection_id))
+    # elif ch == "etau":
+    #     df = df.Filter('(tau_sel & {}) != 0  && l1Tau_pt >= 26 && l1Tau_hwIso > 0 && muon_pt > 27 && muon_iso < 0.1 && muon_mt < 30 && tau_decayMode != 5 && tau_decayMode != 6 && abs(tau_eta) < 2.3 && tau_pt > 20 && vis_mass > 40 && vis_mass < 80'.format(selection_id))
+   
+    # else:
+    df = df.Filter('(tau_sel & {}) != 0  && muon_pt > 27 && muon_iso < 0.1 && muon_mt < 30 && tau_decayMode != 5 && tau_decayMode != 6 && abs(tau_eta) < 2.3 && tau_pt > 20 && vis_mass > 40 && vis_mass < 80 && npv >= 55 && npv < 70'.format(selection_id))
+    
+    # if var == 'tau_eta':
+    #     df = df.Filter('tau_pt > {}'.format(eta_th[ch]))
+    # elif var == 'npu':
+    #     df = df.Filter('tau_pt > 0')
+    # else:
+    #     return 0
+
     df = df.Filter('(byDeepTau2017v2p1VSmu & (1 << 5)) != 0 && (byDeepTau2017v2p1VSjet & (1 << 4)) != 0')
     match_mask = 0
     for path_name, path_index in hlt_paths.items():
         match_mask = match_mask | (1 << path_index)
-    
+
     hist_total = df.Histo1D(hist_model,var)
     hist_pass  = df.Filter('(hlt_acceptAndMatch & {}) != 0'.format(match_mask)) \
                     .Histo1D(hist_model, var)
-    if "Fcopy" in input_file:
-        hist_pass  = df.Filter('(hlt_acceptAndMatch & {}) != 0 && l1Tau_pt >= 34'.format(match_mask)) \
-                    .Histo1D(hist_model, var)
+    # if "Fcopy" in input_file:
+    #     hist_pass  = df.Filter('(hlt_acceptAndMatch & {}) != 0 && l1Tau_pt >= 34'.format(match_mask)) \
+    #                 .Histo1D(hist_model, var)
     eff = ROOT.TEfficiency(hist_pass.GetPtr(), hist_total.GetPtr())
     print(hist_total.GetPtr().GetEntries())
     return hist_pass,hist_total,eff
         
-
+print(args.input)
 trigger_pattern = {"ditau":"HLT_IsoMu24_eta2p1_MediumDeepTauPFTauHPS35_L2NN_eta2p1_CrossL1_v","mutau":"HLT_IsoMu20_eta2p1_LooseDeepTauPFTauHPS27_eta2p1_CrossL1","etau":"HLT_IsoMu20_eta2p1_LooseDeepTauPFTauHPS27_eta2p1_CrossL1","ditaujet":"HLT_IsoMu24_eta2p1_MediumDeepTauPFTauHPS30_L2NN_eta2p1_CrossL1_v","VBFditau_hi":"HLT_IsoMu24_eta2p1_MediumDeepTauPFTauHPS45_L2NN_eta2p1_CrossL1_v","VBFditau_lo":"HLT_IsoMu24_eta2p1_MediumDeepTauPFTauHPS20_eta2p1_SingleL1_v"}
 selection_id = ParseEnum(TauSelection, args.selection)
-print('Tau selection: {}'.format(args.selection))
+print('Tau selection: {}'.format(selection_id))
 
 n_inputs = len(args.input)
 var = args.vars
@@ -125,8 +133,8 @@ hist_total = [None] * n_inputs
 eff = [None] * n_inputs
 
 for input_id in range(n_inputs):
-    hist_passed[input_id], hist_total[input_id], eff[input_id] = \
-        CreateHistograms(args.input[input_id], selection_id, hlt_paths[input_id],var, hist_models,output_file,args.channel)
+    hist_passed[input_id], hist_total[input_id], eff[input_id] = CreateHistograms(args.input[input_id], selection_id, hlt_paths[input_id],var, hist_models,output_file,args.channel)
+    
 
 
 
@@ -154,29 +162,35 @@ for input_id in range(n_inputs):
     legname = args.input[input_id].split(".root")
     legname = legname[0].split("Muon2022")
     eraname = "2022"+legname[1]
-    if legname[1] == "F":
-        eraname = "nominal"
-    elif legname[1] == "Fcopy":
-        eraname = "L1 #tau_{pT} > 34"
+    # if legname[1] == "F":
+    #     eraname = "nominal"
+    # elif legname[1] == "Fcopy":
+    #     eraname = "L1 #tau_{pT} > 34"
     leg.AddEntry(graphs[input_id],eraname)
     print('Drawing {}'.format(eraname))
     mg.Add(graphs[input_id])
 
-
+mg.GetYaxis().SetRangeUser(0,1)
+mg.GetYaxis().SetNdivisions(5)
 mg.Draw("AP")
 if(args.vars == "tau_pt"):
     label.DrawLatex(0.8, 0.03, "#tau_{pT}")
+elif(args.vars== "npu" or args.vars == "npv"):
+    label.DrawLatex(0.8, 0.03, "npu")
 else:
     label.DrawLatex(0.8, 0.03, "#eta_{#tau}")
 label.SetTextSize(0.040); label.DrawLatex(0.100, 0.920, "#bf{CMS Run3 Data}")
-label.SetTextSize(0.030); label.DrawLatex(0.630, 0.920, "#sqrt{s} = 13.6 TeV, D/E/F")
+label.SetTextSize(0.030); label.DrawLatex(0.630, 0.920, "#sqrt{s} = 13.6 TeV, 41 fb^{-1}")
 
+label.DrawLatex(0.33, 0.318, "Medium tauID, 55 < pileup < 70")
+if args.vars == "tau_eta" or args.vars == 'npu':
+    label.DrawLatex(0.33, 0.318, "Medium tauID, #tau_{pT} > 30 GeV")
 
 leg.Draw()
 
 
 plot_name = args.output+'_'+args.channel+'_'+args.vars+'.pdf'
-cfg_name = args.output+'_'+args.vars+'.C'
+cfg_name  = args.output+'_'+args.channel+'_'+args.vars+'.C'
 c.SaveAs('./{}'.format(plot_name))
 c.SaveAs('./{}'.format(cfg_name))
 
