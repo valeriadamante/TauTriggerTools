@@ -8,7 +8,7 @@ cmsrel CMSSW_12_4_6
 cd CMSSW_12_4_6/src
 cmsenv
 git cms-init
-# Necessary for run 2 
+# Necessary only for run 2 for run3 skip to clone the tool step
 git cms-addpkg RecoMET/METFilters
 git cms-merge-topic cms-egamma:EgammaPostRecoTools
 
