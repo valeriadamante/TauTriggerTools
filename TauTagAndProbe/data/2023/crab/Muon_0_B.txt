@@ -1,0 +1,4 @@
+lumiMask=/afs/cern.ch/work/v/vdamante/public/CMSSW_13_0_3/src/TauTriggerTools/Cert_Collisions2023_366442_370790_Golden.json globalTag=130X_dataRun3_HLT_v2
+period=Run2023 isMC=False runDeepTau=True
+
+Muon0_Run2023B	/Muon0/Run2023B-18Sep2023-v2/MINIAOD
