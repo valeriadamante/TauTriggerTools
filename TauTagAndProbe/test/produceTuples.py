@@ -85,7 +85,7 @@ tauIdsToKeep = [ "2017v2" ]
 
 if options.runDeepTau:
     tauIdsToKeep.append("deepTau2017v2p1")
-    if year == 2022:
+    if year == 2022 or year == 2023:
         tauIdsToKeep.append("deepTau2018v2p5")
 
 
@@ -120,7 +120,7 @@ if not options.pureGenMode and year in [ 2017, 2018 ]:
 
 if len(options.metFiltersProcess) == 0:
     metFiltersProcess = 'PAT'
-    if year in [ 2016, 2018, 2022 ] and not options.isMC:
+    if year in [ 2016, 2018, 2022, 2023 ] and not options.isMC:
         metFiltersProcess = 'RECO'
 else:
     metFiltersProcess = options.metFiltersProcess
