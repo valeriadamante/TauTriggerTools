@@ -6,7 +6,7 @@ config = config()
 config.General.workArea = 'work-area'
 config.General.requestName = "Muon0_Run2023C"
 config.JobType.pluginName = 'Analysis'
-config.JobType.psetName = 'produceTuples.py'
+config.JobType.psetName = 'test/produceTuples.py'
 
 config.JobType.maxMemoryMB =2000
 config.JobType.numCores = 1

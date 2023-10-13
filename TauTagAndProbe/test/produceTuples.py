@@ -67,7 +67,7 @@ year = getYear(options.period)
 # Update electron ID according recommendations from https://twiki.cern.ch/twiki/bin/view/CMS/EgammaMiniAODV2
 if options.pureGenMode:
     process.egammaPostRecoSeq = cms.Sequence()
-elif year == 2022:
+elif year == 2022 or year == 2023:
     process.egammaPostRecoSeq = cms.Sequence()
 else:
     from RecoEgamma.EgammaTools.EgammaPostRecoTools import setupEgammaPostRecoSeq
