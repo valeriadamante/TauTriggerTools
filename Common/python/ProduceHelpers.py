@@ -51,8 +51,10 @@ def getBtagThreshold(period, wp):
     btag_thresholds = {
         'Run2016': { 'Loose': 0.0614, 'Medium': 0.3093, 'Tight': 0.7221 },
         'Run2017': { 'Loose': 0.0521, 'Medium': 0.3033, 'Tight': 0.7489 },
+        'Run2022': { 'Loose': 0.0492, 'Medium': 0.3179, 'Tight': 0.7696 },
+        'Run2023': { 'Loose': 0.0492, 'Medium': 0.3179, 'Tight': 0.7696 },
     }
-    btag_thresholds.update(dict.fromkeys(['Run2018', 'Run2018ABC', 'Run2018D','Run2022', 'Run2023'],
+    btag_thresholds.update(dict.fromkeys(['Run2018', 'Run2018ABC', 'Run2018D'],
         { 'Loose': 0.0494, 'Medium': 0.2770, 'Tight': 0.7264 }))
 
     if period not in btag_thresholds:
