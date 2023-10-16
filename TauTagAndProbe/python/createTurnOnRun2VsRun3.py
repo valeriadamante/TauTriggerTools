@@ -74,15 +74,26 @@ def CreateBins(var_name):
 
 def CreateHistograms(input_file, selection_id, hlt_paths, var, hist_model, output_file,ch):
     df = ROOT.RDataFrame('events',input_file)
+    eta_th = {"ditau":45,"mutau":30,"etau":30,"single_tau":180,"ditaujet":45,"vbf_low":30,"vbf_hi":47}
     if ch == "VBFditau_lo":
         df = df.Filter('(tau_sel & {}) != 0  && muon_pt > 27 && muon_iso < 0.1 && muon_mt < 30 && tau_decayMode != 5 && tau_decayMode != 6 && abs(tau_eta) < 2.3 && tau_pt > 5 && vis_mass > 40 && vis_mass < 80'.format(selection_id))
     elif ch == "etau":
-        df = df.Filter('(tau_sel & {}) != 0  && l1Tau_pt >= 26 && l1Tau_hwIso > 0 && muon_pt > 27 && muon_iso < 0.1 && muon_mt < 30 && tau_decayMode != 5 && tau_decayMode != 6 && abs(tau_eta) < 2.3 && tau_pt > 20 && vis_mass > 40 && vis_mass < 80'.format(selection_id))
-    # elif ch == "ditau":
-    #     df = df.Filter('(tau_sel & {}) != 0  && muon_pt > 27 && muon_iso < 0.1 && muon_mt < 30 && tau_decayMode != 5 && tau_decayMode != 6 && abs(tau_eta) < 2.3 && tau_pt > 20 && l1Tau_pt > 32 && vis_mass > 40 && vis_mass < 80'.format(selection_id))
+        df = df.Filter('(tau_sel & {}) != 0  && muon_pt > 27 && muon_iso < 0.1 && muon_mt < 30 && tau_decayMode != 5 && tau_decayMode != 6 && abs(tau_eta) < 2.3 && tau_pt > 20 && vis_mass > 40 && vis_mass < 80'.format(selection_id))
+    elif ch == "single_tau":
+        df = df.Filter('(tau_sel & {}) != 0  && muon_pt > 27 && muon_iso < 0.1 && muon_mt < 30 && tau_decayMode != 5 && tau_decayMode != 6 && abs(tau_eta) < 2.3 && tau_pt > 20 && vis_mass > 40 && vis_mass < 80'.format(selection_id))
+    elif ch == "ditaujet":
+        df = df.Filter('(tau_sel & {}) != 0 && muon_pt > 27 && muon_iso < 0.1 && muon_mt < 30 && tau_decayMode != 5 && tau_decayMode != 6 && abs(tau_eta) < 2.3 && tau_pt > 20 && vis_mass > 40 && vis_mass < 80'.format(selection_id))
+    elif ch == "vbf_low":
+        df = df.Filter('(tau_sel & {}) != 0  && muon_pt > 27 && muon_iso < 0.1 && muon_mt < 30 && tau_decayMode != 5 && tau_decayMode != 6 && abs(tau_eta) < 2.3 && tau_pt > 20 && vis_mass > 40 && vis_mass < 80'.format(selection_id))
+    elif ch == "vbf_hi":
+        df = df.Filter('(tau_sel & {}) != 0  && muon_pt > 27 && muon_iso < 0.1 && muon_mt < 30 && tau_decayMode != 5 && tau_decayMode != 6 && abs(tau_eta) < 2.3 && tau_pt > 20 && vis_mass > 40 && vis_mass < 80'.format(selection_id))
     else:
         df = df.Filter('(tau_sel & {}) != 0  && muon_pt > 27 && muon_iso < 0.1 && muon_mt < 30 && tau_decayMode != 5 && tau_decayMode != 6 && abs(tau_eta) < 2.3 && tau_pt > 20 && vis_mass > 40 && vis_mass < 80'.format(selection_id))
+        print("In Data after preselection ",df.Histo1D(hist_model,var).GetEntries())
     
+    if var == 'tau_eta' or var == 'npv' or var == 'tau_phi':
+        df = df.Filter('tau_pt > {}'.format(eta_th[ch]))
+
     df = df.Filter('(byDeepTau2017v2p1VSmu & (1 << 5)) != 0 && (byDeepTau2017v2p1VSjet & (1 << 4)) != 0')
     match_mask = 0
     for path_name, path_index in hlt_paths.items():
@@ -180,6 +191,8 @@ for input_id in range(n_inputs):
 mg.Draw("AP")
 if(args.vars == "tau_pt"):
     label.DrawLatex(0.8, 0.03, "#tau_{pT}")
+elif(args.vars == "npv"):
+    label.DrawLatex(0.8, 0.03, "nVtx")
 else:
     label.DrawLatex(0.8, 0.03, "#eta_{#tau}")
 label.SetTextSize(0.040); label.DrawLatex(0.100, 0.920, "#bf{CMS Preliminary}")
