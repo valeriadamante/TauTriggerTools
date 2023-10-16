@@ -100,11 +100,20 @@ def CreateHistograms(input_file, selection_id, hlt_paths, var, hist_model, outpu
         match_mask = match_mask | (1 << path_index)
     
     hist_total = df.Histo1D(hist_model,var)
-    hist_pass  = df.Filter('(hlt_acceptAndMatch & {}) != 0'.format(match_mask)) \
+    if args.channel == 'vbf_hi':
+        hist_pass  = df.Filter('(hlt_acceptAndMatch & {}) != 0 && l1Tau_pt >= 45 && l1Tau_hwIso > 0'.format(match_mask)) \
                     .Histo1D(hist_model, var)
-    if "Fcopy" in input_file:
-        hist_pass  = df.Filter('(hlt_acceptAndMatch & {}) != 0 && l1Tau_pt >= 34'.format(match_mask)) \
+    elif args.channel == 'etau' or args.channel == 'ditaujet':
+        hist_pass  = df.Filter('(hlt_acceptAndMatch & {}) != 0 && l1Tau_hwIso > 0'.format(match_mask)) \
+                    .Histo1D(hist_model, var)# && l1Tau_hwIso > 0
+    else:
+        hist_pass  = df.Filter('(hlt_acceptAndMatch & {}) != 0'.format(match_mask)) \
                     .Histo1D(hist_model, var)
+    # hist_pass  = df.Filter('(hlt_acceptAndMatch & {}) != 0'.format(match_mask)) \
+    #                 .Histo1D(hist_model, var)
+    # if "Fcopy" in input_file:
+    #     hist_pass  = df.Filter('(hlt_acceptAndMatch & {}) != 0 && l1Tau_pt >= 34'.format(match_mask)) \
+    #                 .Histo1D(hist_model, var)
     eff = ROOT.TEfficiency(hist_pass.GetPtr(), hist_total.GetPtr())
     print(hist_total.GetPtr().GetEntries())
     return hist_pass,hist_total,eff
