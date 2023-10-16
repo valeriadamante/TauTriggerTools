@@ -36,7 +36,14 @@ crab submit TauTriggerTools/TauTagAndProbe/test/crabConfigForData.py
 
 
 ### Producing turn-On curves
-The plotting script,
+To create the turn-On for different year data can be done using,
 ```
-python3 TauTagAndProbe/python/createTurnOn.py --input  /eos/home-v/vmuralee/run3_tuples/SingleMuon2022*.root --selection DeepTau --var tau_pt --output example --channel ditau
+python3 TauTagAndProbe/python/createTurnOnRun2VsRun3.py --input /eos/home-v/vmuralee/run3_tuples/2023/miniAOD/Muon0_Run2023C.root  /eos/home-v/vmuralee/run3_tuples/2022v1/Muon2022E.root --channel mutau --selection DeepTau --output steam29th --vars tau_pt
 ```
+**--input** : input files for each year 
+**--channel** : all the monitoring path are available, (mutau,ditau,etau and single tau) 
+**--selection** : default DeepTau 
+**--output**: prefix of output file 
+**--vars** : to produce efficiency in terms of pT,eta and no.primary vertices bins use following variable (tau_pt,tau_eta and npv)
+
+The legend and label can edit inside the python script. 
