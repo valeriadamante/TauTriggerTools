@@ -4,7 +4,7 @@ import sys
 import re
 import numpy as np
 from array import array
-import os 
+import os
 import sys
 
 path_prefix = '' if 'TauTriggerTools' in os.getcwd() else 'TauTriggerTools/'
@@ -34,7 +34,7 @@ def CreateBins(var_name,singleTau=False):
 
 def CreateHistograms(input_file, selection_id, hlt_paths, vars, output_file,ch):
     df = ROOT.RDataFrame('events',input_file)
-    eta_th = {"ditau":45,"mutau":30,"etau":30,"single_tau":180,"ditaujet":45,"vbf_low":30,"vbf_hi":47}
+    eta_th = {"ditau":45,"mutau":30,"etau":30,"single_tau":180,"ditaujet":45,"VBFditau_lo":20,"VBFditau_hi":45,"vbf_low":30,"vbf_hi":47}
     if ch == "VBFditau_lo":
         df = df.Filter('(tau_sel & {}) != 0  && muon_pt > 27 && muon_iso < 0.1 && muon_mt < 30 && tau_decayMode != 5 && tau_decayMode != 6 && abs(tau_eta) < 2.3 && tau_pt > 5 && vis_mass > 40 && vis_mass < 80'.format(selection_id))
     elif ch == "etau":
@@ -51,8 +51,8 @@ def CreateHistograms(input_file, selection_id, hlt_paths, vars, output_file,ch):
     else:
         df = df.Filter('(tau_sel & {}) != 0  && muon_pt > 27 && muon_iso < 0.1 && muon_mt < 30 && tau_decayMode != 5 && tau_decayMode != 6 && abs(tau_eta) < 2.3 && tau_pt > 20 && vis_mass > 40 && vis_mass < 80'.format(selection_id))
         #print("In Data after preselection ",df.Histo1D(hist_model,var).GetEntries())
-    
-    
+
+
     df = df.Filter('(byDeepTau2017v2p1VSmu & (1 << 5)) != 0 && (byDeepTau2017v2p1VSjet & (1 << 4)) != 0')
 
     hist_total,hist_pass,eff = dict(),dict(),dict()
@@ -67,7 +67,7 @@ def CreateHistograms(input_file, selection_id, hlt_paths, vars, output_file,ch):
         match_mask = 0
         for path_name, path_index in hlt_paths.items():
             match_mask = match_mask | (1 << path_index)
-    
+
         hist_total[var] = df.Histo1D(hist_model,var)
         if ch == 'vbf_hi':
             hist_pass[var]  = df.Filter('(hlt_acceptAndMatch & {}) != 0 && l1Tau_pt >= 45 && l1Tau_hwIso > 0'.format(match_mask)).Histo1D(hist_model, var)
@@ -80,10 +80,11 @@ def CreateHistograms(input_file, selection_id, hlt_paths, vars, output_file,ch):
         eff[var] = ROOT.TEfficiency(hist_pass[var].GetPtr(), hist_total[var].GetPtr())
         print(hist_total[var].GetPtr().GetEntries())
     return hist_pass,hist_total,eff
-        
+
 def CreateMCHistograms(input_file, selection_id, hlt_paths, vars, output_file,ch,pu):
     df = ROOT.RDataFrame('events',input_file)
-    eta_th = {"ditau":45,"mutau":30,"etau":30,"single_tau":180,"ditaujet":45,"vbf_low":30,"vbf_hi":47}
+    eta_th = {"ditau":45,"mutau":30,"etau":30,"single_tau":180,"ditaujet":45,"VBFditau_lo":20,"VBFditau_hi":45,"vbf_low":30,"vbf_hi":47}
+    print(eta_th.keys())
     if ch == "VBFditau_lo":
         df = df.Filter('(tau_sel & {}) != 0  && muon_pt > 27 && muon_iso < 0.1 && muon_mt < 30 && tau_decayMode != 5 && tau_decayMode != 6 && abs(tau_eta) < 2.3 && tau_pt > 5 && vis_mass > 40 && vis_mass < 80'.format(selection_id))
     elif ch == "etau":
@@ -100,8 +101,8 @@ def CreateMCHistograms(input_file, selection_id, hlt_paths, vars, output_file,ch
     else:
         df = df.Filter('(tau_sel & {}) != 0  && muon_pt > 27 && muon_iso < 0.1 && muon_mt < 30 && tau_decayMode != 5 && tau_decayMode != 6 && abs(tau_eta) < 2.3 && tau_pt > 20 && vis_mass > 40 && vis_mass < 80'.format(selection_id))
         #print("In Data after preselection ",df.Histo1D(hist_model,var).GetEntries())
-    
-    
+
+
     df = df.Filter('(byDeepTau2017v2p1VSmu & (1 << 5)) != 0 && (byDeepTau2017v2p1VSjet & (1 << 4)) != 0')
     df = df.Filter('tau_charge + muon_charge == 0 && tau_gen_match == 5')
     df = df.Define('weight', "PileUpWeightProvider::GetDefault().GetWeight(npu) * genEventWeight")
@@ -117,7 +118,7 @@ def CreateMCHistograms(input_file, selection_id, hlt_paths, vars, output_file,ch
         match_mask = 0
         for path_name, path_index in hlt_paths.items():
             match_mask = match_mask | (1 << path_index)
-    
+
         hist_total[var] = df.Histo1D(hist_model,var,"weight")
         if ch == 'vbf_hi':
             hist_pass[var]  = df.Filter('(hlt_acceptAndMatch & {}) != 0 && l1Tau_pt >= 45 && l1Tau_hwIso > 0'.format(match_mask)).Histo1D(hist_model, var,"weight")
@@ -130,4 +131,4 @@ def CreateMCHistograms(input_file, selection_id, hlt_paths, vars, output_file,ch
         eff[var] = ROOT.TEfficiency(hist_pass[var].GetPtr(), hist_total[var].GetPtr())
         print(hist_total[var].GetPtr().GetEntries())
     return hist_pass,hist_total,eff
-        
+

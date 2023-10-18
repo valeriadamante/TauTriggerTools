@@ -74,16 +74,15 @@ def CreateBins(var_name):
 
 def CreateHistograms(input_file, selection_id, hlt_paths, var, hist_model, output_file,ch):
     df = ROOT.RDataFrame('events',input_file)
-    eta_th = {"ditau":35,"mutau":30,"etau":30}
-    
-    # if ch == "VBFditau_lo":
-    #     df = df.Filter('(tau_sel & {}) != 0  && muon_pt > 27 && muon_iso < 0.1 && muon_mt < 30 && tau_decayMode != 5 && tau_decayMode != 6 && abs(tau_eta) < 2.3 && tau_pt > 5 && vis_mass > 40 && vis_mass < 80'.format(selection_id))
+    eta_th = {"ditau":35,"mutau":30,"etau":30, "VBFditau_lo":20, "VBFditau_hi":45, "singletau":180, "ditaujet":30 }
+     #if ch == "VBFditau_lo":
+     #    df = df.Filter('(tau_sel & {}) != 0  && muon_pt > 27 && muon_iso < 0.1 && muon_mt < 30 && tau_decayMode != 5 && tau_decayMode != 6 && abs(tau_eta) < 2.3 && tau_pt > 5 && vis_mass > 40 && vis_mass < 80'.format(selection_id))
     # elif ch == "etau":
     #     df = df.Filter('(tau_sel & {}) != 0  && l1Tau_pt >= 26 && l1Tau_hwIso > 0 && muon_pt > 27 && muon_iso < 0.1 && muon_mt < 30 && tau_decayMode != 5 && tau_decayMode != 6 && abs(tau_eta) < 2.3 && tau_pt > 20 && vis_mass > 40 && vis_mass < 80'.format(selection_id))
-   
+
     # else:
     df = df.Filter('(tau_sel & {}) != 0  && muon_pt > 27 && muon_iso < 0.1 && muon_mt < 30 && tau_decayMode != 5 && tau_decayMode != 6 && abs(tau_eta) < 2.3 && tau_pt > 20 && vis_mass > 40 && vis_mass < 80 && npv >= 55 && npv < 70'.format(selection_id))
-    
+
     # if var == 'tau_eta':
     #     df = df.Filter('tau_pt > {}'.format(eta_th[ch]))
     # elif var == 'npu':
@@ -105,7 +104,7 @@ def CreateHistograms(input_file, selection_id, hlt_paths, var, hist_model, outpu
     eff = ROOT.TEfficiency(hist_pass.GetPtr(), hist_total.GetPtr())
     print(hist_total.GetPtr().GetEntries())
     return hist_pass,hist_total,eff
-        
+
 print(args.input)
 trigger_pattern = {"ditau":"HLT_IsoMu24_eta2p1_MediumDeepTauPFTauHPS35_L2NN_eta2p1_CrossL1_v","mutau":"HLT_IsoMu20_eta2p1_LooseDeepTauPFTauHPS27_eta2p1_CrossL1","etau":"HLT_IsoMu20_eta2p1_LooseDeepTauPFTauHPS27_eta2p1_CrossL1","ditaujet":"HLT_IsoMu24_eta2p1_MediumDeepTauPFTauHPS30_L2NN_eta2p1_CrossL1_v","VBFditau_hi":"HLT_IsoMu24_eta2p1_MediumDeepTauPFTauHPS45_L2NN_eta2p1_CrossL1_v","VBFditau_lo":"HLT_IsoMu24_eta2p1_MediumDeepTauPFTauHPS20_eta2p1_SingleL1_v"}
 selection_id = ParseEnum(TauSelection, args.selection)
@@ -134,7 +133,7 @@ eff = [None] * n_inputs
 
 for input_id in range(n_inputs):
     hist_passed[input_id], hist_total[input_id], eff[input_id] = CreateHistograms(args.input[input_id], selection_id, hlt_paths[input_id],var, hist_models,output_file,args.channel)
-    
+
 
 
 
@@ -195,4 +194,4 @@ c.SaveAs('./{}'.format(plot_name))
 c.SaveAs('./{}'.format(cfg_name))
 
 print('TurnOn is created')
-    
+
