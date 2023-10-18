@@ -18,7 +18,7 @@ parser.add_argument('--input_run2023', required=True, type=str, nargs='+', help=
 parser.add_argument('--input_mc', required=True, type=str, nargs='+', help="input mc")
 parser.add_argument('--pu', required=True, type=str, help="variable to draw")
 
-parser.add_argument('--channel', required=True, type=str, help="all,ditau,mutau")
+parser.add_argument('--channel', required=True, type=str, help="ditau,mutau,etau,VBFditau_hi,VBFditau_lo,ditaujet")
 parser.add_argument('--selection', required=False, type=str,default="DeepTau", help="Tau selection")
 
 parser.add_argument('--output', required=True, type=str, help="output file")
@@ -153,12 +153,14 @@ for var in args.vars:
         mg.GetXaxis().SetRangeUser(50,500)
     mg.Draw("AP")
     ylabel.SetTextAngle(90);ylabel.SetTextSize(0.0414815);ylabel.DrawLatex(0.035,0.422222, "L1 + HLT Efficiency")
+    if args.channel == "VBFditau_lo":
+        ylabel.SetTextAngle(90);ylabel.SetTextSize(0.0414815);ylabel.DrawLatex(0.035,0.422222, "HLT Efficiency")
     if(var == "tau_pt"):
         label.SetTextSize(0.0414815);label.DrawLatex(0.67,0.0192593, "Offline p_{T}^{#tau} [GeV]")
         label.SetTextSize(0.040); label.DrawLatex(0.100, 0.920, "#bf{CMS} #it{Preliminary}")
         
     elif(var== "npu" or var == "npv"):
-        label.SetTextSize(0.0414815);label.DrawLatex(0.67,0.0192593, "number of offline reconstructed primary vertices")
+        label.SetTextSize(0.0414815);label.DrawLatex(0.197995,0.0122888, "number of offline reconstructed primary vertices")
         label.SetTextSize(0.040); label.DrawLatex(0.100, 0.920, "#bf{CMS} #it{Preliminary}")
     else:
         label.SetTextSize(0.0414815);label.DrawLatex(0.67,0.0192593, "Offline #eta^{#tau}")
@@ -172,14 +174,16 @@ for var in args.vars:
     elif args.channel == 'etau':
         label.DrawLatex(0.358396,0.434074, "#bf{e#tau_{h} trigger performance}")
     elif args.channel == 'single_tau':
-        label.DrawLatex(0.201754,0.015361, "Offline tauID applied at Medium WP")
-    else:
+        label.DrawLatex(0.358396,0.434074, "#bf{Single-#tau_{h} trigger performance}")
+    elif args.channel == "VBFditau_hi" or args.channel == "VBFditau_lo":
         label.DrawLatex(0.358396,0.434074, "#bf{VBF di-#tau_{h} trigger performance}")
+    else:
+        label.DrawLatex(0.358396,0.434074, "#bf{di-#tau_{h} +jets trigger performance}")
     if var == "tau_eta":
         #print("Medium tauID, #tau_ > {} GeV".format(eta_th[args.channel]))
         label.DrawLatex(0.305764,0.183704, "Offline tauID applied at Medium WP")
     elif var == "npv":
-        label.DrawLatex(0.358396,0.434074, "#bf{Single-#tau_{h} trigger performance}")
+        label.DrawLatex(0.305764,0.183704,"Offline tauID applied at Medium WP" )
     else:
         label.DrawLatex(0.305764,0.183704, "Offline tauID applied at Medium WP")
     leg.Draw()
