@@ -34,7 +34,7 @@ def CreateBins(var_name,singleTau=False):
 
 def CreateHistograms(input_file, selection_id, hlt_paths, vars, output_file,ch):
     df = ROOT.RDataFrame('events',input_file)
-    eta_th = {"ditau":45,"mutau":30,"etau":30,"single_tau":180,"ditaujet":45,"vbf_low":30,"vbf_hi":47}
+    eta_th = {"ditau":45,"mutau":30,"etau":30,"single_tau":180,"ditaujet":45,"VBFditau_lo":30,"VBFditau_hi":47}
     if ch == "VBFditau_lo":
         df = df.Filter('(tau_sel & {}) != 0  && muon_pt > 27 && muon_iso < 0.1 && muon_mt < 30 && tau_decayMode != 5 && tau_decayMode != 6 && abs(tau_eta) < 2.3 && tau_pt > 5 && vis_mass > 40 && vis_mass < 80'.format(selection_id))
     elif ch == "etau":
@@ -44,9 +44,9 @@ def CreateHistograms(input_file, selection_id, hlt_paths, vars, output_file,ch):
         df = df.Filter('(tau_sel & {}) != 0'.format(selection_id))
     elif ch == "ditaujet":
         df = df.Filter('(tau_sel & {}) != 0 && muon_pt > 27 && muon_iso < 0.1 && muon_mt < 30 && tau_decayMode != 5 && tau_decayMode != 6 && abs(tau_eta) < 2.3 && tau_pt > 20 && vis_mass > 40 && vis_mass < 80'.format(selection_id))
-    elif ch == "vbf_low":
+    elif ch == "VBFditau_lo":
         df = df.Filter('(tau_sel & {}) != 0  && muon_pt > 27 && muon_iso < 0.1 && muon_mt < 30 && tau_decayMode != 5 && tau_decayMode != 6 && abs(tau_eta) < 2.3 && tau_pt > 20 && vis_mass > 40 && vis_mass < 80'.format(selection_id))
-    elif ch == "vbf_hi":
+    elif ch == "VBFditau_hi":
         df = df.Filter('(tau_sel & {}) != 0  && muon_pt > 27 && muon_iso < 0.1 && muon_mt < 30 && tau_decayMode != 5 && tau_decayMode != 6 && abs(tau_eta) < 2.3 && tau_pt > 20 && vis_mass > 40 && vis_mass < 80'.format(selection_id))
     else:
         df = df.Filter('(tau_sel & {}) != 0  && muon_pt > 27 && muon_iso < 0.1 && muon_mt < 30 && tau_decayMode != 5 && tau_decayMode != 6 && abs(tau_eta) < 2.3 && tau_pt > 20 && vis_mass > 40 && vis_mass < 80'.format(selection_id))
@@ -69,7 +69,7 @@ def CreateHistograms(input_file, selection_id, hlt_paths, vars, output_file,ch):
             match_mask = match_mask | (1 << path_index)
     
         hist_total[var] = df.Histo1D(hist_model,var)
-        if ch == 'vbf_hi':
+        if ch == 'VBFditau_hi':
             hist_pass[var]  = df.Filter('(hlt_acceptAndMatch & {}) != 0 && l1Tau_pt >= 45 && l1Tau_hwIso > 0'.format(match_mask)).Histo1D(hist_model, var)
         elif ch == 'etau' or ch == 'ditaujet':
             hist_pass[var]  = df.Filter('(hlt_acceptAndMatch & {}) != 0 && l1Tau_hwIso > 0 && l1Tau_pt >= 26'.format(match_mask)).Histo1D(hist_model, var)# && l1Tau_hwIso > 0
@@ -83,7 +83,7 @@ def CreateHistograms(input_file, selection_id, hlt_paths, vars, output_file,ch):
         
 def CreateMCHistograms(input_file, selection_id, hlt_paths, vars, output_file,ch,pu):
     df = ROOT.RDataFrame('events',input_file)
-    eta_th = {"ditau":45,"mutau":30,"etau":30,"single_tau":180,"ditaujet":45,"vbf_low":30,"vbf_hi":47}
+    eta_th = {"ditau":45,"mutau":30,"etau":30,"single_tau":180,"ditaujet":45,"VBFditau_lo":30,"VBFditau_hi":47}
     if ch == "VBFditau_lo":
         df = df.Filter('(tau_sel & {}) != 0  && muon_pt > 27 && muon_iso < 0.1 && muon_mt < 30 && tau_decayMode != 5 && tau_decayMode != 6 && abs(tau_eta) < 2.3 && tau_pt > 5 && vis_mass > 40 && vis_mass < 80'.format(selection_id))
     elif ch == "etau":
@@ -93,9 +93,9 @@ def CreateMCHistograms(input_file, selection_id, hlt_paths, vars, output_file,ch
         df = df.Filter('(tau_sel & {}) != 0'.format(selection_id))
     elif ch == "ditaujet":
         df = df.Filter('(tau_sel & {}) != 0 && muon_pt > 27 && muon_iso < 0.1 && muon_mt < 30 && tau_decayMode != 5 && tau_decayMode != 6 && abs(tau_eta) < 2.3 && tau_pt > 20 && vis_mass > 40 && vis_mass < 80'.format(selection_id))
-    elif ch == "vbf_low":
+    elif ch == "VBFditau_lo":
         df = df.Filter('(tau_sel & {}) != 0  && muon_pt > 27 && muon_iso < 0.1 && muon_mt < 30 && tau_decayMode != 5 && tau_decayMode != 6 && abs(tau_eta) < 2.3 && tau_pt > 20 && vis_mass > 40 && vis_mass < 80'.format(selection_id))
-    elif ch == "vbf_hi":
+    elif ch == "VBFditau_hi":
         df = df.Filter('(tau_sel & {}) != 0  && muon_pt > 27 && muon_iso < 0.1 && muon_mt < 30 && tau_decayMode != 5 && tau_decayMode != 6 && abs(tau_eta) < 2.3 && tau_pt > 20 && vis_mass > 40 && vis_mass < 80'.format(selection_id))
     else:
         df = df.Filter('(tau_sel & {}) != 0  && muon_pt > 27 && muon_iso < 0.1 && muon_mt < 30 && tau_decayMode != 5 && tau_decayMode != 6 && abs(tau_eta) < 2.3 && tau_pt > 20 && vis_mass > 40 && vis_mass < 80'.format(selection_id))
@@ -119,7 +119,7 @@ def CreateMCHistograms(input_file, selection_id, hlt_paths, vars, output_file,ch
             match_mask = match_mask | (1 << path_index)
     
         hist_total[var] = df.Histo1D(hist_model,var,"weight")
-        if ch == 'vbf_hi':
+        if ch == 'VBFditau_hi':
             hist_pass[var]  = df.Filter('(hlt_acceptAndMatch & {}) != 0 && l1Tau_pt >= 45 && l1Tau_hwIso > 0'.format(match_mask)).Histo1D(hist_model, var,"weight")
         elif ch == 'etau' or ch == 'ditaujet':
             hist_pass[var]  = df.Filter('(hlt_acceptAndMatch & {}) != 0 && l1Tau_hwIso > 0 && l1Tau_pt >= 26'.format(match_mask)).Histo1D(hist_model, var,"weight")# && l1Tau_hwIso > 0
