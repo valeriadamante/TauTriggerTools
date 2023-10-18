@@ -86,16 +86,16 @@ for input_id in range(n_inputs-n_input3,n_inputs): #5-9
 # for input_id in range(n_input1): #0-2
 #     # bins, x_scales, divide_by_bw = CreateBins(var)
 #     # hist_models = ROOT.RDF.TH1DModel(var, var, len(bins) - 1, array('d', bins))
-    
+
 # for input_id in range(n_input1,n_inputs-n_input3): #2-5
 #     # bins, x_scales, divide_by_bw = CreateBins(var)
 #     # hist_models = ROOT.RDF.TH1DModel(var, var, len(bins) - 1, array('d', bins))
-    
+
 
 # for input_id in range(n_inputs-n_input3,n_inputs): #5-9
 #     # bins, x_scales, divide_by_bw = CreateBins(var)
 #     # hist_models = ROOT.RDF.TH1DModel(var, var, len(bins) - 1, array('d', bins))
-    
+
 
 ROOT.gStyle.SetOptStat(0); ROOT.gStyle.SetTextFont(42)
 c = ROOT.TCanvas("c", "", 800, 700)
@@ -117,11 +117,11 @@ for var in args.vars:
     leg.SetTextSize(0.025)
     leg.SetShadowColor(0)
     leg.SetBorderSize(0)
-    
-    
-    
-    
-    
+
+
+
+
+
     #for var in args.vars:
     graphs = {}
     icolor = [1,4,2]
@@ -136,14 +136,14 @@ for var in args.vars:
         graphs[input_id].SetMarkerSize(1.5)
         ic = ic + 1
         #imaker = imaker + 1
-    
+
         legname = ["Run 2022","Run 2023","Simulation"]
         leg.AddEntry(graphs[input_id],legname[ileg])
         print('Drawing {}'.format(legname[ileg]))
         mg.Add(graphs[input_id])
         ileg = ileg+1
 
-        
+
     mg.GetYaxis().SetRangeUser(0,1)
     mg.GetYaxis().SetNdivisions(5)
     mg.GetXaxis().SetLabelSize(0.04)
@@ -158,15 +158,17 @@ for var in args.vars:
     if(var == "tau_pt"):
         label.SetTextSize(0.0414815);label.DrawLatex(0.67,0.0192593, "Offline p_{T}^{#tau} [GeV]")
         label.SetTextSize(0.040); label.DrawLatex(0.100, 0.920, "#bf{CMS} #it{Preliminary}")
-        
+        label.SetTextSize(0.040); label.DrawLatex(0.75, 0.912593, "13.6 TeV")
     elif(var== "npu" or var == "npv"):
         label.SetTextSize(0.0414815);label.DrawLatex(0.197995,0.0122888, "number of offline reconstructed primary vertices")
         label.SetTextSize(0.040); label.DrawLatex(0.100, 0.920, "#bf{CMS} #it{Preliminary}")
+        label.SetTextSize(0.040); label.DrawLatex(0.75, 0.912593, "13.6 TeV")
     else:
         label.SetTextSize(0.0414815);label.DrawLatex(0.67,0.0192593, "Offline #eta^{#tau}")
         label.SetTextSize(0.040); label.DrawLatex(0.100, 0.920, "#bf{CMS} #it{Preliminary}")
+        label.SetTextSize(0.040); label.DrawLatex(0.75, 0.912593, "13.6 TeV")
         #label.SetTextSize(0.030); label.DrawLatex(0.63, 0.912593, "34.3 fb^{-1} (13.6 TeV, 2022)")
-        
+
     if args.channel == 'ditau':
         label.DrawLatex(0.358396,0.434074, "#bf{Double-#tau_{h} trigger performance}")
     elif args.channel == 'mutau':
@@ -193,6 +195,6 @@ for var in args.vars:
     c.SaveAs('./DPplots/{}'.format(plot_pdf_name))
     c.SaveAs('./DPplots/{}'.format(plot_png_name))
     c.SaveAs('./DPplots/{}'.format(cfg_name))
-    
+
     print('TurnOn is created')
-    
+
