@@ -37,7 +37,7 @@ ROOT.gROOT.SetBatch(True)
 ROOT.TH1.SetDefaultSumw2()
 RootPlotting.ApplyDefaultGlobalStyle()
 
-trigger_pattern = {"ditau":["HLT_IsoMu24_eta2p1_MediumDeepTauPFTauHPS35_L2NN_eta2p1_CrossL1_v","HLT_IsoMu24_eta2p1_MediumDeepTauPFTauHPS35_L2NN_eta2p1_CrossL1_v","HLT_IsoMu24_eta2p1_MediumDeepTauPFTauHPS35_L2NN_eta2p1_CrossL1_v","HLT_IsoMu24_eta2p1_MediumChargedIsoPFTauHPS35_Trk1_eta2p1_Reg_CrossL1_v"],"mutau":["HLT_IsoMu20_eta2p1_LooseDeepTauPFTauHPS27_eta2p1_CrossL1_v","HLT_IsoMu20_eta2p1_LooseDeepTauPFTauHPS27_eta2p1_CrossL1_v","HLT_IsoMu20_eta2p1_LooseDeepTauPFTauHPS27_eta2p1_CrossL1_v","HLT_IsoMu20_eta2p1_LooseChargedIsoPFTauHPS27_eta2p1_CrossL1_v"],"etau":["HLT_IsoMu20_eta2p1_LooseDeepTauPFTauHPS27_eta2p1_CrossL1_v","HLT_IsoMu20_eta2p1_LooseDeepTauPFTauHPS27_eta2p1_CrossL1_v","HLT_IsoMu20_eta2p1_LooseDeepTauPFTauHPS27_eta2p1_CrossL1_v","HLT_IsoMu20_eta2p1_LooseChargedIsoPFTauHPS27_eta2p1_CrossL1_v"],"ditaujet":"HLT_IsoMu24_eta2p1_MediumDeepTauPFTauHPS30_L2NN_eta2p1_CrossL1_v","VBFditau_hi":"HLT_IsoMu24_eta2p1_MediumDeepTauPFTauHPS45_L2NN_eta2p1_CrossL1_v","VBFditau_lo":"HLT_IsoMu24_eta2p1_MediumDeepTauPFTauHPS20_eta2p1_SingleL1_v","single_tau":"HLT_IsoMu24_eta2p1_LooseDeepTauPFTauHPS180_eta2p1_v"}
+trigger_pattern = {"ditau":["HLT_IsoMu24_eta2p1_MediumDeepTauPFTauHPS35_L2NN_eta2p1_CrossL1_v","HLT_IsoMu24_eta2p1_MediumDeepTauPFTauHPS35_L2NN_eta2p1_CrossL1_v","HLT_IsoMu24_eta2p1_MediumDeepTauPFTauHPS35_L2NN_eta2p1_CrossL1_v","HLT_IsoMu24_eta2p1_MediumChargedIsoPFTauHPS35_Trk1_eta2p1_Reg_CrossL1_v"],"mutau":["HLT_IsoMu20_eta2p1_LooseDeepTauPFTauHPS27_eta2p1_CrossL1_v","HLT_IsoMu20_eta2p1_LooseDeepTauPFTauHPS27_eta2p1_CrossL1_v","HLT_IsoMu20_eta2p1_LooseDeepTauPFTauHPS27_eta2p1_CrossL1_v","HLT_IsoMu20_eta2p1_LooseChargedIsoPFTauHPS27_eta2p1_CrossL1_v"],"etau":["HLT_IsoMu20_eta2p1_LooseDeepTauPFTauHPS27_eta2p1_CrossL1_v","HLT_IsoMu20_eta2p1_LooseDeepTauPFTauHPS27_eta2p1_CrossL1_v","HLT_IsoMu20_eta2p1_LooseDeepTauPFTauHPS27_eta2p1_CrossL1_v","HLT_IsoMu20_eta2p1_LooseChargedIsoPFTauHPS27_eta2p1_CrossL1_v"],"ditaujet":"HLT_IsoMu24_eta2p1_MediumDeepTauPFTauHPS30_L2NN_eta2p1_CrossL1_v","VBFditau_hi":"HLT_IsoMu24_eta2p1_MediumDeepTauPFTauHPS45_L2NN_eta2p1_CrossL1_v","VBFditau_lo":"HLT_IsoMu24_eta2p1_MediumDeepTauPFTauHPS20_eta2p1_SingleL1_v","single_tau":["HLT_IsoMu24_eta2p1_LooseDeepTauPFTauHPS180_eta2p1_v","HLT_IsoMu24_eta2p1_LooseDeepTauPFTauHPS180_eta2p1_v","HLT_IsoMu24_eta2p1_LooseDeepTauPFTauHPS180_eta2p1_v"]}
 selection_id = ParseEnum(TauSelection, "DeepTau")
 
 n_input1 =len(args.input_run2022) #2
@@ -169,11 +169,17 @@ for var in args.vars:
         label.DrawLatex(0.358396,0.434074, "#bf{Double-#tau_{h} trigger performance}")
     elif args.channel == 'mutau':
         label.DrawLatex(0.358396,0.434074, "#bf{#mu#tau_{h} trigger performance}")
-    else:
+    elif args.channel == 'etau':
         label.DrawLatex(0.358396,0.434074, "#bf{e#tau_{h} trigger performance}")
-    if var == "tau_eta" or var == 'npv':
+    elif args.channel == 'single_tau':
+        label.DrawLatex(0.201754,0.015361, "Offline tauID applied at Medium WP")
+    else:
+        label.DrawLatex(0.358396,0.434074, "#bf{VBF di-#tau_{h} trigger performance}")
+    if var == "tau_eta":
         #print("Medium tauID, #tau_ > {} GeV".format(eta_th[args.channel]))
         label.DrawLatex(0.305764,0.183704, "Offline tauID applied at Medium WP")
+    elif var == "npv":
+        label.DrawLatex(0.358396,0.434074, "#bf{Single-#tau_{h} trigger performance}")
     else:
         label.DrawLatex(0.305764,0.183704, "Offline tauID applied at Medium WP")
     leg.Draw()

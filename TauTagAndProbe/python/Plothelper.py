@@ -16,8 +16,8 @@ def CreateBins(var_name,singleTau=False):
         bins = np.arange(20, 40, step=4)
         #bins = np.append(bins, np.arange(40, 120, step=4))
         high_pt_bins = [ 40,50, 70, 150]
-        # if singleTau:
-        #     high_pt_bins = [ 40,50, 150,300,500]
+        if singleTau:
+            high_pt_bins = [50,70,90,120,150,200,250,500]
         bins = np.append(bins,high_pt_bins)
         return bins,False,False
     elif var_name in [ 'jet_pt']:
@@ -29,7 +29,7 @@ def CreateBins(var_name,singleTau=False):
     elif var_name in [ 'tau_eta', 'tau_gen_vis_eta' ]:
         return np.linspace(-2.3, 2.3, 7), False, False
     elif var_name in [ 'npu', 'npv' ]:
-        return np.linspace(0, 80, 20), False, False
+        return np.linspace(0, 80, 6), False, False
     raise RuntimeError("Can't find binning for \"{}\"".format(var_name))
 
 def CreateHistograms(input_file, selection_id, hlt_paths, vars, output_file,ch):
@@ -40,7 +40,8 @@ def CreateHistograms(input_file, selection_id, hlt_paths, vars, output_file,ch):
     elif ch == "etau":
         df = df.Filter('(tau_sel & {}) != 0  && muon_pt > 27 && muon_iso < 0.1 && muon_mt < 30 && tau_decayMode != 5 && tau_decayMode != 6 && abs(tau_eta) < 2.3 && tau_pt > 20 && vis_mass > 40 && vis_mass < 80'.format(selection_id))
     elif ch == "single_tau":
-        df = df.Filter('(tau_sel & {}) != 0  && muon_pt > 27 && muon_iso < 0.1 && muon_mt < 30 && tau_decayMode != 5 && tau_decayMode != 6 && abs(tau_eta) < 2.3 && tau_pt > 20 && vis_mass > 40 && vis_mass < 80'.format(selection_id))
+        #df = df.Filter('(tau_sel & {}) != 0  && muon_pt > 27 && muon_iso < 0.1 && muon_mt < 30 && tau_decayMode != 5 && tau_decayMode != 6 && abs(tau_eta) < 2.3 && tau_pt > 20 && vis_mass > 40 && vis_mass < 80'.format(selection_id))
+        df = df.Filter('(tau_sel & {}) != 0'.format(selection_id))
     elif ch == "ditaujet":
         df = df.Filter('(tau_sel & {}) != 0 && muon_pt > 27 && muon_iso < 0.1 && muon_mt < 30 && tau_decayMode != 5 && tau_decayMode != 6 && abs(tau_eta) < 2.3 && tau_pt > 20 && vis_mass > 40 && vis_mass < 80'.format(selection_id))
     elif ch == "vbf_low":
@@ -71,7 +72,7 @@ def CreateHistograms(input_file, selection_id, hlt_paths, vars, output_file,ch):
         if ch == 'vbf_hi':
             hist_pass[var]  = df.Filter('(hlt_acceptAndMatch & {}) != 0 && l1Tau_pt >= 45 && l1Tau_hwIso > 0'.format(match_mask)).Histo1D(hist_model, var)
         elif ch == 'etau' or ch == 'ditaujet':
-            hist_pass[var]  = df.Filter('(hlt_acceptAndMatch & {}) != 0 && l1Tau_hwIso > 0'.format(match_mask)).Histo1D(hist_model, var)# && l1Tau_hwIso > 0
+            hist_pass[var]  = df.Filter('(hlt_acceptAndMatch & {}) != 0 && l1Tau_hwIso > 0 && l1Tau_pt >= 26'.format(match_mask)).Histo1D(hist_model, var)# && l1Tau_hwIso > 0
         else:
             hist_pass[var]  = df.Filter('(hlt_acceptAndMatch & {}) != 0'.format(match_mask)) \
                     .Histo1D(hist_model, var)
@@ -88,7 +89,8 @@ def CreateMCHistograms(input_file, selection_id, hlt_paths, vars, output_file,ch
     elif ch == "etau":
         df = df.Filter('(tau_sel & {}) != 0  && muon_pt > 27 && muon_iso < 0.1 && muon_mt < 30 && tau_decayMode != 5 && tau_decayMode != 6 && abs(tau_eta) < 2.3 && tau_pt > 20 && vis_mass > 40 && vis_mass < 80'.format(selection_id))
     elif ch == "single_tau":
-        df = df.Filter('(tau_sel & {}) != 0  && muon_pt > 27 && muon_iso < 0.1 && muon_mt < 30 && tau_decayMode != 5 && tau_decayMode != 6 && abs(tau_eta) < 2.3 && tau_pt > 20 && vis_mass > 40 && vis_mass < 80'.format(selection_id))
+        #df = df.Filter('(tau_sel & {}) != 0  && muon_pt > 27 && muon_iso < 0.1 && muon_mt < 30 && tau_decayMode != 5 && tau_decayMode != 6 && abs(tau_eta) < 2.3 && tau_pt > 20 && vis_mass > 40 && vis_mass < 80'.format(selection_id))
+        df = df.Filter('(tau_sel & {}) != 0'.format(selection_id))
     elif ch == "ditaujet":
         df = df.Filter('(tau_sel & {}) != 0 && muon_pt > 27 && muon_iso < 0.1 && muon_mt < 30 && tau_decayMode != 5 && tau_decayMode != 6 && abs(tau_eta) < 2.3 && tau_pt > 20 && vis_mass > 40 && vis_mass < 80'.format(selection_id))
     elif ch == "vbf_low":
@@ -120,7 +122,7 @@ def CreateMCHistograms(input_file, selection_id, hlt_paths, vars, output_file,ch
         if ch == 'vbf_hi':
             hist_pass[var]  = df.Filter('(hlt_acceptAndMatch & {}) != 0 && l1Tau_pt >= 45 && l1Tau_hwIso > 0'.format(match_mask)).Histo1D(hist_model, var,"weight")
         elif ch == 'etau' or ch == 'ditaujet':
-            hist_pass[var]  = df.Filter('(hlt_acceptAndMatch & {}) != 0 && l1Tau_hwIso > 0'.format(match_mask)).Histo1D(hist_model, var,"weight")# && l1Tau_hwIso > 0
+            hist_pass[var]  = df.Filter('(hlt_acceptAndMatch & {}) != 0 && l1Tau_hwIso > 0 && l1Tau_pt >= 26'.format(match_mask)).Histo1D(hist_model, var,"weight")# && l1Tau_hwIso > 0
         else:
             hist_pass[var]  = df.Filter('(hlt_acceptAndMatch & {}) != 0'.format(match_mask)) \
                     .Histo1D(hist_model, var,"weight")
